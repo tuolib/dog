@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "246225191424",
+    "firebase_url": "https://flutter-26ef5.firebaseio.com",
+    "project_id": "flutter-26ef5",
+    "storage_bucket": "flutter-26ef5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246225191424:android:8c9c0ba99b7466da264ee5",
+        "android_client_info": {
+          "package_name": "com.u4ursafety.dog"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "246225191424-rjfkgrk8k62kht2nrvcto1sa1lh8je08.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDn9qUaOpZwG_KCNAc3vQdfTCFCb-Rh9vU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "246225191424-rjfkgrk8k62kht2nrvcto1sa1lh8je08.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "246225191424-4rk9d2gtf7vc5vnan12vd1v8fdgng7ua.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "ml.ursafety.dog"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246225191424:android:37ce30cbf4e377bc264ee5",
+        "android_client_info": {
+          "package_name": "ml.ursafety.dog"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "246225191424-rjfkgrk8k62kht2nrvcto1sa1lh8je08.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDn9qUaOpZwG_KCNAc3vQdfTCFCb-Rh9vU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "246225191424-rjfkgrk8k62kht2nrvcto1sa1lh8je08.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "246225191424-4rk9d2gtf7vc5vnan12vd1v8fdgng7ua.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "ml.ursafety.dog"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

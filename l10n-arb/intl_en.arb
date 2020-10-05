@@ -1,0 +1,140 @@
+{
+  "@@locale":"en",
+  "@@last_modified": "2020-06-27T20:43:52.703264",
+  "title": "Flutter APP",
+  "@title": {
+    "description": "Title for the Demo application",
+    "type": "text",
+    "placeholders": {}
+  },
+  "remainingEmailsMessage": "{howMany,plural, =0{There are no emails left}=1{There is {howMany} email left}other{There are {howMany} emails left}}",
+  "@remainingEmailsMessage": {
+    "description": "How many emails remain after archiving.",
+    "type": "text",
+    "placeholders": {
+      "howMany": {
+        "example": 42
+      }
+    }
+  },
+  "noDescription": "noDescription",
+  "@noDescription": {
+    "description": "noDescription",
+    "type": "text",
+    "placeholders": {}
+  },
+  "home": "Home",
+  "@home": {
+    "description": "Home",
+    "type": "text",
+    "placeholders": {}
+  },
+  "login": "Login",
+  "@login": {
+    "description": "Login",
+    "type": "text",
+    "placeholders": {}
+  },
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme",
+    "type": "text",
+    "placeholders": {}
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language",
+    "type": "text",
+    "placeholders": {}
+  },
+  "logout": "Log out",
+  "@logout": {
+    "description": "Log out",
+    "type": "text",
+    "placeholders": {}
+  },
+  "logoutTip": "Log out tip",
+  "@logoutTip": {
+    "description": "Log out tip",
+    "type": "text",
+    "placeholders": {}
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "yes": "Yes",
+  "@yes": {
+    "description": "Yes",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userName": "User name",
+  "@userName": {
+    "description": "User name",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userNameOrEmail": "User name or email",
+  "@userNameOrEmail": {
+    "description": "User name or email",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userNameRequired": "User name required",
+  "@userNameRequired": {
+    "description": "User name required",
+    "type": "text",
+    "placeholders": {}
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password",
+    "type": "text",
+    "placeholders": {}
+  },
+  "passwordRequired": "Password required",
+  "@passwordRequired": {
+    "description": "Password required",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userNameOrPasswordWrong": "User name or password wrong",
+  "@userNameOrPasswordWrong": {
+    "description": "User name or password wrong",
+    "type": "text",
+    "placeholders": {}
+  },
+  "auto": "Auto",
+  "@auto": {
+    "description": "Auto",
+    "type": "text",
+    "placeholders": {}
+  },
+  "message": "Message",
+  "@message": {
+    "description": "Message",
+    "type": "text",
+    "placeholders": {}
+  },
+  "personal": "Personal",
+  "@personal": {
+    "description": "Personal",
+    "type": "text",
+    "placeholders": {}
+  },
+  "discovery": "Discovery",
+  "@discovery": {
+    "description": "Discovery",
+    "type": "text",
+    "placeholders": {}
+  },
+  "contacts": "Contacts",
+  "@contacts": {
+    "description": "Contacts",
+    "type": "text",
+    "placeholders": {}
+  }
+}

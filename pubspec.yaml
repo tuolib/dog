@@ -28,16 +28,91 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3
+  shared_preferences: ^0.5.7+3
+  shared_preferences_macos:
+  shared_preferences_web:
+  dio: ^3.0.9
+  intl: ^0.16.1
+  json_annotation: ^2.2.0
+  flutter_localizations:
+    sdk: flutter
+  #  provider: ^3.0.0+1
+  provider: ^4.1.0
+  cached_network_image: ^2.2.0+1
+  fluttertoast: ^4.0.1
+  english_words: ^3.1.3
+  socket_io_client: ^0.9.11
+  path: ^1.6.4
+  sqflite: ^1.3.1
+  photo_view: ^0.9.2
+  path_provider: ^1.6.11
+  path_provider_macos: ^0.0.1
+  path_provider_linux: ^0.0.1+2
+  permission_handler: ^5.0.1+1
+  open_file: ^3.0.1
+  file_picker: ^1.12.0
+  #  image_picker: ^0.6.7+2
+  image_picker: ^0.6.7+4
+  chewie: ^0.9.10
+  video_thumbnail: ^0.2.2
+  mime: ^0.9.6+3
+  audioplayers: ^0.15.1
+  #  audio_recorder: ^1.0.2
+  audio_recorder:
+    git: https://github.com/tuolib/audio_recorder.git
+  flutter_launcher_icons: ^0.7.5
+  badges: ^1.1.1
+  modal_bottom_sheet: ^0.2.0
+  alphabet_list_scroll_view: ^1.0.6
+  image_cropper: ^1.3.1
+  animations: ^1.1.1
+  flutter_sqflite_manager: ^0.1.2
+  secure_application: ^3.4.1
+  logger: ^0.9.4
+  flutter_sticky_header: ^0.4.5
+  sliver_fab: ^1.0.0
+  flutter_slidable: ^0.5.5
+  flutter_luban: ^0.1.11
+  time_machine: ^0.9.13
+  infinite_listview: ^1.0.1+1
+  assorted_layout_widgets: ^1.3.2
+  after_layout: ^1.0.7+2
+  cupertino_back_gesture: ^0.0.3
+  swipedetector: ^1.2.0
+  flutter_webrtc: ^0.3.3
+  #  flutter_callkeep: ^0.1.8
+  #  flutter_callkeep:
+  #    git: https://github.com/tuolib/flutter_callkeep.git
+  #  firebase_messaging:
+  #    git: https://github.com/tuolib/firebase_messaging.git
+  #  bringtoforeground: ^0.0.2
+  #  flutter_call_kit: ^0.0.2
+  #  flutter_voip_push_notification: ^0.0.3
+  #  plain_notification_token: ^0.0.1
+  device_info: ^0.4.2+8
+  #  flutter_apns: ^1.1.0
+  #  firebase_core: ^0.5.0
+  #  firebase_messaging: ^7.0.0
+  flutter_local_notifications: ^1.4.4+4
   flutter_voip_push_notification: ^0.0.3
+  #  flutter_callkeep: ^0.1.8
+  #  flutter_call_kit: ^0.0.2
   flutter_call_kit:
     git: https://github.com/peerwaya/flutter_call_kit.git
   uuid: ^2.0.2
-#  callkeep: ^0.1.1
+  callkeep: ^0.1.1
+  gallery_saver: ^2.0.1
+  multi_image_picker: ^4.7.14
   flutter_apns: ^1.3.1
+  flutter_app_badger: ^1.1.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  json_model: ^0.0.2
+  build_runner: ^1.0.0
+  json_serializable: ^2.0.0
+  intl_translation: ^0.17.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -49,6 +124,16 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - imgs/avatar-default.jpg
+    - imgs/app_logo.png
+    - assets/
+    - packages/time_machine/data/cultures/cultures.bin
+    - packages/time_machine/data/tzdb/tzdb.bin
+  fonts:
+    - family: defineIcon  #指定一个字体名
+      fonts:
+        - asset: fonts/iconfont.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -80,3 +165,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_icons:
+  ios: true
+  android: true
+  image_path_ios: "imgs/app_logo.png"
+  image_path_android: "imgs/app_logo.png"

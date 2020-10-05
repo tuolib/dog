@@ -1,121 +1,413 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'push_notifications_manager.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:time_machine/time_machine.dart';
+import 'package:time_machine/time_machine_text_patterns.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:cupertino_back_gesture/cupertino_back_gesture.dart';
+
+// import 'package:flutter_callkeep/flutter_callkeep.dart';
+// import 'package:callkeep/callkeep.dart';
 
 
+import 'index.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+
+  // Sets up timezone and culture information
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // await CallKeep.setup();
+
+//  var newHash;
+//  var pathDir = await Git().getSaveDirectory();
+//  var newHashPath = pathDir.path;
+//
+//  var n1 = newHashPath.split('/');
+//  for(var i = 0; i < n1.length; i++) {
+//    if (n1[i] == 'Application') {
+//      newHash = n1[i + 1];
+//      break;
+//    }
+//  }
+  final dbHelper = DatabaseHelper.instance;
+  await dbHelper.fileUpdateLocalUrl();
+  await Global.init().then((e) => runApp(MyApp()));
+  if (Global.profile.token != null) {
+    socketIoItem.initCommunication();
+  }
+
+//  if (didReceiveLocalNotificationSubject != null) {
+//    didReceiveLocalNotificationSubject.close();
+//  }
+//  if (selectNotificationSubject != null) {
+//    selectNotificationSubject.close();
+//  }
+//
+//  notificationAppLaunchDetails =
+//      await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+
+ var initializationSettingsAndroid = AndroidInitializationSettings('app_logo');
+ // Note: permissions aren't requested here just to demonstrate that can be done later using the `requestPermissions()` method
+ // of the `IOSFlutterLocalNotificationsPlugin` class
+ var initializationSettingsIOS = IOSInitializationSettings(
+     requestAlertPermission: false,
+     requestBadgePermission: false,
+     requestSoundPermission: false,
+     onDidReceiveLocalNotification:
+         (int id, String title, String body, String payload) async {
+       didReceiveLocalNotificationSubject.add(ReceivedNotification(
+           id: id, title: title, body: body, payload: payload));
+     });
+ var initializationSettings = InitializationSettings(
+     initializationSettingsAndroid, initializationSettingsIOS);
+ await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+     onSelectNotification: (String payload) async {
+   if (payload != null) {
+     debugPrint('notification payload: ' + payload);
+   }
+   selectNotificationSubject.add(payload);
+ });
+ NotificationHelper().requestIOSPermissions();
+ NotificationHelper().configureSelectNotificationSubject();
+
+  await TimeMachine.initialize({
+    'rootBundle': rootBundle,
+  });
+  // logger.d('Hello, ${DateTimeZone.local} from the Dart Time Machine!\n');
+//1598000220688
+  var t = DateTime.fromMillisecondsSinceEpoch(1598001088836, isUtc: true);
+  // logger.d('$t');
+//  DateTime.now().toUtc().toIso8601String()
+
+//  var tzdb = await DateTimeZoneProviders.tzdb;
+//  var paris = await tzdb["Europe/Paris"];
+//
+//  var now = Instant.now();
+//
+//  logger.d('Basic');
+//  logger.d('UTC Time: $now');
+//  logger.d('Local Time: ${now.inLocalZone()}');
+//  logger.d('Paris Time: ${now.inZone(paris)}\n');
+//
+//  logger.d('Formatted');
+//  logger.d('UTC Time: ${now.toString('dddd yyyy-MM-dd HH:mm')}');
+//  logger.d('Local Time: ${now.inLocalZone().toString('dddd yyyy-MM-dd HH:mm')}\n');
+//
+//  var french = await Cultures.getCulture('fr-FR');
+//  logger.d('Formatted and French ($french)');
+//  logger.d('UTC Time: ${now.toString('dddd yyyy-MM-dd HH:mm', french)}');
+//  logger.d('Local Time: ${now.inLocalZone().toString('dddd yyyy-MM-dd HH:mm', french)}\n');
+//
+//  logger.d('Parse French Formatted ZonedDateTime');
+//
+//  // without the 'z' parsing will be forced to interpret the timezone as UTC
+//  var localText = now
+//      .inLocalZone()
+//      .toString('dddd yyyy-MM-dd HH:mm z', french);
+//
+//  var localClone = ZonedDateTimePattern
+//      .createWithCulture('dddd yyyy-MM-dd HH:mm z', french)
+//      .parse(localText);
+//
+//  logger.d(localClone.value);
+//  LifecycleEventHandler()
+
+ // if(Platform.isAndroid) {
+ //   PushNotificationsManager().init();
+ // }
   PushNotificationsManager().init();
+
+
 }
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+    return MultiProvider(
+      providers: [
+//        ChangeNotifierProvider.value(value: ThemeModel()),
+//        ChangeNotifierProvider.value(value: UserModel()),
+//        ChangeNotifierProvider.value(value: LocaleModel()),
+//        ChangeNotifierProvider.value(value: ChatListModel()),
+        ChangeNotifierProvider(
+          create: (_) => ThemeModel(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => UserModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => LocaleModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ChatListModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ConversationListModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ChatInfoModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ConnectSocketModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ContactListModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AddPeopleModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => GroupMemberModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => FloatButtonModel(),
+        ),
+
+      ],
+      child: Consumer2<ThemeModel, LocaleModel>(
+        builder: (BuildContext context, themeModel, localeModel, Widget child) {
+//          return BackGestureWidthTheme(
+////            backGestureWidth: BackGestureWidth.fraction(1 / 2),
+//            backGestureWidth: BackGestureWidth.fixed(200),
+//            child: ,
+//          );
+          return MaterialApp(
+            theme: ThemeData(
+//              pageTransitionsTheme: PageTransitionsTheme(
+//                  builders: {
+//                    TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+//                    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+//                    // for Android - default page transition
+////                      TargetPlatform.android: CupertinoPageTransitionsBuilderCustomBackGestureWidth(),
+////                      // for iOS - one which considers ancestor BackGestureWidthTheme
+////                      TargetPlatform.iOS: CupertinoPageTransitionsBuilderCustomBackGestureWidth(),
+//                  }
+//              ),
+              primarySwatch: themeModel.theme,
+//              accentColor: Colors.pink,
+            ),
+            onGenerateTitle: (context) {
+              return GmLocalizations.of(context).title;
+            },
+            navigatorObservers: [GetNavigationObserver()],
+//            home: HomeRoute(),
+            //应用主页
+            locale: localeModel.getLocale(),
+            //我们只支持美国英语和中文简体
+            supportedLocales: [
+              const Locale('en', 'US'), // 美国英语
+              const Locale('zh', 'CN'), // 中文简体
+              //其它Locales
+            ],
+            localizationsDelegates: [
+              // 本地化的代理类
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GmLocalizationsDelegate()
+            ],
+            localeResolutionCallback:
+                (Locale _locale, Iterable<Locale> supportedLocales) {
+              if (localeModel.getLocale() != null) {
+                //如果已经选定语言，则不跟随系统
+                return localeModel.getLocale();
+              } else {
+                Locale locale;
+                //APP语言跟随系统语言，如果系统语言不是中文简体或美国英语，
+                //则默认使用美国英语
+                if (supportedLocales.contains(_locale)) {
+                  locale = _locale;
+                } else {
+                  locale = Locale('en', 'US');
+                }
+                return locale;
+              }
+            },
+            // 注册命名路由表
+//            routes: <String, WidgetBuilder>{
+//              "login": (context) => LoginRoute(),
+//              "themes": (context) => ThemeChangeRoute(),
+//              "language": (context) => LanguageRoute(),
+//            },
+//            判断是否登录
+            initialRoute: "main",
+            navigatorKey: navigatorKey,
+            onGenerateRoute: (RouteSettings settings) {
+              return MaterialPageRoute(
+                  settings: settings,
+                  builder: (context) {
+                    String routeName = settings.name;
+                    // 如果访问的路由页需要登录，但当前未登录，则直接返回登录页路由，
+                    // 引导用户登录；其它情况则正常打开路由。
+
+                    UserModel userModel = Provider.of<UserModel>(context);
+                    currentPage = routeName;
+                    var goPage;
+                    if (!userModel.isLogin) {
+                      if (routeName == 'register') {
+                        return RegisterRoute();
+                      }
+                      return LoginRoute();
+//                      return LoginRoute();
+                    } else {
+                      if (routeName == 'themes') {
+                        return ThemeChangeRoute();
+//                        return ThemeChangeRoute();
+                      } else if (routeName == 'language') {
+                        return LanguageRoute();
+//                        return LanguageRoute();
+                      } else if (routeName == 'conversation') {
+//                        不能这样做:
+//                        return ChangeNotifierProvider(
+//                          create: (_) => ConversationListModel(),
+//                          child: Conversation(),
+//                        );
+
+//                      这样: 问题见 https://github.com/rrousselGit/provider/issues/168
+//                        return ChangeNotifierProvider.value(
+//                          value: ConversationListModel(),
+//                          child: Conversation(),
+//                        );
+//                        return ChangeNotifierProvider.value(
+//                          value: ConversationListModel(),
+//                          child: Conversation(),
+//                        );
+                        Map<String, dynamic> arg = settings.arguments;
+                        return Conversation(
+//                          groupId: arg['groupId'],
+//                          groupType: arg['groupType'],
+//                          groupName: arg['groupName'],
+//                          groupAvatar: arg['groupAvatar'],
+//                          isOnline: arg['isOnline'],
+//                          newChatNumber: arg['newChatNumber'],
+//                          content: arg['content'],
+//                          createdDate: arg['createdDate'],
+//                          groupMembers: arg['groupMembers'],
+                        );
+                      } else if (routeName == 'photoView') {
+                        Map<String, dynamic> arg =
+                        json.decode(settings.arguments);
+                        if (arg['type'] == 'local') {
+                          return PhotoViewSimpleScreen(
+                            imageProvider:
+                            FileImage(File("${arg['imageProvider']}")),
+                            heroTag: 'PhotoView',
+                            fileId: arg['fileId'],
+                          );
+                        } else {
+                          return PhotoViewSimpleScreen(
+                            imageProvider: NetworkImage(arg['imageProvider']),
+                            heroTag: 'PhotoView',
+                            fileId: arg['fileId'],
+                          );
+                        }
+//                        return PhotoViewSimpleScreen(
+//                          imageProvider:NetworkImage(arg['imageProvider']),
+//                          heroTag: arg['heroTag'],
+//                        );
+                      } else if (routeName == 'videoPlay') {
+                        Map<String, dynamic> arg =
+                        json.decode(settings.arguments);
+                        var videoUrl = arg['videoUrl'];
+                        return VideoPlayRoute(videoUrl);
+//                        return PhotoViewSimpleScreen(
+//                          imageProvider:NetworkImage(arg['imageProvider']),
+//                          heroTag: arg['heroTag'],
+//                        );
+                      } else if (routeName == 'testSql') {
+                        return TestSqlRoute();
+                      } else if (routeName == 'editProfile') {
+                        return EditProfileRoute();
+                      } else if (routeName == 'editUsername') {
+                        return EditUsernameRoute();
+                      } else if (routeName == 'addContact') {
+                        return AddContactRoute();
+                      } else if (routeName == 'newMessage') {
+                        return NewMessagePage();
+                      } else if (routeName == 'newGroup') {
+                        return NewGroupPage();
+                      } else if (routeName == 'newGroupInfo') {
+                        return NewGroupInfoPage();
+                      } else if (routeName == 'editGroupInfo') {
+                        Map<String, dynamic> arg = settings.arguments;
+                        return EditGroupInfoRoute(
+                          groupId: arg['groupId'],
+                          firstName: arg['firstName'],
+                          lastName: arg['lastName'],
+                          colorId: arg['colorId'],
+                          avatarUrl: arg['avatarUrl'],
+                          avatarLocal: arg['avatarLocal'],
+                          avatar: arg['avatar'],
+                          description: arg['description'],
+                        );
+                      } else if (routeName == 'showGroupInfo') {
+                        Map<String, dynamic> arg = settings.arguments;
+                        var personFromGroup = false;
+                        if (arg['personFromGroup'] == true) {
+                          personFromGroup = true;
+                        }
+                        return ShowGroupInfoRoute(
+                          showBigImage: arg['showBigImage'],
+                          personFromGroup: personFromGroup,
+                        );
+                      } else if (routeName == 'addMember') {
+                        return AddMemberRoute();
+                      } else if (routeName == 'editContact') {
+                        Map<String, dynamic> arg = settings.arguments;
+                        return EditContactRoute(
+                            firstName: arg['firstName'],
+                            lastName: arg['lastName'],
+                            colorId: arg['colorId'],
+                            avatarUrl: arg['avatarUrl'],
+                            avatarLocal: arg['avatarLocal'],
+                            userId: arg['userId'],
+                            contactSqlId: arg['contactSqlId'],
+                            isAdd: arg['isAdd'],
+                            username: arg['username']);
+                      } else if (routeName == 'callVideo') {
+                        Map<String, dynamic> arg = settings.arguments;
+                        return CallVideoTest(
+                          invite: arg['invite'] == null ? false : true,
+                        );
+                      } else {
+                        return MainScreen();
+
+//                        return ChangeNotifierProvider.value(
+//                          value: ChatListModel(),
+//                          child: HomeRoute(),
+//                        );
+                      }
+//                      return HomeRoute();
+                    }
+//                    return goPage;
+                  });
+            },
+          );
+        },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+}
+class GetNavigationObserver extends NavigatorObserver {
+  @override
+  void didStartUserGesture(Route route, Route previousRoute) {
+//    logger.d('back page');
+    backingRoute = true;
+    super.didStartUserGesture(route, previousRoute);
+  }
+
+  @override
+  void didStopUserGesture() {
+//    logger.d('back page end');
+    backingRoute = false;
+  }
+
 }

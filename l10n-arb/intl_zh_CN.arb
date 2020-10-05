@@ -1,0 +1,140 @@
+{
+  "@@last_modified": "2018-12-10T15:46:20.897228",
+  "@@locale":"zh_CN",
+  "title": "Flutter应用",
+  "@title": {
+    "description": "Title for the Demo application",
+    "type": "text",
+    "placeholders": {}
+  },
+  "remainingEmailsMessage": "{howMany,plural, =0{没有未读邮件}=1{有{howMany}封未读邮件}other{有{howMany}封未读邮件}}",
+  "@remainingEmailsMessage": {
+    "description": "How many emails remain after archiving.",
+    "type": "text",
+    "placeholders": {
+      "howMany": {
+        "example": 42
+      }
+    }
+  },
+  "noDescription": "没有描述",
+  "@noDescription": {
+    "description": "noDescription",
+    "type": "text",
+    "placeholders": {}
+  },
+  "home": "首页",
+  "@home": {
+    "description": "Home",
+    "type": "text",
+    "placeholders": {}
+  },
+  "login": "登录",
+  "@login": {
+    "description": "Login",
+    "type": "text",
+    "placeholders": {}
+  },
+  "theme": "主题",
+  "@theme": {
+    "description": "Theme",
+    "type": "text",
+    "placeholders": {}
+  },
+  "language": "语言",
+  "@language": {
+    "description": "Language",
+    "type": "text",
+    "placeholders": {}
+  },
+  "logout": "退出登录",
+  "@logout": {
+    "description": "Log out",
+    "type": "text",
+    "placeholders": {}
+  },
+  "logoutTip": "退出提示",
+  "@logoutTip": {
+    "description": "Log out tip",
+    "type": "text",
+    "placeholders": {}
+  },
+  "cancel": "取消",
+  "@cancel": {
+    "description": "Cancel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "yes": "确定",
+  "@yes": {
+    "description": "Yes",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userName": "用户名",
+  "@userName": {
+    "description": "User name",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userNameOrEmail": "用户名或邮箱",
+  "@userNameOrEmail": {
+    "description": "User name or email",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userNameRequired": "用户名必填",
+  "@userNameRequired": {
+    "description": "User name required",
+    "type": "text",
+    "placeholders": {}
+  },
+  "password": "密码",
+  "@password": {
+    "description": "Password",
+    "type": "text",
+    "placeholders": {}
+  },
+  "passwordRequired": "密码必填",
+  "@passwordRequired": {
+    "description": "Password required",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userNameOrPasswordWrong": "用户名或者密码错误",
+  "@userNameOrPasswordWrong": {
+    "description": "User name or password wrong",
+    "type": "text",
+    "placeholders": {}
+  },
+  "auto": "自动",
+  "@auto": {
+    "description": "Auto",
+    "type": "text",
+    "placeholders": {}
+  },
+  "contacts": "联系人",
+  "@contacts": {
+    "description": "Contacts",
+    "type": "text",
+    "placeholders": {}
+  },
+  "personal": "我的",
+  "@personal": {
+    "description": "Personal",
+    "type": "text",
+    "placeholders": {}
+  },
+  "message": "消息",
+  "@message": {
+    "description": "Message",
+    "type": "text",
+    "placeholders": {}
+  },
+  "discovery": "发现",
+  "@discovery": {
+    "description": "Discovery",
+    "type": "text",
+    "placeholders": {}
+  }
+}
