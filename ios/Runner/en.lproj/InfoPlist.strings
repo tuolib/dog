@@ -1,0 +1,13 @@
+/* 
+  InfoPlist.strings
+  Runner
+
+  Created by test on 2020/10/5.
+  
+*/
+NSMicrophoneUsageDescription = "microphone";
+NSAppleMusicUsageDescription = "AppleMusic";
+NSCameraUsageDescription = "Camera";
+NSPhotoLibraryUsageDescription = "PhotoLibraryUsage";
+CFBundleDisplayName = "Dog";
+NSSpeechRecognitionUsageDescription = "SpeechRecognition";

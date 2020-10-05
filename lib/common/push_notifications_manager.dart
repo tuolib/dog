@@ -5,12 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_voip_push_notification/flutter_voip_push_notification.dart';
-// import 'package:flutter_callkeep/flutter_callkeep.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_call_kit/flutter_call_kit.dart';
 import 'package:callkeep/callkeep.dart';
 import 'package:flutter_apns/apns.dart';
-import 'package:flutter_app_badger/flutter_app_badger.dart';
+// import 'package:flutter_app_badger/flutter_app_badger.dart';
+// import 'package:flutter_callkeep/flutter_callkeep.dart' as flutterCallKeep;
 
 import '../index.dart';
 
@@ -22,10 +22,10 @@ class Call {
   bool muted = false;
 }
 
-BuildContext mainContext;
+// BuildContext mainContext;
 
 
-final FlutterCallkeep callKeepIn = FlutterCallkeep();
+FlutterCallkeep callKeepIn = FlutterCallkeep();
 Map<String, Call> calls = {};
 String callingUuid = '';
 // List callArr = [];
@@ -54,6 +54,7 @@ class PushNotificationsManager {
     } else {
       configureCallKeep();
     }
+    // android ios 通用
     configureApns();
   }
 
@@ -147,23 +148,21 @@ class PushNotificationsManager {
     });
   }
   Future<void> configureCallKit() async {
-    Future<void> configure() async {
-      callKitIn.configure(
-        IOSOptions("Dog",
-            imageName: 'sim_icon',
-            supportsVideo: false,
-            maximumCallGroups: 1,
-            maximumCallsPerCallGroup: 1),
-        didReceiveStartCallAction: _didReceiveStartCallAction,
-        performAnswerCallAction: _performAnswerCallAction,
-        performEndCallAction: _performEndCallAction,
-        didActivateAudioSession: _didActivateAudioSession,
-        didDisplayIncomingCall: _didDisplayIncomingCall,
-        didPerformSetMutedCallAction: _didPerformSetMutedCallAction,
-        didPerformDTMFAction: _didPerformDTMFAction,
-        didToggleHoldAction: _didToggleHoldAction,
-      );
-    }
+    callKitIn.configure(
+      IOSOptions("Dog",
+          imageName: 'voip_icon',
+          supportsVideo: true,
+          maximumCallGroups: 1,
+          maximumCallsPerCallGroup: 1),
+      didReceiveStartCallAction: _didReceiveStartCallAction,
+      performAnswerCallAction: _performAnswerCallAction,
+      performEndCallAction: _performEndCallAction,
+      didActivateAudioSession: _didActivateAudioSession,
+      didDisplayIncomingCall: _didDisplayIncomingCall,
+      didPerformSetMutedCallAction: _didPerformSetMutedCallAction,
+      didPerformDTMFAction: _didPerformDTMFAction,
+      didToggleHoldAction: _didToggleHoldAction,
+    );
   }
 
   // showLocalNotification(Map<String, dynamic> notification) {
@@ -246,6 +245,11 @@ Future<dynamic> onResume(Map<String, dynamic> payload) {
 Future<dynamic> onMessage(Map<String, dynamic> payload) {
   // handle background notification
   logger.d("onMessage payload: $payload");
+  if (Platform.isAndroid) {
+    if (payload['data']['msgType'] == "voip") {
+      displayIncomingCall('123');
+    }
+  }
   return null;
 }
 
@@ -414,9 +418,9 @@ Future<void> displayIncomingCall(String number) async {
     // callArr.add(Call(number));
     // logger.d(calls);
     logger.d('Display incoming call now');
-    final bool hasPhoneAccount = await callKeepIn.hasPhoneAccount();
+    bool hasPhoneAccount = await callKeepIn.hasPhoneAccount();
     if (!hasPhoneAccount) {
-      await callKeepIn.hasDefaultPhoneAccount(mainContext, <String, dynamic>{
+      await callKeepIn.hasDefaultPhoneAccount(mainScreePage, <String, dynamic>{
         'alertTitle': 'Permissions required',
         'alertDescription':
         'This application needs to access your phone accounts',
@@ -424,10 +428,18 @@ Future<void> displayIncomingCall(String number) async {
         'okButton': 'ok',
       });
     }
+    logger.d('hasPhoneAccount: $hasPhoneAccount');
 
     logger.d('[displayIncomingCall] $callUUID number: $number');
-    callKeepIn.displayIncomingCall(callUUID, number,
+    await callKeepIn.displayIncomingCall(callUUID, number,
         handleType: 'number', hasVideo: true);
+
+    // await flutterCallKeep.CallKeep.askForPermissionsIfNeeded(mainScreePage);
+    // final callUUID = '0783a8e5-8353-4802-9448-c6211109af51';
+    // final number = '+46 70 123 45 67';
+    //
+    // await flutterCallKeep.CallKeep.displayIncomingCall(
+    //     callUUID, number, number, flutterCallKeep.HandleType.number, false);
   }
 }
 
@@ -489,7 +501,7 @@ String get currentCallId {
 
   return currentCallKitId;
 }
-
+//
 // enum HandleType {
 //   generic,
 //   number,

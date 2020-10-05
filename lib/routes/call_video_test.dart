@@ -12,9 +12,6 @@ import '../index.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
-var username = "co35";
-var room = 'GENERAL';
-Socket socketInit2;
 bool hasInvite = false;
 
 class CallVideoTest extends StatefulWidget {

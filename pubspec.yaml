@@ -95,7 +95,11 @@ dependencies:
   #  firebase_messaging: ^7.0.0
   flutter_local_notifications: ^1.4.4+4
   flutter_voip_push_notification: ^0.0.3
-  #  flutter_callkeep: ^0.1.8
+#  flutter_callkeep: ^0.1.8
+#  flutter_callkeep:
+#    git:
+#      url: git://github.com/gopalkrishan123/flutter_callkeep.git
+#      ref: fix/example
   #  flutter_call_kit: ^0.0.2
   flutter_call_kit:
     git: https://github.com/peerwaya/flutter_call_kit.git

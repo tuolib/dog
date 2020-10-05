@@ -24,8 +24,8 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
       case AppLifecycleState.inactive:
         lifecycleState = state;
         print('AppLifecycleState===========================: $state');
-        var activeCall = await callKeepIn.isCallActive(callingUuid);
-        logger.d(activeCall);
+        // var activeCall = await callKeepIn.isCallActive(callingUuid);
+        // logger.d(activeCall);
         break;
       case AppLifecycleState.paused:
         lifecycleState = state;

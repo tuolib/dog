@@ -24,7 +24,9 @@ void main() async {
   // Sets up timezone and culture information
   WidgetsFlutterBinding.ensureInitialized();
 
-  // await CallKeep.setup();
+  // if (Platform.isAndroid) {
+  //   await CallKeep.setup();
+  // }
 
 //  var newHash;
 //  var pathDir = await Git().getSaveDirectory();
