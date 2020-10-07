@@ -27,7 +27,6 @@ typedef void DataChannelMessageCallback(
 typedef void DataChannelCallback(RTCDataChannel dc);
 
 class Signaling {
-
   JsonEncoder _encoder = new JsonEncoder();
   JsonDecoder _decoder = new JsonDecoder();
   String _selfId = randomNumeric(6);
@@ -38,7 +37,9 @@ class Signaling {
   var _peerConnections = new Map<String, RTCPeerConnection>();
   var _dataChannels = new Map<String, RTCDataChannel>();
   var _remoteCandidates = [];
+  var _localCandidates = [];
   var _turnCredential;
+  var _groupId;
 
   MediaStream _localStream;
   List<MediaStream> _remoteStreams;
@@ -113,15 +114,34 @@ class Signaling {
     if (this.onStateChange != null) {
       this.onStateChange(SignalingState.CallStateNew);
     }
-
+    if (isInvite == true) {
+      logger.d('invite emit');
+      SocketIoEmit.callInvite(
+        fromId: Global.profile.user.userId,
+        toId: chatInfoModelSocket.conversationInfo['contactId'],
+        groupId: callGroupId,
+      );
+    } else {
+      logger.d('callCandidateGet');
+      SocketIoEmit.callCandidateGet(
+        fromId: Global.profile.user.userId,
+        // toId: chatInfoModelSocket.conversationInfo['contactId'],
+        groupId: callGroupId,
+      );
+      SocketIoEmit.callDescriptionGet(
+        fromId: Global.profile.user.userId,
+        // toId: chatInfoModelSocket.conversationInfo['contactId'],
+        groupId: callGroupId,
+      );
+    }
     // this.onStateChange(SignalingState.CallStateNew);
-    logger.d('start create peer');
+    // logger.d('start create peer');
     _createPeerConnection(peer_id, media, use_screen).then((pc) {
       _peerConnections[peer_id] = pc;
       if (media == 'data') {
         _createDataChannel(peer_id, pc);
       }
-      logger.d('end create peer');
+      // logger.d('end create peer');
       _createOffer(peer_id, pc, media);
     });
   }
@@ -263,8 +283,12 @@ class Signaling {
     }
   }
 
-  void connect({bool invite}) async {
-    print('connect to ');
+  void connect({
+    bool invite,
+    int groupId = 0,
+  }) async {
+    print('connect to invite: $invite ');
+    _groupId = groupId;
 
     if (_turnCredential == null) {
       try {
@@ -287,23 +311,40 @@ class Signaling {
         };
       } catch (e) {}
     }
-    if (invite == true) {
-      logger.d('invite emit');
-      SocketIoEmit.callInvite(
-        fromId: Global.profile.user.userId,
-        toId: chatInfoModelSocket.conversationInfo['contactId'],
-        groupId: 0,
-      );
-    }
+
     // print('onOpen');
-    this?.onStateChange(SignalingState.ConnectionOpen);
+    // this?.onStateChange(SignalingState.ConnectionOpen);
     // _send('new', {
     //   'name': DeviceInfo.label,
     //   'id': _selfId,
     //   'user_agent': DeviceInfo.userAgent
     // });
 
-    socketInit.on('callMessageOffer', (data) async {
+    socketInit.on('callDescriptionGet', (data) async {
+      logger.d('callDescriptionGet: ' + data);
+
+      var des = await _peerConnections['${Global.profile.user.userId}']
+          .getLocalDescription();
+
+      SocketIoEmit.callOffer(
+        groupId: callGroupId,
+        description: {
+          "type": des.type,
+          "sdp": des.sdp,
+        },
+      );
+    });
+    socketInit.on('callCandidateGet', (data) async {
+      logger.d('callCandidateGet: ' + data);
+      for (var i = 0; i < _localCandidates.length; i++) {
+        SocketIoEmit.callCandidate(
+          groupId: callGroupId,
+          candidate: _localCandidates[i],
+        );
+      }
+      // _peerConnections['${Global.profile.user.userId}'].get();
+    });
+    socketInit.on('callOffer', (data) async {
       logger.d('callMessageOffer data: ' + data);
       JsonDecoder decoder = new JsonDecoder();
       var d = decoder.convert(data)['data'];
@@ -312,7 +353,8 @@ class Signaling {
         "type": "offer",
       });
     });
-    socketInit.on('callMessageAnswer', (data) async {
+
+    socketInit.on('callAnswer', (data) async {
       logger.d('callMessageAnswer data: ' + data);
       JsonDecoder decoder = new JsonDecoder();
       var d = decoder.convert(data)['data'];
@@ -321,7 +363,7 @@ class Signaling {
         "type": "answer",
       });
     });
-    socketInit.on('callMessageBye', (data) async {
+    socketInit.on('callBye', (data) async {
       logger.d('callMessageBye data: ' + data);
       JsonDecoder decoder = new JsonDecoder();
       var d = decoder.convert(data)['data'];
@@ -368,6 +410,7 @@ class Signaling {
     RTCPeerConnection pc = await createPeerConnection(_iceServers, _config);
     if (media != 'data') pc.addStream(_localStream);
     pc.onIceCandidate = (candidate) {
+      _localCandidates.add(candidate);
       // logger.d('onIceCandidate');
       // logger.d(candidate.sdpMlineIndex);
       // logger.d(candidate.sdpMid);
@@ -382,11 +425,23 @@ class Signaling {
       //   },
       //   'session_id': this._sessionId,
       // });
+      logger.d('callGroupId: $callGroupId');
+      SocketIoEmit.callCandidate(
+        groupId: callGroupId,
+        candidate: {
+          'sdpMLineIndex': candidate.sdpMlineIndex,
+          'sdpMid': candidate.sdpMid,
+          'candidate': candidate.candidate,
+        },
+      );
     };
 
-    pc.onIceConnectionState = (state) {};
+    pc.onIceConnectionState = (state) {
+      logger.d(state);
+    };
 
     pc.onAddStream = (stream) {
+      logger.d('onAddRemoteStream');
       if (this.onAddRemoteStream != null) this.onAddRemoteStream(stream);
       //_remoteStreams.add(stream);
     };
@@ -436,6 +491,14 @@ class Signaling {
       //   'session_id': this._sessionId,
       //   'media': media,
       // });
+      logger.d('callGroupId: $callGroupId');
+      SocketIoEmit.callOffer(
+        description: {
+          'sdp': s.sdp,
+          'type': s.type,
+        },
+        groupId: callGroupId,
+      );
     } catch (e) {
       print(e.toString());
     }
@@ -452,15 +515,16 @@ class Signaling {
       //   'description': {'sdp': s.sdp, 'type': s.type},
       //   'session_id': this._sessionId,
       // });
+      logger.d('callGroupId: $callGroupId');
+      SocketIoEmit.callAnswer(
+        description: {
+          'sdp': s.sdp,
+          'type': s.type,
+        },
+        groupId: callGroupId,
+      );
     } catch (e) {
       print(e.toString());
     }
-  }
-
-  _send(event, data) {
-    var request = new Map();
-    request["type"] = event;
-    request["data"] = data;
-    // _socket.send(_encoder.convert(request));
   }
 }

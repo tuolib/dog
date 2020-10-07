@@ -15,8 +15,6 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
-
-
 int preOffset = 0;
 Timer getHistoryTime;
 bool emitHistory = false;
@@ -409,10 +407,14 @@ class _ConversationState extends State<Conversation> {
             Icons.call,
           ),
           onPressed: () async {
-
             // Navigator.of(context).pushNamed("callVideo");
-            displayIncomingCall('123456');
+            // displayIncomingCall('123456');
             // displayOutCall();
+            // callKitIn.endCall(currentCallKitId);
+            callGroupId = socketProviderConversationListModelGroupId;
+            logger.d(callGroupId);
+            // return;
+            createOverlayView(context, true);
           },
         ),
         IconButton(
@@ -420,10 +422,10 @@ class _ConversationState extends State<Conversation> {
             Icons.videocam,
           ),
           onPressed: () async {
-
-            Navigator.of(context).pushNamed("callVideo", arguments: {
-              "invite": true,
-            });
+            callGroupId = socketProviderConversationListModelGroupId;
+            // Navigator.of(context).pushNamed("callVideo", arguments: {
+            //   "invite": true,
+            // });
           },
         ),
       ],
@@ -1056,25 +1058,23 @@ class _ConversationState extends State<Conversation> {
     Navigator.of(context).pop();
     var file;
     if (other == 'camera') {
-
       final isPermissionStatusGranted =
-      await Git(context).requestCameraPermissions();
+          await Git(context).requestCameraPermissions();
       if (!isPermissionStatusGranted) return;
       file = await getCamera(other);
     } else if (other == 'video') {
       final isPermissionStatusGranted =
-      await Git(context).requestCameraPermissions();
+          await Git(context).requestCameraPermissions();
       if (!isPermissionStatusGranted) return;
       final isPermissionStatusGranted2 =
-      await Git(context).requestAudioPermissions(type: 'video');
+          await Git(context).requestAudioPermissions(type: 'video');
       if (!isPermissionStatusGranted2) return;
       file = await getCamera(other);
     } else {
 //      print('fileType: $fileType');
 //    if (fileType == 'custom')
 
-      final isPermissionStatusGranted =
-      await Git(context).requestPermissions();
+      final isPermissionStatusGranted = await Git(context).requestPermissions();
       if (!isPermissionStatusGranted) return;
       _pickingType = fileType;
       await _openFileExplorer();
@@ -1544,7 +1544,7 @@ class _ConversationState extends State<Conversation> {
 //        showToast('You must accept audio permissions');
 
         final isPermissionStatusGranted =
-        await Git(context).requestAudioPermissions();
+            await Git(context).requestAudioPermissions();
       }
     } catch (e) {
       print(e);

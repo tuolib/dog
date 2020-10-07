@@ -1,3 +1,4 @@
+export 'my_app.dart';
 export 'home_page.dart';
 export 'language_page.dart';
 export 'login_page.dart';

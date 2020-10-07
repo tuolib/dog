@@ -15,3 +15,4 @@ export 'android_back_desktop.dart';
 export 'avatar_widget.dart';
 export 'request_permission.dart';
 export 'signaling.dart';
+export 'overlay_view.dart';

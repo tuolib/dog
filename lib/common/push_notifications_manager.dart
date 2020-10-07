@@ -24,15 +24,18 @@ class Call {
 
 // BuildContext mainContext;
 
-
+int callGroupId;
+// 是否通话中
+bool callingState = false;
+// 是否正有拨打过来的通话，但是还未接
+bool hasCall = false;
 FlutterCallkeep callKeepIn = FlutterCallkeep();
 Map<String, Call> calls = {};
-String callingUuid = '';
 // List callArr = [];
 String newUUID() => Uuid().v4();
 
 // bool _configured;
-String currentCallKitId;
+String currentCallUuid;
 FlutterCallKit callKitIn = FlutterCallKit();
 
 class PushNotificationsManager {
@@ -193,6 +196,9 @@ void onTokenVoip(String token) {
 Future<dynamic> onMessageVoip(bool isLocal, Map<String, dynamic> payload) {
   // handle foreground notification
   print("received on foreground payload: $payload, isLocal=$isLocal");
+  if (payload['data']['type'] == 'callInvite') {
+    callGroupId = payload['data']['groupId'];
+  }
   displayIncomingCall('123456');
   return null;
 }
@@ -202,8 +208,13 @@ Future<dynamic> onMessageVoip(bool isLocal, Map<String, dynamic> payload) {
 /// [isLocal] is true if its a local notification or false otherwise (remote notification)
 /// [payload] the notification payload to be processed. use this to present a local notification
 Future<dynamic> onResumeVoip(bool isLocal, Map<String, dynamic> payload) {
+
+  lifecycleState = AppLifecycleState.detached;
   // handle background notification
   logger.d("received on background payload: $payload, isLocal=$isLocal");
+  if (payload['data']['type'] == 'callInvite') {
+    callGroupId = payload['data']['groupId'];
+  }
   // showLocalNotification(payload);
   displayIncomingCall('123456');
   return null;
@@ -246,7 +257,9 @@ Future<dynamic> onMessage(Map<String, dynamic> payload) {
   // handle background notification
   logger.d("onMessage payload: $payload");
   if (Platform.isAndroid) {
-    if (payload['data']['msgType'] == "voip") {
+    if (payload['data']['type'] == "callInvite") {
+      callGroupId = payload['data']['groupId'];
+      logger.d(callGroupId);
       displayIncomingCall('123');
     }
   }
@@ -260,10 +273,13 @@ Future<dynamic> onLaunch(Map<String, dynamic> payload) {
 }
 
 Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
+  lifecycleState = AppLifecycleState.detached;
   if (message.containsKey('data')) {
 // Handle data message
     final dynamic data = message['data'];
     logger.d(data);
+    callGroupId = data['groupId'];
+    logger.d(callGroupId);
   }
 
   if (message.containsKey('notification')) {
@@ -302,22 +318,24 @@ Future<void> answerCall(CallKeepPerformAnswerCallAction event) async {
   final String callUUID = event.callUUID;
   final String number = "1234444";
   logger.d('[answerCall] $callUUID, number: $number');
-  callingUuid = callUUID;
+  currentCallUuid = callUUID;
   callKeepIn.startCall(event.callUUID, number, number);
   Timer(const Duration(seconds: 1), () {
-    logger.d('[setCurrentCallActive] $callUUID, number: $number');
+    // logger.d('[setCurrentCallActive] $callUUID, number: $number');
     callKeepIn.setCurrentCallActive(callUUID);
   });
 
+  createOverlayView(mainScreePage, false);
   // navigatorKey.currentState.pushNamed('callVideo', arguments: {
   //   "invite": false,
   // });
-  // callKeepIn.backToForeground();
+  callKeepIn.backToForeground();
 }
 
 Future<void> endCall(CallKeepPerformEndCallAction event) async {
   logger.d('endCall: ${event.callUUID}');
   removeCall(event.callUUID);
+  hangUpCall();
 }
 
 Future<void> didPerformDTMFAction(CallKeepDidPerformDTMFAction event) async {
@@ -403,21 +421,53 @@ Future<void> displayIncomingCallDelayed(String number) async {
 }
 
 Future<void> displayIncomingCall(String number) async {
+  hasCall = true;
+  if (socketInit != null) {
+    // logger.d('has connect socket');
+    displayConnectedCall(number);
+    // navigatorKey.currentState.pushNamed('callVideo');
+  } else {
+    // logger.d('not connect socket');
+    // await Global.init();
+
+    await Global.init().then((e) => runApp(MyApp()));
+    socketIoItem.initCommunication();
+    socketInit.on('connect', (_) async {
+      if (hasCall) {
+        displayConnectedCall(number);
+        // navigatorKey.currentState.pushNamed('callVideo', arguments: {
+        //   "invite": false,
+        // });
+        // Navigator.push(thisContext, MaterialPageRoute(builder: (context) {
+        //   return NewPage(
+        //       title: "New Page"
+        //   );
+        // }));
+      }
+    });
+  }
+  // return;
+
+
+}
+
+displayConnectedCall(String number) async {
   if (Platform.isIOS) {
 
-    currentCallKitId = newUUID();
+    currentCallUuid = newUUID();
     await startCall("generic", 'Somebody');
-    await callKitIn.displayIncomingCall(currentCallKitId, "generic", 'Somebody');
+    await callKitIn.displayIncomingCall(currentCallUuid, "generic", 'Somebody');
   } else {
 
     final String callUUID = newUUID();
     // setState(() {
     //   calls[callUUID] = Call(number);
     // });
+    currentCallUuid = callUUID;
     calls[callUUID] = Call(number);
     // callArr.add(Call(number));
     // logger.d(calls);
-    logger.d('Display incoming call now');
+    // logger.d('Display incoming call now');
     bool hasPhoneAccount = await callKeepIn.hasPhoneAccount();
     if (!hasPhoneAccount) {
       await callKeepIn.hasDefaultPhoneAccount(mainScreePage, <String, dynamic>{
@@ -428,11 +478,11 @@ Future<void> displayIncomingCall(String number) async {
         'okButton': 'ok',
       });
     }
-    logger.d('hasPhoneAccount: $hasPhoneAccount');
+    // logger.d('hasPhoneAccount: $hasPhoneAccount');
 
     logger.d('[displayIncomingCall] $callUUID number: $number');
     await callKeepIn.displayIncomingCall(callUUID, number,
-        handleType: 'number', hasVideo: true);
+        handleType: 'generic', hasVideo: true);
 
     // await flutterCallKeep.CallKeep.askForPermissionsIfNeeded(mainScreePage);
     // final callUUID = '0783a8e5-8353-4802-9448-c6211109af51';
@@ -448,10 +498,12 @@ Future<void> displayIncomingCall(String number) async {
 Future<void> startCall(String handle, String localizedCallerName) async {
   /// Your normal start call action
   await callKitIn.startCall(currentCallId, handle, localizedCallerName);
+  logger.d('startCall');
 }
 
 Future<void> reportEndCallWithUUID(String uuid, EndReason reason) async {
   await callKitIn.reportEndCallWithUUID(uuid, reason);
+  logger.d('reportEndCallWithUUID');
 }
 
 /// Event Listener Callbacks
@@ -459,47 +511,57 @@ Future<void> reportEndCallWithUUID(String uuid, EndReason reason) async {
 Future<void> _didReceiveStartCallAction(String uuid, String handle) async {
   // Get this event after the system decides you can start a call
   // You can now start a call from within your app
+  logger.d('_didReceiveStartCallAction');
 }
 
 Future<void> _performAnswerCallAction(String uuid) async {
   // Called when the user answers an incoming call
+  logger.d('_performAnswerCallAction');
 }
 
 Future<void> _performEndCallAction(String uuid) async {
-  await callKitIn.endCall(currentCallKitId);
-  currentCallKitId = null;
+  await callKitIn.endCall(currentCallUuid);
+  currentCallUuid = null;
+  logger.d('_performEndCallAction');
+  hangUpCall();
 }
 
 Future<void> _didActivateAudioSession() async {
   // you might want to do following things when receiving this event:
   // - Start playing ringback if it is an outgoing call
+  logger.d('_didActivateAudioSession');
 }
 
 Future<void> _didDisplayIncomingCall(String error, String uuid, String handle,
     String localizedCallerName, bool fromPushKit) async {
   // You will get this event after RNCallKeep finishes showing incoming call UI
   // You can check if there was an error while displaying
+  logger.d('_didDisplayIncomingCall');
 }
 
 Future<void> _didPerformSetMutedCallAction(bool mute, String uuid) async {
   // Called when the system or user mutes a call
+  logger.d('_didPerformSetMutedCallAction');
 }
 
 Future<void> _didPerformDTMFAction(String digit, String uuid) async {
   // Called when the system or user performs a DTMF action
+  logger.d('_didPerformDTMFAction');
 }
 
 Future<void> _didToggleHoldAction(bool hold, String uuid) async {
   // Called when the system or user holds a call
+  logger.d('_didToggleHoldAction');
+  createOverlayView(mainScreePage, false);
 }
 
 String get currentCallId {
-  if (currentCallKitId == null) {
+  if (currentCallUuid == null) {
     final uuid = new Uuid();
-    currentCallKitId = uuid.v4();
+    currentCallUuid = uuid.v4();
   }
 
-  return currentCallKitId;
+  return currentCallUuid;
 }
 //
 // enum HandleType {

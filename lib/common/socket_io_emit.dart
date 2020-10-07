@@ -606,9 +606,98 @@ class SocketIoEmit {
       'authtoken': Global.profile.token,
       'fromId': fromId,
       'toId': toId,
+      'groupId': groupId,
+    };
+    socketInit.emit('msg', json.encode(sendData));
+  }
+  //  发出 candidate
+  static callCandidate({
+    int fromId,
+    int toId,
+    int groupId,
+    Map candidate,
+  }) async {
+//    isUpdatingGroup = true;
+    Map<String, dynamic> sendData = {
+      'type': 'callCandidate',
+      'authtoken': Global.profile.token,
+      'fromId': fromId,
+      'toId': toId,
+      'groupId': groupId,
+      'candidate': candidate,
+    };
+    socketInit.emit('msg', json.encode(sendData));
+  }
+  //  发出 candidate
+  static callCandidateGet({
+    int fromId,
+    int toId,
+    int groupId,
+    Map candidate,
+  }) async {
+//    isUpdatingGroup = true;
+    Map<String, dynamic> sendData = {
+      'type': 'callCandidateGet',
+      'authtoken': Global.profile.token,
+      'groupId': groupId,
+      'fromId': fromId,
+      'toId': toId,
+    };
+    socketInit.emit('msg', json.encode(sendData));
+  }
+  //  发出 candidate
+  static callDescriptionGet({
+    int fromId,
+    int toId,
+    int groupId,
+    Map candidate,
+  }) async {
+//    isUpdatingGroup = true;
+    Map<String, dynamic> sendData = {
+      'type': 'callDescriptionGet',
+      'authtoken': Global.profile.token,
+      'groupId': groupId,
+      'fromId': fromId,
+      'toId': toId,
+    };
+    socketInit.emit('msg', json.encode(sendData));
+  }
+  //  发出 candidate
+  static callOffer({
+    int fromId,
+    int toId,
+    int groupId,
+    Map description,
+  }) async {
+//    isUpdatingGroup = true;
+    Map<String, dynamic> sendData = {
+      'type': 'callOffer',
+      'authtoken': Global.profile.token,
+      'groupId': groupId,
+      'fromId': fromId,
+      'toId': toId,
+      'description': description,
     };
     socketInit.emit('msg', json.encode(sendData));
   }
 
+  //  发出 candidate
+  static callAnswer({
+    int fromId,
+    int toId,
+    int groupId,
+    Map description,
+  }) async {
+//    isUpdatingGroup = true;
+    Map<String, dynamic> sendData = {
+      'type': 'callAnswer',
+      'authtoken': Global.profile.token,
+      'groupId': groupId,
+      'fromId': fromId,
+      'toId': toId,
+      'description': description,
+    };
+    socketInit.emit('msg', json.encode(sendData));
+  }
 
 }

@@ -58,6 +58,8 @@ class _MainScreenState extends State<MainScreen> {
     var chatInfo = Provider.of<ChatInfoModel>(context, listen: false);
     chatInfoModelSocket = chatInfo;
 //    socketProviderChatListModel.getChatList();
+    var callInfo = Provider.of<CallInfoModel>(context, listen: false);
+    callInfoSocket = callInfo;
 
 
 //    var gAvatar;
@@ -111,34 +113,34 @@ class _MainScreenState extends State<MainScreen> {
 //      );
 //    }
     return WillPopScope(
-      onWillPop: AndroidBackTop.BackDeskTop,
-//       onWillPop: () async {
-// //        BackDesktop.backDesktop(); //设置为返回不退出app
-// //        return false;
-// //        MoveToBackground.moveTaskToBack();
-// //        return false;
-// //        SystemNavigator.pop();
-// //        SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop');
-// //        return false;
-// //        return true;
-//
-// //        if (_lastPressedAt == null ||
-// //            DateTime.now().difference(_lastPressedAt) > Duration(seconds: 1)) {
-// //          //两次点击间隔超过1秒则重新计时
-// //          _lastPressedAt = DateTime.now();
-// //          if (Platform.isAndroid) {
-// //            showToast('Click twice to exit');
-// //          }
-// //          return false;
-// //        }
-//
-//         return true;
-//
-// ////          Navigator.of(context).pushReplacementNamed("main");
-// //        socketProviderConversationListModelGroupId = null;
-// //        Navigator.of(context).popUntil((route) => route.isFirst);
-// //        return false;
-//       },
+      // onWillPop: AndroidBackTop.BackDeskTop,
+      onWillPop: () async {
+//        BackDesktop.backDesktop(); //设置为返回不退出app
+//        return false;
+//        MoveToBackground.moveTaskToBack();
+//        return false;
+//        SystemNavigator.pop();
+//        SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop');
+//        return false;
+//        return true;
+
+//        if (_lastPressedAt == null ||
+//            DateTime.now().difference(_lastPressedAt) > Duration(seconds: 1)) {
+//          //两次点击间隔超过1秒则重新计时
+//          _lastPressedAt = DateTime.now();
+//          if (Platform.isAndroid) {
+//            showToast('Click twice to exit');
+//          }
+//          return false;
+//        }
+
+        return true;
+
+////          Navigator.of(context).pushReplacementNamed("main");
+//        socketProviderConversationListModelGroupId = null;
+//        Navigator.of(context).popUntil((route) => route.isFirst);
+//        return false;
+      },
       child: Scaffold(
         body: PageView(
           physics: NeverScrollableScrollPhysics(),

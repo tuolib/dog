@@ -16,19 +16,20 @@ class SocketsIoNotify {
 //  SocketsIoNotify._internal();
 //  var timer;
 
-  initCommunication() {
+  initCommunication({Function callback}) {
     final dbHelper = DatabaseHelper.instance;
     try {
 //      socketProviderChatListModel.getChatList();
       print('socketInit  $socketInit');
       print('socketInit?.connected ${socketInit?.connected}');
       if (socketInit != null) return;
-      if (Global.profile.token == null || Global.profile.token == '') return;
+      // if (Global.profile.token == null || Global.profile.token == '') return;
       var addr = "$localAddress";
       socketInit = io(addr, <String, dynamic>{
         'transports': ['websocket'],
         'autoConnect': true,
       });
+      logger.d('start connect socket');
 
 //      socketProviderChatListModel.getChatList();
 //      socketInit.on('connecting', (_) async {
@@ -36,16 +37,23 @@ class SocketsIoNotify {
 ////        socketProviderChatListModel.getChatList();
 //      });
       socketInit.on('connect', (_) async {
-        isUpdatingGroup = true;
-        if (socketProviderConnectModel != null) {
-          socketProviderConnectModel.notifyConnect();
-        }
         print('connect');
-        SocketIoEmit.connectInfoSend();
+        // logger.d(lifecycleState);
+        if (callback != null) {
+          callback();
+        }
+        if (lifecycleState == AppLifecycleState.inactive) {
+          isUpdatingGroup = true;
+          if (socketProviderConnectModel != null) {
+            socketProviderConnectModel.notifyConnect();
+          }
+          SocketIoEmit.connectInfoSend();
 //        SocketIoEmit.clientOpenGroupTable();
-        SocketIoEmit.clientGetContacts();
-        SocketIoEmit.contactStatusGet();
-        SocketIoEmit.messageDialogsGet();
+          SocketIoEmit.clientGetContacts();
+          SocketIoEmit.contactStatusGet();
+          SocketIoEmit.messageDialogsGet();
+        }
+
       });
 
 
