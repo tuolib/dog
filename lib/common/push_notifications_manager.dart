@@ -11,6 +11,7 @@ import 'package:callkeep/callkeep.dart';
 import 'package:flutter_apns/apns.dart';
 // import 'package:flutter_app_badger/flutter_app_badger.dart';
 // import 'package:flutter_callkeep/flutter_callkeep.dart' as flutterCallKeep;
+import 'package:is_lock_screen/is_lock_screen.dart';
 
 import '../index.dart';
 
@@ -24,6 +25,7 @@ class Call {
 
 // BuildContext mainContext;
 
+int callFriendId;
 int callGroupId;
 // 是否通话中
 bool callingState = false;
@@ -196,10 +198,11 @@ void onTokenVoip(String token) {
 Future<dynamic> onMessageVoip(bool isLocal, Map<String, dynamic> payload) {
   // handle foreground notification
   print("received on foreground payload: $payload, isLocal=$isLocal");
-  if (payload['data']['type'] == 'callInvite') {
-    callGroupId = payload['data']['groupId'];
+  var data = payload['data'];
+  if (data['type'] == 'callInvite') {
+    callGroupId = int.parse(data['groupId']);
+    displayIncomingCall('123456');
   }
-  displayIncomingCall('123456');
   return null;
 }
 
@@ -212,11 +215,12 @@ Future<dynamic> onResumeVoip(bool isLocal, Map<String, dynamic> payload) {
   lifecycleState = AppLifecycleState.detached;
   // handle background notification
   logger.d("received on background payload: $payload, isLocal=$isLocal");
-  if (payload['data']['type'] == 'callInvite') {
-    callGroupId = payload['data']['groupId'];
+  var data = payload['data'];
+  if (data['type'] == 'callInvite') {
+    callGroupId = int.parse(data['groupId']);
+    displayIncomingCall('123456');
   }
   // showLocalNotification(payload);
-  displayIncomingCall('123456');
   return null;
 }
 
@@ -256,9 +260,12 @@ Future<dynamic> onResume(Map<String, dynamic> payload) {
 Future<dynamic> onMessage(Map<String, dynamic> payload) {
   // handle background notification
   logger.d("onMessage payload: $payload");
+  var data = payload['data'];
+  // logger.d('${data['type'] == "callInvite"}');
+  // logger.d('${data['groupId']}');
   if (Platform.isAndroid) {
-    if (payload['data']['type'] == "callInvite") {
-      callGroupId = payload['data']['groupId'];
+    if (data['type'] == "callInvite") {
+      callGroupId = int.parse(data['groupId']);
       logger.d(callGroupId);
       displayIncomingCall('123');
     }
@@ -278,7 +285,7 @@ Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
 // Handle data message
     final dynamic data = message['data'];
     logger.d(data);
-    callGroupId = data['groupId'];
+    callGroupId = int.parse(data['groupId']);
     logger.d(callGroupId);
   }
 
@@ -329,7 +336,10 @@ Future<void> answerCall(CallKeepPerformAnswerCallAction event) async {
   // navigatorKey.currentState.pushNamed('callVideo', arguments: {
   //   "invite": false,
   // });
-  callKeepIn.backToForeground();
+  bool result = await isLockScreen();
+  if (!result) {
+    callKeepIn.backToForeground();
+  }
 }
 
 Future<void> endCall(CallKeepPerformEndCallAction event) async {
@@ -370,6 +380,7 @@ Future<void> didPerformSetMutedCallAction(
       '[didPerformSetMutedCallAction] ${event.callUUID}, number: $number (${event.muted})');
 
   setCallMuted(event.callUUID, event.muted);
+  muteMic(event.muted);
 }
 
 Future<void> didToggleHoldCallAction(
@@ -484,6 +495,7 @@ displayConnectedCall(String number) async {
     await callKeepIn.displayIncomingCall(callUUID, number,
         handleType: 'generic', hasVideo: true);
 
+
     // await flutterCallKeep.CallKeep.askForPermissionsIfNeeded(mainScreePage);
     // final callUUID = '0783a8e5-8353-4802-9448-c6211109af51';
     // final number = '+46 70 123 45 67';
@@ -542,6 +554,7 @@ Future<void> _didDisplayIncomingCall(String error, String uuid, String handle,
 Future<void> _didPerformSetMutedCallAction(bool mute, String uuid) async {
   // Called when the system or user mutes a call
   logger.d('_didPerformSetMutedCallAction');
+  muteMic(mute);
 }
 
 Future<void> _didPerformDTMFAction(String digit, String uuid) async {

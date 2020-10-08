@@ -6,6 +6,8 @@ import 'dart:convert';
 
 import '../index.dart';
 
+JsonEncoder _encoder = new JsonEncoder();
+JsonDecoder _decoder = new JsonDecoder();
 Map<String, dynamic> messageDialogsGetState = {
   'limit': 10,
   'offsetId': 0,
@@ -608,14 +610,14 @@ class SocketIoEmit {
       'toId': toId,
       'groupId': groupId,
     };
-    socketInit.emit('msg', json.encode(sendData));
+    socketInit.emit('msg', _encoder.convert(sendData));
   }
   //  发出 candidate
   static callCandidate({
     int fromId,
     int toId,
     int groupId,
-    Map candidate,
+    dynamic candidate,
   }) async {
 //    isUpdatingGroup = true;
     Map<String, dynamic> sendData = {
@@ -626,7 +628,8 @@ class SocketIoEmit {
       'groupId': groupId,
       'candidate': candidate,
     };
-    socketInit.emit('msg', json.encode(sendData));
+
+    socketInit.emit('msg', _encoder.convert(sendData));
   }
   //  发出 candidate
   static callCandidateGet({
@@ -643,7 +646,7 @@ class SocketIoEmit {
       'fromId': fromId,
       'toId': toId,
     };
-    socketInit.emit('msg', json.encode(sendData));
+    socketInit.emit('msg', _encoder.convert(sendData));
   }
   //  发出 candidate
   static callDescriptionGet({
@@ -660,7 +663,7 @@ class SocketIoEmit {
       'fromId': fromId,
       'toId': toId,
     };
-    socketInit.emit('msg', json.encode(sendData));
+    socketInit.emit('msg', _encoder.convert(sendData));
   }
   //  发出 candidate
   static callOffer({
@@ -678,7 +681,7 @@ class SocketIoEmit {
       'toId': toId,
       'description': description,
     };
-    socketInit.emit('msg', json.encode(sendData));
+    socketInit.emit('msg', _encoder.convert(sendData));
   }
 
   //  发出 candidate
@@ -697,7 +700,7 @@ class SocketIoEmit {
       'toId': toId,
       'description': description,
     };
-    socketInit.emit('msg', json.encode(sendData));
+    socketInit.emit('msg', _encoder.convert(sendData));
   }
 
 }

@@ -412,7 +412,9 @@ class _ConversationState extends State<Conversation> {
             // displayOutCall();
             // callKitIn.endCall(currentCallKitId);
             callGroupId = socketProviderConversationListModelGroupId;
+            callFriendId = conversionInfo['contactId'];
             logger.d(callGroupId);
+            logger.d(callFriendId);
             // return;
             createOverlayView(context, true);
           },

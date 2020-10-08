@@ -19,7 +19,6 @@ List<dynamic> peersCall;
 var selfIdCall;
 RTCVideoRenderer localRendererCall = RTCVideoRenderer();
 RTCVideoRenderer remoteRendererCall = RTCVideoRenderer();
-bool inCalling = false;
 String serverIP;
 BuildContext callContext;
 
@@ -55,7 +54,6 @@ void connectCall() async {
           // this.setState(() {
           //   inCalling = true;
           // });
-          inCalling = true;
           callInfoSocket.updateInCalling(true);
           break;
         case SignalingState.CallStateBye:
@@ -66,7 +64,6 @@ void connectCall() async {
           // });
           localRendererCall.srcObject = null;
           remoteRendererCall.srcObject = null;
-          inCalling = false;
           callInfoSocket.updateInCalling(false);
           break;
         case SignalingState.CallStateInvite:
@@ -94,6 +91,7 @@ void connectCall() async {
 
     signalingCall.onAddRemoteStream = ((stream) {
       remoteRendererCall.srcObject = stream;
+      callInfoSocket.updateCall();
     });
 
     signalingCall.onRemoveRemoteStream = ((stream) {
@@ -101,11 +99,27 @@ void connectCall() async {
     });
     // logger.d('center connect');
   }
-
+  // logger.d()
+  // return;
   // logger.d('end connect');
   if (!hasStartCall) {
     hasStartCall = true;
-    invitePeer(callContext, '${Global.profile.user.userId}', false);
+    if (isInvite) {
+      invitePeer(callContext, '$callFriendId', false);
+    } else {
+      logger.d('callDescriptionGet');
+      SocketIoEmit.callDescriptionGet(
+        fromId: Global.profile.user.userId,
+        // toId: chatInfoModelSocket.conversationInfo['contactId'],
+        groupId: callGroupId,
+      );
+
+      // SocketIoEmit.callCandidateGet(
+      //   fromId: Global.profile.user.userId,
+      //   // toId: chatInfoModelSocket.conversationInfo['contactId'],
+      //   groupId: callGroupId,
+      // );
+    }
   }
   // _invitePeer(context, '1', false);
 }
@@ -120,30 +134,70 @@ invitePeer(context, peerId, use_screen) async {
 hangUpCall() async {
   if (signalingCall != null) {
     logger.d('hangup');
+
+    // if (Platform.isAndroid) {
+    //   localRendererCall.dispose();
+    //   remoteRendererCall.dispose();
+    // }
     // SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     // hangup(currentCallUuid);
-    inCalling = false;
-    callInfoSocket.updateInCalling(false);
     hasStartCall = false;
     isInvite = false;
     if (signalingCall != null) {
       signalingCall.close();
       // signalingCall.bye();
     }
-    if (Platform.isAndroid) {
-      await localRendererCall?.dispose();
-      await remoteRendererCall?.dispose();
-    }
-    TestOverLay.remove();
+    // if (Platform.isAndroid) {
+    //   localRendererCall?.dispose();
+    //   remoteRendererCall?.dispose();
+    // }
     // Navigator.of(callContext).pop();
+    callInfoSocket.updateInCalling(false);
+    TestOverLay.remove();
   }
+
+}
+
+overCallAll() {
+  if (Platform.isAndroid) {
+    // hangup(currentCallUuid);
+
+    callKeepIn.endAllCalls();
+  } else {
+    // callKitIn.endCall(currentCallUuid);
+    callKitIn.endAllCalls();
+  }
+  hangUpCall();
 }
 
 switchCamera() {
   signalingCall.switchCamera();
 }
 
-muteMic() {}
+videoSet() {
+  bool enable = !callInfoSocket.videoEnable;
+  signalingCall.videoSet(enable);
+}
+
+muteMic(enable) {
+  signalingCall.voiceSet(enable);
+  callInfoSocket.updateVoice(enable);
+
+}
+mutePhoneCall(enable) async {
+  if (Platform.isAndroid) {
+    bool isBusy = await callKeepIn.isCallActive(currentCallUuid);
+    if (isBusy) {
+      setCallMuted(currentCallUuid, enable);
+    }
+  } else if (Platform.isIOS) {
+    // callKitIn.
+    bool isBusy =  await callKitIn.checkIfBusy();
+    if (isBusy) {
+      callKitIn.setMutedCall(currentCallUuid, enable);
+    }
+  }
+}
 
 createOverlayView(BuildContext context, bool invite) {
   isInvite = invite;
@@ -162,6 +216,8 @@ createOverlayView(BuildContext context, bool invite) {
       bool fullScreen = callInfoModel.fullScreen;
       double width = callInfoModel.width;
       double height = callInfoModel.height;
+      var remoteStream = callInfoModel.remoteStream;
+      bool voiceMute = callInfoModel.voiceMute;
       return Container(
         width: fullScreen ? MediaQuery.of(context).size.width : width,
         height: fullScreen ? MediaQuery.of(context).size.height : height,
@@ -246,19 +302,27 @@ createOverlayView(BuildContext context, bool invite) {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               FloatingActionButton(
+                child: Icon(Icons.videocam),
+                onPressed: videoSet,
+              ),
+              FloatingActionButton(
                 child: const Icon(Icons.switch_camera),
                 onPressed: switchCamera,
               ),
               FloatingActionButton(
-                onPressed: hangUpCall,
+                child:  Icon(voiceMute ? Icons.mic_off : Icons.mic),
+                onPressed: () {
+                  bool enable = !callInfoSocket.voiceMute;
+                  muteMic(enable);
+                  mutePhoneCall(enable);
+                },
+              ),
+              FloatingActionButton(
+                onPressed: overCallAll,
                 tooltip: 'Hangup',
                 child: Icon(Icons.call_end),
                 backgroundColor: Colors.pink,
               ),
-              FloatingActionButton(
-                child: const Icon(Icons.mic_off),
-                onPressed: muteMic,
-              )
             ],
           )
               : SizedBox(),
@@ -286,7 +350,7 @@ class _CallVideoTestState extends State<CallVideoTest> {
     super.initState();
 
     // SystemChrome.setEnabledSystemUIOverlays([]);
-    if (!inCalling) {
+    if (!callInfoSocket.inCalling) {
       if (!hasStartCall) {
         // SystemChrome.setEnabledSystemUIOverlays([]);
         initRenderers();
@@ -371,20 +435,20 @@ class _CallVideoTestState extends State<CallVideoTest> {
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      FloatingActionButton(
-                        child: const Icon(Icons.switch_camera),
-                        onPressed: switchCamera,
-                      ),
-                      FloatingActionButton(
-                        onPressed: hangUpCall,
-                        tooltip: 'Hangup',
-                        child: Icon(Icons.call_end),
-                        backgroundColor: Colors.pink,
-                      ),
-                      FloatingActionButton(
-                        child: const Icon(Icons.mic_off),
-                        onPressed: muteMic,
-                      )
+                      // FloatingActionButton(
+                      //   child: const Icon(Icons.switch_camera),
+                      //   onPressed: switchCamera,
+                      // ),
+                      // FloatingActionButton(
+                      //   onPressed: hangUpCall,
+                      //   tooltip: 'Hangup',
+                      //   child: Icon(Icons.call_end),
+                      //   backgroundColor: Colors.pink,
+                      // ),
+                      // FloatingActionButton(
+                      //   child: const Icon(Icons.mic_off),
+                      //   onPressed: muteMic,
+                      // )
                     ]))
             : null,
       );

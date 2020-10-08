@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../index.dart';
 
@@ -53,7 +54,13 @@ class Signaling {
 
   Map<String, dynamic> _iceServers = {
     'iceServers': [
-      {'url': 'stun:stun.l.google.com:19302'},
+      // {'url': 'stun:stun.l.google.com:19302'},
+      {'url': 'stun:challengeabc.ml:443'},
+      {
+        'url': 'turn:challengeabc.ml:443',
+        'username': 'webrtc',
+        'credential': 'webrtc1234'
+      },
       /*
        * turn server configuration example.
       {
@@ -75,7 +82,7 @@ class Signaling {
   final Map<String, dynamic> _constraints = {
     'mandatory': {
       'OfferToReceiveAudio': true,
-      'OfferToReceiveVideo': false,
+      'OfferToReceiveVideo': true,
     },
     'optional': [],
   };
@@ -95,17 +102,34 @@ class Signaling {
       _localStream.dispose();
       _localStream = null;
     }
-
+    // localRendererCall.dispose();
+    // remoteRendererCall.dispose();
     _peerConnections.forEach((key, pc) {
       pc.close();
     });
-    if (_socket != null) _socket.close();
+    // _remoteStreams
+    // if (_socket != null) _socket.close();
   }
 
   void switchCamera() {
     if (_localStream != null) {
       _localStream.getVideoTracks()[0].switchCamera();
     }
+  }
+  void voiceSet(bool enable) {
+    if (_localStream != null) {
+      _localStream.getAudioTracks()[0].setMicrophoneMute(enable);
+    }
+  }
+
+  void videoSet(bool enable) async {
+    // if (enable) {
+    //   _localStream = await createStream('video', false);
+    // } else {
+    //   if (_localStream != null) {
+    //     _localStream.dispose();
+    //   }
+    // }
   }
 
   void invite(String peer_id, String media, use_screen) {
@@ -114,26 +138,27 @@ class Signaling {
     if (this.onStateChange != null) {
       this.onStateChange(SignalingState.CallStateNew);
     }
-    if (isInvite == true) {
-      logger.d('invite emit');
-      SocketIoEmit.callInvite(
-        fromId: Global.profile.user.userId,
-        toId: chatInfoModelSocket.conversationInfo['contactId'],
-        groupId: callGroupId,
-      );
-    } else {
-      logger.d('callCandidateGet');
-      SocketIoEmit.callCandidateGet(
-        fromId: Global.profile.user.userId,
-        // toId: chatInfoModelSocket.conversationInfo['contactId'],
-        groupId: callGroupId,
-      );
-      SocketIoEmit.callDescriptionGet(
-        fromId: Global.profile.user.userId,
-        // toId: chatInfoModelSocket.conversationInfo['contactId'],
-        groupId: callGroupId,
-      );
-    }
+
+    // logger.d('invite emit');
+    SocketIoEmit.callInvite(
+      fromId: Global.profile.user.userId,
+      toId: chatInfoModelSocket.conversationInfo['contactId'],
+      groupId: callGroupId,
+    );
+    // if (isInvite == true) {
+    // } else {
+    //   logger.d('callCandidateGet');
+    //   SocketIoEmit.callCandidateGet(
+    //     fromId: Global.profile.user.userId,
+    //     // toId: chatInfoModelSocket.conversationInfo['contactId'],
+    //     groupId: callGroupId,
+    //   );
+    //   SocketIoEmit.callDescriptionGet(
+    //     fromId: Global.profile.user.userId,
+    //     // toId: chatInfoModelSocket.conversationInfo['contactId'],
+    //     groupId: callGroupId,
+    //   );
+    // }
     // this.onStateChange(SignalingState.CallStateNew);
     // logger.d('start create peer');
     _createPeerConnection(peer_id, media, use_screen).then((pc) {
@@ -173,10 +198,10 @@ class Signaling {
         break;
       case 'offer':
         {
-          var id = data['from'];
+          var id = data['from'].toString();
           var description = data['description'];
           var media = data['media'];
-          var sessionId = data['session_id'];
+          var sessionId = 'session_id';
           this._sessionId = sessionId;
 
           if (this.onStateChange != null) {
@@ -198,19 +223,34 @@ class Signaling {
         break;
       case 'answer':
         {
-          var id = data['from'];
+          var id = data['from'].toString();
           var description = data['description'];
 
           var pc = _peerConnections[id];
+          logger.d('answer');
+          logger.d(pc);
           if (pc != null) {
             await pc.setRemoteDescription(new RTCSessionDescription(
                 description['sdp'], description['type']));
+          } else {
+            // _peerConnections[id] = await createPeerConnection(_iceServers, _config);
+            // // _peerConnections[id] = pc;
+            // pc = _peerConnections[id];
+            // await pc.setRemoteDescription(new RTCSessionDescription(
+            //     description['sdp'], description['type']));
+            // if (this._remoteCandidates.length > 0) {
+            //   _remoteCandidates.forEach((candidate) async {
+            //     await pc.addCandidate(candidate);
+            //   });
+            //   _remoteCandidates.clear();
+            // }
           }
+
         }
         break;
       case 'candidate':
         {
-          var id = data['from'];
+          var id = data['from'].toString();
           var candidateMap = data['candidate'];
           var pc = _peerConnections[id];
           RTCIceCandidate candidate = new RTCIceCandidate(
@@ -246,8 +286,8 @@ class Signaling {
         break;
       case 'bye':
         {
-          var to = data['to'];
-          var sessionId = data['session_id'];
+          var to = data['to'].toString();
+          var sessionId = 'session_id';
           print('bye: ' + sessionId);
 
           if (_localStream != null) {
@@ -289,28 +329,30 @@ class Signaling {
   }) async {
     print('connect to invite: $invite ');
     _groupId = groupId;
+    //
+    // if (_turnCredential == null) {
+    // }
 
-    if (_turnCredential == null) {
-      try {
+    try {
 //        _turnCredential = await getTurnCredential(_host, _port);
-        /*{
+      /*{
             "username": "1584195784:mbzrxpgjys",
             "password": "isyl6FF6nqMTB9/ig5MrMRUXqZg",
             "ttl": 86400,
             "uris": ["turn:127.0.0.1:19302?transport=udp"]
           }
         */
-        _iceServers = {
-          'iceServers': [
-            {
-              'url': 'stun:challengeabc.ml',
-              'username': 'webrtc',
-              'credential': 'webrtc1234'
-            },
-          ]
-        };
-      } catch (e) {}
-    }
+      _iceServers = {
+        'iceServers': [
+          {'url': 'stun:challengeabc.ml:443'},
+          {
+            'url': 'turn:challengeabc.ml:443',
+            'username': 'webrtc',
+            'credential': 'webrtc1234'
+          },
+        ]
+      };
+    } catch (e) {}
 
     // print('onOpen');
     // this?.onStateChange(SignalingState.ConnectionOpen);
@@ -323,7 +365,7 @@ class Signaling {
     socketInit.on('callDescriptionGet', (data) async {
       logger.d('callDescriptionGet: ' + data);
 
-      var des = await _peerConnections['${Global.profile.user.userId}']
+      var des = await _peerConnections['$callFriendId']
           .getLocalDescription();
 
       SocketIoEmit.callOffer(
@@ -333,31 +375,60 @@ class Signaling {
           "sdp": des.sdp,
         },
       );
+      // logger.d('callDescription send after get offer');
+      // SocketIoEmit.callDescriptionGet(
+      //   fromId: Global.profile.user.userId,
+      //   // toId: chatInfoModelSocket.conversationInfo['contactId'],
+      //   groupId: callGroupId,
+      // );
     });
     socketInit.on('callCandidateGet', (data) async {
       logger.d('callCandidateGet: ' + data);
       for (var i = 0; i < _localCandidates.length; i++) {
+        var candidate = _localCandidates[i];
         SocketIoEmit.callCandidate(
           groupId: callGroupId,
-          candidate: _localCandidates[i],
+          candidate: {
+            'sdpMLineIndex': candidate.sdpMlineIndex,
+            'sdpMid': candidate.sdpMid,
+            'candidate': candidate.candidate,
+          }
+          // candidate: _localCandidates[i],
+
         );
       }
       // _peerConnections['${Global.profile.user.userId}'].get();
     });
+    socketInit.on('callCandidate', (data) async {
+      logger.d('callCandidate data: ' + data);
+      JsonDecoder decoder = new JsonDecoder();
+      var d = decoder.convert(data);
+      this.onMessage({
+        "data": d,
+        "type": "candidate",
+      });
+    });
     socketInit.on('callOffer', (data) async {
+
       logger.d('callMessageOffer data: ' + data);
       JsonDecoder decoder = new JsonDecoder();
-      var d = decoder.convert(data)['data'];
+      var d = decoder.convert(data);
       this.onMessage({
         "data": d,
         "type": "offer",
       });
+
+      SocketIoEmit.callCandidateGet(
+        fromId: Global.profile.user.userId,
+        // toId: chatInfoModelSocket.conversationInfo['contactId'],
+        groupId: callGroupId,
+      );
     });
 
     socketInit.on('callAnswer', (data) async {
       logger.d('callMessageAnswer data: ' + data);
       JsonDecoder decoder = new JsonDecoder();
-      var d = decoder.convert(data)['data'];
+      var d = decoder.convert(data);
       this.onMessage({
         "data": d,
         "type": "answer",
@@ -366,7 +437,7 @@ class Signaling {
     socketInit.on('callBye', (data) async {
       logger.d('callMessageBye data: ' + data);
       JsonDecoder decoder = new JsonDecoder();
-      var d = decoder.convert(data)['data'];
+      var d = decoder.convert(data);
       this.onMessage({
         "data": d,
         "type": "bye",
@@ -425,9 +496,10 @@ class Signaling {
       //   },
       //   'session_id': this._sessionId,
       // });
-      logger.d('callGroupId: $callGroupId');
       SocketIoEmit.callCandidate(
         groupId: callGroupId,
+        fromId: Global.profile.user.userId,
+        toId: int.parse(id),
         candidate: {
           'sdpMLineIndex': candidate.sdpMlineIndex,
           'sdpMid': candidate.sdpMid,
@@ -435,14 +507,20 @@ class Signaling {
         },
       );
     };
+    pc.onIceGatheringState = (state) {
+      //onIceGatheringChangeCOMPLETE
+      logger.d(state);
+
+    };
 
     pc.onIceConnectionState = (state) {
       logger.d(state);
     };
 
     pc.onAddStream = (stream) {
-      logger.d('onAddRemoteStream');
-      if (this.onAddRemoteStream != null) this.onAddRemoteStream(stream);
+      logger.d('onAddRemoteStream: $stream');
+      this.onAddRemoteStream(stream);
+      // if (this.onAddRemoteStream != null) this.onAddRemoteStream(stream);
       //_remoteStreams.add(stream);
     };
 
@@ -491,13 +569,14 @@ class Signaling {
       //   'session_id': this._sessionId,
       //   'media': media,
       // });
-      logger.d('callGroupId: $callGroupId');
       SocketIoEmit.callOffer(
         description: {
           'sdp': s.sdp,
           'type': s.type,
         },
+        fromId: Global.profile.user.userId,
         groupId: callGroupId,
+        toId: int.parse(id),
       );
     } catch (e) {
       print(e.toString());
@@ -515,12 +594,12 @@ class Signaling {
       //   'description': {'sdp': s.sdp, 'type': s.type},
       //   'session_id': this._sessionId,
       // });
-      logger.d('callGroupId: $callGroupId');
       SocketIoEmit.callAnswer(
         description: {
           'sdp': s.sdp,
           'type': s.type,
         },
+        fromId: Global.profile.user.userId,
         groupId: callGroupId,
       );
     } catch (e) {

@@ -137,6 +137,8 @@ PODS:
     - TOCropViewController (~> 2.5.4)
   - image_picker (0.0.1):
     - Flutter
+  - is_lock_screen (1.0.0):
+    - Flutter
   - libwebp (1.1.0):
     - libwebp/demux (= 1.1.0)
     - libwebp/mux (= 1.1.0)
@@ -204,6 +206,7 @@ DEPENDENCIES:
   - gallery_saver (from `.symlinks/plugins/gallery_saver/ios`)
   - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
+  - is_lock_screen (from `.symlinks/plugins/is_lock_screen/ios`)
   - multi_image_picker (from `.symlinks/plugins/multi_image_picker/ios`)
   - open_file (from `.symlinks/plugins/open_file/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
@@ -281,6 +284,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/image_cropper/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
+  is_lock_screen:
+    :path: ".symlinks/plugins/is_lock_screen/ios"
   multi_image_picker:
     :path: ".symlinks/plugins/multi_image_picker/ios"
   open_file:
@@ -340,6 +345,7 @@ SPEC CHECKSUMS:
   GoogleWebRTC: cfb83bc346435a17fe06bb05f04ad826b858a7fb
   image_cropper: c8f9b4157933c7bb965a66d1c5e6c8fd408c6eb4
   image_picker: 9c3312491f862b28d21ecd8fdf0ee14e601b3f09
+  is_lock_screen: 3312dcce52245e965b893a7886bb1b260ed51472
   libwebp: 946cb3063cea9236285f7e9a8505d806d30e07f3
   Libyuv: 5f79ced0ee66e60a612ca97de1e6ccacd187a437
   multi_image_picker: c068931d08240565e0615fb01437d16984909183
