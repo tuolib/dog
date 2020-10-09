@@ -1,4 +1,4 @@
-import 'package:dog/common/global_variable.dart';
+
 import 'package:flutter/material.dart';
 import 'dart:io';
 import '../index.dart';

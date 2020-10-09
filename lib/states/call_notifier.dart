@@ -1,3 +1,5 @@
+
+import 'package:flutter/services.dart';
 import '../index.dart';
 
 // 语音 视频 info
@@ -18,6 +20,7 @@ class CallInfoModel extends ChangeNotifier {
   var _remoteStream;
   bool _voiceMute = false;
   bool _videoEnable = true;
+  bool _callSuccess = true;
 
 
   Map<String, dynamic> get callInfo => _callInfo;
@@ -28,6 +31,8 @@ class CallInfoModel extends ChangeNotifier {
   dynamic get remoteStream => _remoteStream;
   bool get voiceMute => _voiceMute;
   bool get videoEnable => _videoEnable;
+  bool get callSuccess => _callSuccess;
+
 
 
   updateInCalling(bool call) {
@@ -38,6 +43,11 @@ class CallInfoModel extends ChangeNotifier {
 
   updateFullScreen(bool value) {
     if (_fullScreen == value) return;
+    if (value) {
+      SystemChrome.setEnabledSystemUIOverlays([]);
+    } else {
+      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    }
     _fullScreen = value;
     notifyListeners();
   }
@@ -59,6 +69,11 @@ class CallInfoModel extends ChangeNotifier {
   updateVideo(bool enable) {
     if (_videoEnable == enable) return;
     _videoEnable = enable;
+    notifyListeners();
+  }
+  updateCallSuccess(bool enable) {
+    if (_callSuccess == enable) return;
+    _callSuccess = enable;
     notifyListeners();
   }
 // 更新

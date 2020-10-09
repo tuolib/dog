@@ -11,7 +11,6 @@ class SocketIoListen {
   static messageDialogsGet() async {
     final dbHelper = DatabaseHelper.instance;
     socketInit.on('messageDialogsGet', (data) async {
-
       isUpdatingGroup = true;
       socketProviderConnectModel.setUpdating(true);
       // logger.d('------------------messageDialogsGet :');
@@ -21,8 +20,8 @@ class SocketIoListen {
       if (dataObj['success'] == 1) {
         var allContact = await dbHelper
             .contactMultipleCondition(['userId'], [Global.profile.user.userId]);
-        var allGroupUser = await dbHelper
-            .groupUserMultipleCondition(['userId'], [Global.profile.user.userId]);
+        var allGroupUser = await dbHelper.groupUserMultipleCondition(
+            ['userId'], [Global.profile.user.userId]);
         List<int> willGetGroupRoom = [];
         List<int> willGetUser = [];
         List<int> willGetLastMessage = [];
@@ -34,7 +33,7 @@ class SocketIoListen {
         for (var j = 0; j < dataObj['groupUser'].length; j++) {
           var jsonObj = dataObj['groupUser'][j];
 //          originGroupUserId.add(jsonObj['id']);
-          
+
           compareDialogInfo() async {
             var chatItem;
             if (jsonObj['contactId'] != 0) {
@@ -225,6 +224,7 @@ class SocketIoListen {
               ]);
             }
           }
+
           futuresLocalUpdate.add(compareDialogInfo());
 
           willGetCompare() async {
@@ -255,8 +255,10 @@ class SocketIoListen {
               }
             }
           }
+
           futuresLocalUpdate.add(willGetCompare());
         }
+
         /// 问题待解决，删除不存在的 dialog
 //        for(var m = 0; m < allGroupUser.length; m++) {
 //          var isInGroup = false;
@@ -470,8 +472,7 @@ class SocketIoListen {
           );
           futuresLocalUpdate.add(dbHelper.contactUpdateOrInsert(contactInsert));
 //          如果是从个人详情页面 添加的联系人，就更新对话信息
-          var conversationInfo =
-              chatInfoModelSocket.conversationInfo;
+          var conversationInfo = chatInfoModelSocket.conversationInfo;
           if (conversationInfo['contactId'] == jsonObj['contactId']) {
             chatInfoModelSocket.updateInfoProperty(
                 'contactSqlId', jsonObj['id']);
@@ -484,8 +485,7 @@ class SocketIoListen {
             if (jsonObj['lastName'] != null) {
               groupName += jsonObj['lastName'];
             }
-            chatInfoModelSocket.updateInfoProperty(
-                'groupName', '$groupName');
+            chatInfoModelSocket.updateInfoProperty('groupName', '$groupName');
           }
         }
         //   更新 user
@@ -589,22 +589,18 @@ class SocketIoListen {
         await dbHelper.deleteContacts(contactSqlId);
         await socketProviderContactListModel.getContactList();
         if (socketProviderConversationListModelGroupId != null) {
-          var conversationInfo =
-              chatInfoModelSocket.conversationInfo;
-          chatInfoModelSocket.updateInfoProperty(
-              'contactSqlId', null);
+          var conversationInfo = chatInfoModelSocket.conversationInfo;
+          chatInfoModelSocket.updateInfoProperty('contactSqlId', null);
           UserSql userInfo =
               await dbHelper.userOne(conversationInfo['contactId']);
           chatInfoModelSocket.updateInfoProperty(
               'firstName', userInfo.firstName);
-          chatInfoModelSocket.updateInfoProperty(
-              'lastName', userInfo.lastName);
+          chatInfoModelSocket.updateInfoProperty('lastName', userInfo.lastName);
           var groupName = userInfo.firstName;
           if (userInfo.lastName != null) {
             groupName += ' ${userInfo.lastName}';
           }
-          chatInfoModelSocket.updateInfoProperty(
-              'groupName', groupName);
+          chatInfoModelSocket.updateInfoProperty('groupName', groupName);
           if (conversationInfo['groupId'] != 0) {
             await socketProviderChatListModel.getChatList();
           }
@@ -636,8 +632,7 @@ class SocketIoListen {
           [dataObj['contactSqlId']],
         );
 //        更新个人页面详情信息
-        var conversationInfo =
-            chatInfoModelSocket.conversationInfo;
+        var conversationInfo = chatInfoModelSocket.conversationInfo;
 //        await socketProviderConversationListModel.getConversationInfo();
         if (conversationInfo['contactSqlId'] == dataObj['contactSqlId']) {
           chatInfoModelSocket.updateInfoProperty(
@@ -948,8 +943,7 @@ class SocketIoListen {
           [dataObj['groupId']],
         );
         //        更新群详情信息
-        var conversationInfo =
-            chatInfoModelSocket.conversationInfo;
+        var conversationInfo = chatInfoModelSocket.conversationInfo;
 //        await socketProviderConversationListModel.getConversationInfo();
         if (conversationInfo['groupId'] == dataObj['groupId']) {
           String str = dataObj['groupName'];
@@ -962,10 +956,8 @@ class SocketIoListen {
           if (pieces.length > 1) {
             lastName = pieces[pieces.length - 1];
           }
-          chatInfoModelSocket.updateInfoProperty(
-              'firstName', firstName);
-          chatInfoModelSocket.updateInfoProperty(
-              'lastName', lastName);
+          chatInfoModelSocket.updateInfoProperty('firstName', firstName);
+          chatInfoModelSocket.updateInfoProperty('lastName', lastName);
           chatInfoModelSocket.updateInfoProperty(
               'groupName', '${dataObj['groupName']}');
           chatInfoModelSocket.updateInfoProperty(
@@ -1010,30 +1002,22 @@ class SocketIoListen {
                 insertFile.fileCompressUrl,
               );
             }
-            if (chatInfoModelSocket
-                    .conversationInfo['avatar'] !=
+            if (chatInfoModelSocket.conversationInfo['avatar'] !=
                 dataObj['avatar']) {
-              chatInfoModelSocket.updateInfoProperty(
-                  'fileOriginUrl', '');
-              chatInfoModelSocket.updateInfoProperty(
-                  'fileOriginLocal', '');
+              chatInfoModelSocket.updateInfoProperty('fileOriginUrl', '');
+              chatInfoModelSocket.updateInfoProperty('fileOriginLocal', '');
             }
-            chatInfoModelSocket.updateInfoProperty(
-                'avatar', dataObj['avatar']);
+            chatInfoModelSocket.updateInfoProperty('avatar', dataObj['avatar']);
             chatInfoModelSocket.updateInfoProperty(
                 'fileCompressUrl', dataObj['groupAvatarCompress']);
             FileSql fileInfo2 = await dbHelper.fileOne(dataObj['avatar']);
             chatInfoModelSocket.updateInfoProperty(
                 'fileCompressLocal', fileInfo2.fileCompressLocal);
           } else {
-            chatInfoModelSocket.updateInfoProperty(
-                'fileCompressUrl', '');
-            chatInfoModelSocket.updateInfoProperty(
-                'fileCompressLocal', '');
-            chatInfoModelSocket.updateInfoProperty(
-                'fileOriginUrl', '');
-            chatInfoModelSocket.updateInfoProperty(
-                'fileOriginLocal', '');
+            chatInfoModelSocket.updateInfoProperty('fileCompressUrl', '');
+            chatInfoModelSocket.updateInfoProperty('fileCompressLocal', '');
+            chatInfoModelSocket.updateInfoProperty('fileOriginUrl', '');
+            chatInfoModelSocket.updateInfoProperty('fileOriginLocal', '');
           }
         }
 //        更新 聊天列表
@@ -1056,8 +1040,7 @@ class SocketIoListen {
 //        logger.d(dataObj);
         if (chatInfoModelSocket.conversationInfo != null &&
             dataObj['groupId'] ==
-                chatInfoModelSocket
-                    .conversationInfo['groupId']) {
+                chatInfoModelSocket.conversationInfo['groupId']) {
 //            socketProviderConversationListModel
 //                .updateInfo(dataObj['groupInfo']);
           chatInfoModelSocket.updateInfoProperty(
@@ -1111,10 +1094,8 @@ class SocketIoListen {
                       'fileCompressLocal', fileInfo['pathUrl']);
                 }
               } else {
-                chatInfoModelSocket.updateInfoProperty(
-                    'fileCompressUrl', '');
-                chatInfoModelSocket.updateInfoProperty(
-                    'fileCompressLocal', '');
+                chatInfoModelSocket.updateInfoProperty('fileCompressUrl', '');
+                chatInfoModelSocket.updateInfoProperty('fileCompressLocal', '');
               }
             } else {
 //                更新两个字段
@@ -1477,8 +1458,7 @@ class SocketIoListen {
         await dbHelper.chatListUpdateProperty(['groupUserLength'], ['groupId'],
             [groupMemberLen], [dataObj['groupId']]);
 //          更新群成员人数
-        chatInfoModelSocket.updateInfoProperty(
-            'groupMembers', groupMemberLen);
+        chatInfoModelSocket.updateInfoProperty('groupMembers', groupMemberLen);
       }
       socketProviderChatListModel.getChatList();
       if (Global.profile.user.userId == dataObj['memberId']) {
@@ -1615,8 +1595,7 @@ class SocketIoListen {
         var dataObj = Map<dynamic, dynamic>.from(parsed);
         if (dataObj['type'] == 'serverGetGroupMessage' &&
             dataObj['groupId'] ==
-                chatInfoModelSocket
-                    .conversationInfo['groupId']) {
+                chatInfoModelSocket.conversationInfo['groupId']) {
           socketProviderConversationListModel
               .updateList(dataObj['groupMessageList'].reversed.toList());
         }
@@ -1900,11 +1879,8 @@ class SocketIoListen {
       /// 如果是最旧消息页
       if (dataObj['isLast']) {
 //        lastDeleteMsgTime
-        await dbHelper.groupUserMerge(
-            ['hasGetOldest'],
-            ['groupId', 'userId'],
-            [1],
-            [dataObj['groupId'], Global.profile.user.userId]);
+        await dbHelper.groupUserMerge(['hasGetOldest'], ['groupId', 'userId'],
+            [1], [dataObj['groupId'], Global.profile.user.userId]);
         socketProviderChatListModel.getChatList();
 //        List chatList = socketProviderChatListModel.chatList;
 //        int groupId = dataObj['groupId'];
@@ -1915,7 +1891,8 @@ class SocketIoListen {
 //        }
       }
       if (dataObj['isEmpty'] != true) {
-        if (dataObj['groupId'] == chatInfoModelSocket.conversationInfo['groupId']) {
+        if (dataObj['groupId'] ==
+            chatInfoModelSocket.conversationInfo['groupId']) {
           /// 如果还在当前对话，则
           socketProviderConversationListModel.getConversationList(
             limit: dataObj['limitSave'],
@@ -1970,7 +1947,8 @@ class SocketIoListen {
         //            pageList.preMessage nextMessage
 
       } else {
-        if (dataObj['groupId'] == chatInfoModelSocket.conversationInfo['groupId']) {
+        if (dataObj['groupId'] ==
+            chatInfoModelSocket.conversationInfo['groupId']) {
           /// 如果还在当前对话，则
           socketProviderConversationListModel.getConversationList(
             limit: dataObj['limitSave'],
@@ -2150,6 +2128,12 @@ class SocketIoListen {
         int userId = dataObj['userId'];
         int isOnline = dataObj['isOnline'] ? 1 : 0;
         int lastSeen = dataObj['lastSeen'];
+        if (userId == callFriendId &&
+            callInfoSocket.inCalling &&
+            callInfoSocket.callSuccess &&
+            !dataObj['isOnline']) {
+          overCallAll(emit: false);
+        }
         UserSql index = await dbHelper.userOne(userId);
         if (index != null) {
 //            print(index.id);
@@ -2167,15 +2151,11 @@ class SocketIoListen {
           );
           await dbHelper.userUpdate(row);
           if (chatInfoModelSocket.conversationInfo != null) {
-            var groupType = chatInfoModelSocket
-                .conversationInfo['groupType'];
-            var contactId = chatInfoModelSocket
-                .conversationInfo['contactId'];
+            var groupType = chatInfoModelSocket.conversationInfo['groupType'];
+            var contactId = chatInfoModelSocket.conversationInfo['contactId'];
             if (groupType == 2 && contactId == index.id) {
-              chatInfoModelSocket.updateInfoProperty(
-                  'isOnline', isOnline == 1);
-              chatInfoModelSocket.updateInfoProperty(
-                  'lastSeen', lastSeen);
+              chatInfoModelSocket.updateInfoProperty('isOnline', isOnline == 1);
+              chatInfoModelSocket.updateInfoProperty('lastSeen', lastSeen);
             }
           }
           if (socketProviderChatListModel != null) {

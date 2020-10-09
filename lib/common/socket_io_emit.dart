@@ -601,6 +601,11 @@ class SocketIoEmit {
     int fromId,
     int toId,
     int groupId,
+
+    String uuid,
+    String handle,
+    bool hasVideo = false,
+    String callerName,
   }) async {
 //    isUpdatingGroup = true;
     Map<String, dynamic> sendData = {
@@ -609,6 +614,28 @@ class SocketIoEmit {
       'fromId': fromId,
       'toId': toId,
       'groupId': groupId,
+      'uuid': uuid,
+      'handle': handle,
+      'hasVideo': hasVideo,
+      'callerName': callerName,
+    };
+    socketInit.emit('msg', _encoder.convert(sendData));
+  }
+  //  发出通话邀请
+  static cancelInvite({
+    int fromId,
+    int toId,
+    int groupId,
+    String uuid,
+  }) async {
+//    isUpdatingGroup = true;
+    Map<String, dynamic> sendData = {
+      'type': 'cancelInvite',
+      'authtoken': Global.profile.token,
+      'fromId': fromId,
+      'toId': toId,
+      'groupId': groupId,
+      'uuid': uuid,
     };
     socketInit.emit('msg', _encoder.convert(sendData));
   }
@@ -702,5 +729,20 @@ class SocketIoEmit {
     };
     socketInit.emit('msg', _encoder.convert(sendData));
   }
-
+  //  发出 candidate
+  static callBye({
+    int fromId,
+    int toId,
+    int groupId,
+  }) async {
+//    isUpdatingGroup = true;
+    Map<String, dynamic> sendData = {
+      'type': 'callBye',
+      'authtoken': Global.profile.token,
+      'groupId': groupId,
+      'fromId': fromId,
+      'toId': toId,
+    };
+    socketInit.emit('msg', _encoder.convert(sendData));
+  }
 }

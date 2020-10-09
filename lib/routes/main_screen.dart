@@ -1,11 +1,14 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:core';
+import 'dart:async';
 
 import '../index.dart';
 import 'package:badges/badges.dart';
 import 'package:flutter/services.dart';
 
 BuildContext mainScreePage;
+Timer timer;
 class MainScreen extends StatefulWidget {
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -31,36 +34,75 @@ class _MainScreenState extends State<MainScreen> {
 //    isSend = false; , keepPage: true, viewportFraction: 1
     _pageController = PageController(initialPage: 0, keepPage: true);
 //    监听 手机打开，进入后台
-    WidgetsBinding.instance
-        .addObserver(LifecycleEventHandler(resumeCallBack: () async {
-      lifecycleState = AppLifecycleState.inactive;
-      // await NotificationHelper().cancelAllNotifications();
-    }));
+    WidgetsBinding.instance.addObserver(LifecycleEventHandler(
+      resumeCallBack: () async {
+        lifecycleState = AppLifecycleState.inactive;
+        // await NotificationHelper().cancelAllNotifications();
+        if (Platform.isAndroid) {
+          if (currentCallUuid != null) {
+            logger.d('---------------currentCallUuid: $currentCallUuid');
+            logger.d(mainScreePage);
+            logger.d('---------------hasCall: $hasCall');
+            logger.d('socketInit.connected: ${socketInit.connected}');
+            if (mainScreePage != null) {
+              Timer.periodic(const Duration(seconds: 1), (timer) {
+                if (socketInit.connected) {
+                  timer.cancel();
+                  createOverlayView(mainScreePage, false);
+                }
+              });
+            }
+          }
+        }
+      },
+      // inactiveCallBack: () async {
+      //   logger.d('active life');
+      // },
+    ));
+    if (Platform.isAndroid) {
+      if (currentCallUuid != null) {
+        logger.d('---------------currentCallUuid: $currentCallUuid');
+        logger.d(mainScreePage);
+        if (hasCall && mainScreePage != null) {
+          Timer.periodic(const Duration(seconds: 1), (timer) {
+            if (socketInit.connected) {
+              timer.cancel();
+              createOverlayView(mainScreePage, false);
+            }
+          });
+        }
+      }
+    }
   }
 
-//  @override
-//  void dispose() {
-//    super.dispose();
-//    _pageController.dispose();
-//  }
+ // @override
+ // void dispose() {
+ //   super.dispose();
+ //   // _pageController.dispose();
+ // }
 
   @override
   Widget build(BuildContext context) {
     mainScreePage = context;
 
-    socketProviderChatListModel = Provider.of<ChatListModel>(context, listen: false);
+    socketProviderChatListModel =
+        Provider.of<ChatListModel>(context, listen: false);
     var info = Provider.of<ConversationListModel>(context, listen: false);
     socketProviderConversationListModel = info;
-    var contactsProvider = Provider.of<ContactListModel>(context, listen: false);
+    var contactsProvider =
+        Provider.of<ContactListModel>(context, listen: false);
     socketProviderContactListModel = contactsProvider;
-    var groupMemberModelProvider = Provider.of<GroupMemberModel>(context, listen: false);
+    var groupMemberModelProvider =
+        Provider.of<GroupMemberModel>(context, listen: false);
     socketGroupMemberModel = groupMemberModelProvider;
     var chatInfo = Provider.of<ChatInfoModel>(context, listen: false);
     chatInfoModelSocket = chatInfo;
 //    socketProviderChatListModel.getChatList();
     var callInfo = Provider.of<CallInfoModel>(context, listen: false);
     callInfoSocket = callInfo;
-
+    // if (!hasStartCall) {
+    //   createOverlayView(mainScreePage, false);
+    // }
 
 //    var gAvatar;
 //    User user = Global.profile.user;
@@ -217,7 +259,6 @@ class _MainScreenState extends State<MainScreen> {
   void navigationTapped(int page) {
     _pageController.jumpToPage(page);
   }
-
 
   void onPageChanged(int page) {
 //    logger.d(hasGetContact);

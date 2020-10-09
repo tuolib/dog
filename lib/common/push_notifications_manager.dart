@@ -25,6 +25,7 @@ class Call {
 
 // BuildContext mainContext;
 
+bool sendCallBye = false;
 int callFriendId;
 int callGroupId;
 // 是否通话中
@@ -37,6 +38,7 @@ Map<String, Call> calls = {};
 String newUUID() => Uuid().v4();
 
 // bool _configured;
+String callerName;
 String currentCallUuid;
 FlutterCallKit callKitIn = FlutterCallKit();
 
@@ -197,11 +199,30 @@ void onTokenVoip(String token) {
 // /// [payload] the notification payload to be processed. use this to present a local notification
 Future<dynamic> onMessageVoip(bool isLocal, Map<String, dynamic> payload) {
   // handle foreground notification
-  print("received on foreground payload: $payload, isLocal=$isLocal");
+  logger.d("received on foreground payload: $payload, isLocal=$isLocal");
+  logger.d("hasCall: $hasCall");
+  logger.d("callGroupId: $callGroupId");
   var data = payload['data'];
   if (data['type'] == 'callInvite') {
-    callGroupId = int.parse(data['groupId']);
-    displayIncomingCall('123456');
+    // 如果正在通话中，则不显示新通知
+    if (!hasCall) {
+      currentCallUuid = data['uuid'];
+      callGroupId = int.parse(data['groupId']);
+      displayIncomingCall(data['callerName']);
+    }
+  }
+  if (data['type'] == "cancelInvite") {
+    if (hasCall && callGroupId == int.parse(data['groupId'])) {
+      logger.d('cancel call: $currentCallUuid');
+      if (Platform.isIOS) {
+        // callKitIn.endCall(currentCallUuid);
+        // reportEndCallWithUUID(currentCallUuid, EndReason.remoteEnded);
+        callKitIn.endCall(data['uuid']);
+        reportEndCallWithUUID(data['uuid'], EndReason.remoteEnded);
+      } else {
+        callKeepIn.endCall(currentCallUuid);
+      }
+    }
   }
   return null;
 }
@@ -215,10 +236,29 @@ Future<dynamic> onResumeVoip(bool isLocal, Map<String, dynamic> payload) {
   lifecycleState = AppLifecycleState.detached;
   // handle background notification
   logger.d("received on background payload: $payload, isLocal=$isLocal");
+  logger.d("hasCall: $hasCall");
+  logger.d("callGroupId: $callGroupId");
   var data = payload['data'];
   if (data['type'] == 'callInvite') {
-    callGroupId = int.parse(data['groupId']);
-    displayIncomingCall('123456');
+    // 如果已经有通话中，则不显示新通知
+    if (!hasCall) {
+      currentCallUuid = data['uuid'];
+      callGroupId = int.parse(data['groupId']);
+      displayIncomingCall(data['callerName']);
+    }
+  }
+  if (data['type'] == "cancelInvite") {
+    if (hasCall && callGroupId == int.parse(data['groupId'])) {
+      logger.d('cancel call: $currentCallUuid');
+      if (Platform.isIOS) {
+        // callKitIn.endCall(currentCallUuid);
+        // reportEndCallWithUUID(currentCallUuid, EndReason.remoteEnded);
+        callKitIn.endCall(data['uuid']);
+        reportEndCallWithUUID(data['uuid'], EndReason.remoteEnded);
+      } else {
+        callKeepIn.endCall(currentCallUuid);
+      }
+    }
   }
   // showLocalNotification(payload);
   return null;
@@ -227,6 +267,18 @@ Future<dynamic> onResumeVoip(bool isLocal, Map<String, dynamic> payload) {
 Future<dynamic> onResume(Map<String, dynamic> payload) {
   // handle background notification
   logger.d("onResume payload: $payload");
+  var data = payload['data'];
+  if (data['type'] == "cancelInvite") {
+    if (hasCall && callGroupId == int.parse(data['groupId'])) {
+      logger.d('cancel call: $currentCallUuid');
+      if (Platform.isIOS) {
+        callKitIn.endCall(data['uuid']);
+        reportEndCallWithUUID(data['uuid'], EndReason.remoteEnded);
+      } else {
+        callKeepIn.endCall(currentCallUuid);
+      }
+    }
+  }
 
   // print("onResume: $payload");
 //          var payload = ;
@@ -265,9 +317,25 @@ Future<dynamic> onMessage(Map<String, dynamic> payload) {
   // logger.d('${data['groupId']}');
   if (Platform.isAndroid) {
     if (data['type'] == "callInvite") {
-      callGroupId = int.parse(data['groupId']);
-      logger.d(callGroupId);
-      displayIncomingCall('123');
+      if (!hasCall) {
+        callGroupId = int.parse(data['groupId']);
+        logger.d(callGroupId);
+        callerName = data['callerName'];
+        currentCallUuid = data['uuid'];
+        displayIncomingCall(data['callerName']);
+      }
+    }
+  }
+  if (data['type'] == "cancelInvite") {
+
+    if (hasCall && callGroupId == int.parse(data['groupId'])) {
+      logger.d('cancel call: $currentCallUuid');
+      if (Platform.isIOS) {
+        callKitIn.endCall(data['uuid']);
+        reportEndCallWithUUID(data['uuid'], EndReason.remoteEnded);
+      } else {
+        callKeepIn.endCall(data['uuid']);
+      }
     }
   }
   return null;
@@ -285,18 +353,20 @@ Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
 // Handle data message
     final dynamic data = message['data'];
     logger.d(data);
-    callGroupId = int.parse(data['groupId']);
-    logger.d(callGroupId);
+    if (!hasCall) {
+      callGroupId = int.parse(data['groupId']);
+      logger.d(callGroupId);
+      callerName = data['callerName'];
+      currentCallUuid = data['uuid'];
+      displayIncomingCall(data['callerName']);
+    }
   }
 
-  if (message.containsKey('notification')) {
-// Handle notification message
-    final dynamic notification = message['notification'];
-    logger.d(notification);
-  }
-
-
-  displayIncomingCall('123');
+//   if (message.containsKey('notification')) {
+// // Handle notification message
+//     final dynamic notification = message['notification'];
+//     logger.d(notification);
+//   }
 }
 
 
@@ -323,29 +393,33 @@ void setCallMuted(String callUUID, bool muted) {
 
 Future<void> answerCall(CallKeepPerformAnswerCallAction event) async {
   final String callUUID = event.callUUID;
-  final String number = "1234444";
-  logger.d('[answerCall] $callUUID, number: $number');
+  // final String number = callerName;
+  logger.d('[answerCall] $callUUID, callerName: $callerName');
   currentCallUuid = callUUID;
-  callKeepIn.startCall(event.callUUID, number, number);
+  callKeepIn.startCall(event.callUUID, 'generic', callerName);
   Timer(const Duration(seconds: 1), () {
     // logger.d('[setCurrentCallActive] $callUUID, number: $number');
     callKeepIn.setCurrentCallActive(callUUID);
   });
 
-  createOverlayView(mainScreePage, false);
   // navigatorKey.currentState.pushNamed('callVideo', arguments: {
   //   "invite": false,
   // });
+  logger.d('---------------hasCall: $hasCall');
+  logger.d('socketInit.connected: ${socketInit.connected}');
   bool result = await isLockScreen();
   if (!result) {
     callKeepIn.backToForeground();
   }
+
+  // createOverlayView(mainScreePage, false);
 }
 
 Future<void> endCall(CallKeepPerformEndCallAction event) async {
   logger.d('endCall: ${event.callUUID}');
   removeCall(event.callUUID);
-  hangUpCall();
+  // currentCallUuid = null;
+  overCallAll();
 }
 
 Future<void> didPerformDTMFAction(CallKeepDidPerformDTMFAction event) async {
@@ -392,10 +466,11 @@ Future<void> didToggleHoldCallAction(
   setCallHeld(event.callUUID, event.hold);
 }
 
-Future<void> hangup(String callUUID) async {
-  callKeepIn.endCall(callUUID);
-  removeCall(callUUID);
-}
+//
+// Future<void> hangup(String callUUID) async {
+//   callKeepIn.endCall(callUUID);
+//   removeCall(callUUID);
+// }
 
 Future<void> setOnHold(String callUUID, bool held) async {
   callKeepIn.setOnHold(callUUID, held);
@@ -425,60 +500,58 @@ Future<void> updateDisplay(String callUUID) async {
   logger.d('[updateDisplay: $number] $callUUID');
 }
 
-Future<void> displayIncomingCallDelayed(String number) async {
-  Timer(const Duration(seconds: 3), () {
-    displayIncomingCall(number);
-  });
-}
+// Future<void> displayIncomingCallDelayed(String number) async {
+//   Timer(const Duration(seconds: 3), () {
+//     displayIncomingCall(number);
+//   });
+// }
 
-Future<void> displayIncomingCall(String number) async {
+Future<void> displayIncomingCall(String callerName, {String uuid}) async {
   hasCall = true;
-  if (socketInit != null) {
-    // logger.d('has connect socket');
-    displayConnectedCall(number);
-    // navigatorKey.currentState.pushNamed('callVideo');
-  } else {
-    // logger.d('not connect socket');
-    // await Global.init();
-
-    await Global.init().then((e) => runApp(MyApp()));
-    socketIoItem.initCommunication();
-    socketInit.on('connect', (_) async {
-      if (hasCall) {
-        displayConnectedCall(number);
-        // navigatorKey.currentState.pushNamed('callVideo', arguments: {
-        //   "invite": false,
-        // });
-        // Navigator.push(thisContext, MaterialPageRoute(builder: (context) {
-        //   return NewPage(
-        //       title: "New Page"
-        //   );
-        // }));
-      }
-    });
-  }
+  logger.d('Call socketInit.connected: ${socketInit.connected}');
+  displayConnectedCall(callerName, uuid: uuid);
+  // if (socketInit != null) {
+  //   // logger.d('has connect socket');
+  //   displayConnectedCall(number);
+  //   // navigatorKey.currentState.pushNamed('callVideo');
+  // } else {
+  //   // logger.d('not connect socket');
+  //   // await Global.init();
+  //
+  //   await Global.init().then((e) => runApp(MyApp()));
+  //   socketIoItem.initCommunication();
+  //   socketInit.on('connect', (_) async {
+  //     if (hasCall) {
+  //       displayConnectedCall(number);
+  //       // navigatorKey.currentState.pushNamed('callVideo', arguments: {
+  //       //   "invite": false,
+  //       // });
+  //       // Navigator.push(thisContext, MaterialPageRoute(builder: (context) {
+  //       //   return NewPage(
+  //       //       title: "New Page"
+  //       //   );
+  //       // }));
+  //     }
+  //   });
+  // }
   // return;
 
 
 }
 
-displayConnectedCall(String number) async {
+displayConnectedCall(String callerName, {String uuid}) async {
   if (Platform.isIOS) {
 
-    currentCallUuid = newUUID();
-    await startCall("generic", 'Somebody');
-    await callKitIn.displayIncomingCall(currentCallUuid, "generic", 'Somebody');
+    // currentCallUuid = newUUID();
+    await startCall("generic", callerName);
+    await callKitIn.displayIncomingCall(currentCallUuid, "generic", callerName);
   } else {
-
-    final String callUUID = newUUID();
+    // final String callUUID = newUUID();
     // setState(() {
     //   calls[callUUID] = Call(number);
     // });
-    currentCallUuid = callUUID;
-    calls[callUUID] = Call(number);
-    // callArr.add(Call(number));
-    // logger.d(calls);
-    // logger.d('Display incoming call now');
+    // currentCallUuid = callUUID;
+    calls[currentCallUuid] = Call(callerName);
     bool hasPhoneAccount = await callKeepIn.hasPhoneAccount();
     if (!hasPhoneAccount) {
       await callKeepIn.hasDefaultPhoneAccount(mainScreePage, <String, dynamic>{
@@ -491,17 +564,9 @@ displayConnectedCall(String number) async {
     }
     // logger.d('hasPhoneAccount: $hasPhoneAccount');
 
-    logger.d('[displayIncomingCall] $callUUID number: $number');
-    await callKeepIn.displayIncomingCall(callUUID, number,
+    logger.d('[displayIncomingCall] $currentCallUuid callerName: $callerName');
+    await callKeepIn.displayIncomingCall(currentCallUuid, callerName,
         handleType: 'generic', hasVideo: true);
-
-
-    // await flutterCallKeep.CallKeep.askForPermissionsIfNeeded(mainScreePage);
-    // final callUUID = '0783a8e5-8353-4802-9448-c6211109af51';
-    // final number = '+46 70 123 45 67';
-    //
-    // await flutterCallKeep.CallKeep.displayIncomingCall(
-    //     callUUID, number, number, flutterCallKeep.HandleType.number, false);
   }
 }
 
@@ -529,13 +594,14 @@ Future<void> _didReceiveStartCallAction(String uuid, String handle) async {
 Future<void> _performAnswerCallAction(String uuid) async {
   // Called when the user answers an incoming call
   logger.d('_performAnswerCallAction');
+  createOverlayView(mainScreePage, false);
 }
-
+// iOS 点击 关闭
 Future<void> _performEndCallAction(String uuid) async {
   await callKitIn.endCall(currentCallUuid);
   currentCallUuid = null;
   logger.d('_performEndCallAction');
-  hangUpCall();
+  overCallAll();
 }
 
 Future<void> _didActivateAudioSession() async {

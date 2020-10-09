@@ -40,13 +40,24 @@
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type withCompletionHandler:(void (^)(void))completion {
   // Process the received push
   [FlutterVoipPushNotificationPlugin didReceiveIncomingPushWithPayload:payload forType:(NSString *)type];
+    NSLog(@"payload voip");
+    
+//    NSString *uuid = payload.dictionaryPayload[@"uuid"];
+    NSString *uuid = payload.dictionaryPayload[@"uuid"];
+    NSUUID *uuidString = [[NSUUID alloc] initWithUUIDString:uuid];
+    NSLog(@"Value of uuid = %@", uuid);
+//    NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:uuidString];
+
+    NSString *handle = payload.dictionaryPayload[@"handle"];
+    bool hasVideo = payload.dictionaryPayload[@"hasVideo"];
 
   // Retrieve information like handle and callerName here
-   NSString *uuid = /* fetch for payload or ... */ [[[NSUUID UUID] UUIDString] lowercaseString];
-   NSString *callerName = @"ham";
-   NSString *handle = @"+12011234567";
+//   NSString *uuid = /* fetch for payload or ...  [[[NSUUID UUID] UUIDString] lowercaseString];*/
+   NSString *callerName = payload.dictionaryPayload[@"callerName"];
+   NSLog(@"Value of callerName = %@", callerName);
+//   NSString *handle = @"+12011234567";
 
-  [FlutterCallKitPlugin reportNewIncomingCall:uuid handle:handle handleType:@"generic" hasVideo:false  localizedCallerName:callerName fromPushKit: YES];
+  [FlutterCallKitPlugin reportNewIncomingCall:uuid handle:handle handleType:@"generic" hasVideo:hasVideo  localizedCallerName:callerName fromPushKit: YES];
 
   completion();
 }

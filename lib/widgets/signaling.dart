@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../index.dart';
 
+import 'package:uuid/uuid.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
+String serverSendUuid;
 enum SignalingState {
   CallStateNew,
   CallStateRinging,
@@ -97,18 +99,16 @@ class Signaling {
 
   Signaling();
 
-  close() {
+  close() async {
+    signalingCall = null;
     if (_localStream != null) {
-      _localStream.dispose();
+      // _localStream.getAudioTracks()[0].dispose();
+     await  _localStream.dispose();
       _localStream = null;
     }
-    // localRendererCall.dispose();
-    // remoteRendererCall.dispose();
-    _peerConnections.forEach((key, pc) {
-      pc.close();
+    _peerConnections.forEach((key, pc) async {
+      await pc.close();
     });
-    // _remoteStreams
-    // if (_socket != null) _socket.close();
   }
 
   void switchCamera() {
@@ -140,10 +140,21 @@ class Signaling {
     }
 
     // logger.d('invite emit');
+    serverSendUuid = newUUID();
+    String fullName = '';
+    String firstName = Global.profile.user.firstName;
+    String lastName = Global.profile.user.lastName;
+    if (lastName != null) {
+      fullName = '$firstName $lastName';
+    }
     SocketIoEmit.callInvite(
       fromId: Global.profile.user.userId,
       toId: chatInfoModelSocket.conversationInfo['contactId'],
       groupId: callGroupId,
+      uuid: serverSendUuid,
+      handle: '',
+      hasVideo: true,
+      callerName: fullName,
     );
     // if (isInvite == true) {
     // } else {
@@ -228,7 +239,7 @@ class Signaling {
 
           var pc = _peerConnections[id];
           logger.d('answer');
-          logger.d(pc);
+          // logger.d(pc);
           if (pc != null) {
             await pc.setRemoteDescription(new RTCSessionDescription(
                 description['sdp'], description['type']));
@@ -266,7 +277,8 @@ class Signaling {
         break;
       case 'leave':
         {
-          var id = data;
+          // var id = data;
+          var id = data['to'].toString();
           var pc = _peerConnections.remove(id);
           _dataChannels.remove(id);
 
@@ -286,7 +298,7 @@ class Signaling {
         break;
       case 'bye':
         {
-          var to = data['to'].toString();
+          var to = data['from'].toString();
           var sessionId = 'session_id';
           print('bye: ' + sessionId);
 
@@ -301,11 +313,11 @@ class Signaling {
             _peerConnections.remove(to);
           }
 
-          var dc = _dataChannels[to];
-          if (dc != null) {
-            dc.close();
-            _dataChannels.remove(to);
-          }
+          // var dc = _dataChannels[to];
+          // if (dc != null) {
+          //   dc.close();
+          //   _dataChannels.remove(to);
+          // }
 
           this._sessionId = null;
           if (this.onStateChange != null) {
@@ -400,7 +412,7 @@ class Signaling {
       // _peerConnections['${Global.profile.user.userId}'].get();
     });
     socketInit.on('callCandidate', (data) async {
-      logger.d('callCandidate data: ' + data);
+      // logger.d('callCandidate data: ' + data);
       JsonDecoder decoder = new JsonDecoder();
       var d = decoder.convert(data);
       this.onMessage({
@@ -438,11 +450,16 @@ class Signaling {
       logger.d('callMessageBye data: ' + data);
       JsonDecoder decoder = new JsonDecoder();
       var d = decoder.convert(data);
-      this.onMessage({
-        "data": d,
-        "type": "bye",
-      });
+
+      // this.onMessage({
+      //   "data": d,
+      //   "type": "bye",
+      // });
+
+      callInfoSocket.updateCallSuccess(false);
+      overCallAll(emit: false);
     });
+    // socketInit.
     socketInit.on('callClosed', (data) async {
       logger.d('callClosed');
       if (this.onStateChange != null) {
@@ -509,17 +526,22 @@ class Signaling {
     };
     pc.onIceGatheringState = (state) {
       //onIceGatheringChangeCOMPLETE
-      logger.d(state);
+      // logger.d(state);
 
     };
 
     pc.onIceConnectionState = (state) {
-      logger.d(state);
+      // logger.d(state);
+      if (state == RTCIceConnectionState.RTCIceConnectionStateConnected) {
+        callInfoSocket.updateCallSuccess(true);
+      }
     };
 
     pc.onAddStream = (stream) {
-      logger.d('onAddRemoteStream: $stream');
-      this.onAddRemoteStream(stream);
+      // logger.d('onAddRemoteStream: $stream');
+      if (hasStartCall) {
+        this.onAddRemoteStream(stream);
+      }
       // if (this.onAddRemoteStream != null) this.onAddRemoteStream(stream);
       //_remoteStreams.add(stream);
     };
