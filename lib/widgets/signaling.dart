@@ -103,12 +103,13 @@ class Signaling {
     signalingCall = null;
     if (_localStream != null) {
       // _localStream.getAudioTracks()[0].dispose();
-     await  _localStream.dispose();
-      _localStream = null;
+     await _localStream.dispose();
+     _localStream = null;
     }
     _peerConnections.forEach((key, pc) async {
       await pc.close();
     });
+    _peerConnections = null;
   }
 
   void switchCamera() {
@@ -116,22 +117,25 @@ class Signaling {
       _localStream.getVideoTracks()[0].switchCamera();
     }
   }
-  void voiceSet(bool enable) {
+  void voiceSet(bool mute) {
     if (_localStream != null) {
-      _localStream.getAudioTracks()[0].setMicrophoneMute(enable);
-      _localStream.getAudioTracks()[0].enableSpeakerphone(enable);
+      // _localStream.getAudioTracks()[0].setMicrophoneMute(enable);
+      // _localStream.getAudioTracks()[0].enableSpeakerphone(enable);
+      _localStream.getAudioTracks()[0].enabled = !mute;
     }
   }
 
 
   void videoSet(bool enable) async {
-    // var mediaT = MediaStreamTrack();
-    if (enable) {
-      // _localStream = await createStream('video', false);
-      _localStream.addTrack(_localStream.getVideoTracks()[0]);
-    } else {
-      _localStream.removeTrack(_localStream.getVideoTracks()[0]);
+    if (_localStream != null) {
+      _localStream.getVideoTracks()[0].enabled = enable;
     }
+    // if (enable) {
+    //   // _localStream = await createStream('video', false);
+    //   _localStream.addTrack(_localStream.getVideoTracks()[0]);
+    // } else {
+    //   _localStream.removeTrack(_localStream.getVideoTracks()[0]);
+    // }
   }
 
   void invite(String peer_id, String media, use_screen) {
@@ -152,8 +156,10 @@ class Signaling {
     }
     if (Platform.isIOS) {
       startCall("generic", Global.callerName, uuid: Global.currentCallUuid);
+      callKitIn.setOnHold(Global.currentCallUuid, true);
     } else if (Platform.isAndroid) {
       callKeepIn.startCall(Global.currentCallUuid, "generic", Global.callerName);
+      callKeepIn.setOnHold(Global.currentCallUuid, true);
     }
     SocketIoEmit.callInvite(
       fromId: Global.profile.user.userId,
@@ -547,10 +553,10 @@ class Signaling {
 
     pc.onAddStream = (stream) {
       // logger.d('onAddRemoteStream: $stream');
-      if (hasStartCall) {
-        this.onAddRemoteStream(stream);
-      }
-      // if (this.onAddRemoteStream != null) this.onAddRemoteStream(stream);
+      // if (hasStartCall) {
+      //   this.onAddRemoteStream(stream);
+      // }
+      if (this.onAddRemoteStream != null) this.onAddRemoteStream(stream);
       //_remoteStreams.add(stream);
     };
 

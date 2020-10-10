@@ -39,27 +39,27 @@ class _MainScreenState extends State<MainScreen> {
       resumeCallBack: () async {
         lifecycleState = AppLifecycleState.inactive;
         // await NotificationHelper().cancelAllNotifications();
-        if (Platform.isAndroid) {
-          if (Global.currentCallUuid != '') {
-            logger
-                .d('---------------currentCallUuid: ${Global.currentCallUuid}');
-            logger.d(mainScreePage);
-            logger.d('---------------hasCall: ${Global.hasCall}');
-            logger.d('socketInit.connected: ${socketInit?.connected}');
-            if (mainScreePage != null) {
-              Timer.periodic(const Duration(seconds: 1), (timer) async {
-                // var isAct = await callKeepIn.isCallActive(Global.currentCallUuid);
-                if (Global.hasCall == '1' &&
-                    !callInfoSocket.callSuccess &&
-                    socketInit != null &&
-                    socketInit.connected) {
-                  timer.cancel();
-                  createOverlayView(mainScreePage, false);
-                }
-              });
-            }
-          }
-        }
+        // if (Platform.isAndroid) {
+        //   if (Global.currentCallUuid != '') {
+        //     logger
+        //         .d('---------------currentCallUuid: ${Global.currentCallUuid}');
+        //     logger.d(mainScreePage);
+        //     logger.d('---------------hasCall: ${Global.hasCall}');
+        //     logger.d('socketInit.connected: ${socketInit?.connected}');
+        //     if (mainScreePage != null) {
+        //       Timer.periodic(const Duration(seconds: 1), (timer) async {
+        //         // var isAct = await callKeepIn.isCallActive(Global.currentCallUuid);
+        //         if (Global.hasCall == '1' &&
+        //             !callInfoSocket.callSuccess &&
+        //             socketInit != null &&
+        //             socketInit.connected) {
+        //           timer.cancel();
+        //           createOverlayView(mainScreePage, false);
+        //         }
+        //       });
+        //     }
+        //   }
+        // }
       },
       // inactiveCallBack: () async {
       //   logger.d('active life');
@@ -76,26 +76,26 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     mainScreePage = context;
-    if (Platform.isAndroid) {
-      if (Global.currentCallUuid != '') {
-        logger.d('---------------currentCallUuid: ${Global.currentCallUuid}');
-        logger.d(mainScreePage);
-        if (mainScreePage != null) {
-          Timer.periodic(const Duration(seconds: 1), (timer) async {
-            // var isAct = await callKeepIn.isCallActive(Global.currentCallUuid);
-            // logger.d(isAct);
-            if (Global.hasCall == '1' &&
-                socketInit != null &&
-                socketInit.connected &&
-                !callInfoSocket.callSuccess
-            ) {
-              timer.cancel();
-              createOverlayView(mainScreePage, false);
-            }
-          });
-        }
-      }
-    }
+    // if (Platform.isAndroid) {
+    //   if (Global.currentCallUuid != '') {
+    //     logger.d('---------------currentCallUuid: ${Global.currentCallUuid}');
+    //     logger.d(mainScreePage);
+    //     if (mainScreePage != null) {
+    //       Timer.periodic(const Duration(seconds: 1), (timer) async {
+    //         // var isAct = await callKeepIn.isCallActive(Global.currentCallUuid);
+    //         // logger.d(isAct);
+    //         if (Global.hasCall == '1' &&
+    //             socketInit != null &&
+    //             socketInit.connected &&
+    //             !callInfoSocket.callSuccess
+    //         ) {
+    //           timer.cancel();
+    //           createOverlayView(mainScreePage, false);
+    //         }
+    //       });
+    //     }
+    //   }
+    // }
     socketProviderChatListModel =
         Provider.of<ChatListModel>(context, listen: false);
     var info = Provider.of<ConversationListModel>(context, listen: false);

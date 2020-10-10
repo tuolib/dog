@@ -10,7 +10,7 @@ class DatabaseHelper {
   static final _databaseName = "MyDatabase.db";
 
 //  static final _databaseVersion = 1;
-  static final _databaseVersion = 45;
+  static final _databaseVersion = 46;
   static final table = 'my_table';
 
   static final columnId = '_id';
@@ -23,6 +23,7 @@ class DatabaseHelper {
   var userTable = 'user_table';
   var contactsTable = 'contacts_table';
   var fileTable = 'file_table';
+  var callTable = 'call_table';
 
 //  static final tableChatList = 'tableChatList';
 
@@ -199,6 +200,14 @@ class DatabaseHelper {
             $columnAge INTEGER NOT NULL
           )
           ''');
+    await db.execute('''
+          CREATE TABLE $callTable (
+            id TEXT,
+            groupId TEXT,
+            callerName TEXT,
+            uuid TEXT
+          )
+          ''');
 //    await db.execute('''
 //      CREATE INDEX index_name ON $groupMessage(createdDate,groupId)
 //    ''');
@@ -211,15 +220,16 @@ class DatabaseHelper {
   }
 
   _onUpgrade(Database db, int oldVersion, int newVersion) async {
-//    await db.execute("DROP TABLE IF EXISTS $chatListTable");
-//    await db.execute("DROP TABLE IF EXISTS $groupRoom");
-//    await db.execute("DROP TABLE IF EXISTS $groupUser");
-//    await db.execute("DROP TABLE IF EXISTS $groupMessage");
-//    await db.execute("DROP TABLE IF EXISTS $contactsTable");
-//    await db.execute("DROP TABLE IF EXISTS $userTable");
-//    await db.execute("DROP TABLE IF EXISTS $fileTable");
-//    await db.execute("DROP TABLE IF EXISTS $table");
-//    await _onCreate(db, newVersion);
+   await db.execute("DROP TABLE IF EXISTS $chatListTable");
+   await db.execute("DROP TABLE IF EXISTS $groupRoom");
+   await db.execute("DROP TABLE IF EXISTS $groupUser");
+   await db.execute("DROP TABLE IF EXISTS $groupMessage");
+   await db.execute("DROP TABLE IF EXISTS $contactsTable");
+   await db.execute("DROP TABLE IF EXISTS $userTable");
+   await db.execute("DROP TABLE IF EXISTS $fileTable");
+   await db.execute("DROP TABLE IF EXISTS $table");
+   await db.execute("DROP TABLE IF EXISTS $callTable");
+   await _onCreate(db, newVersion);
     if (oldVersion < newVersion) {
       // await db.execute("ALTER TABLE $groupRoom ADD COLUMN pts INTEGER DEFAULT 0");
 //      await db.execute('CREATE INDEX test_createdDate ON $groupMessage(createdDate)');
@@ -1561,5 +1571,27 @@ class DatabaseHelper {
       res = await fileInsertProperty(insertProperty, insertPropertyArr);
     }
     return res;
+  }
+
+  callAdd(List values) async {
+    Database db = await instance.database;
+    return await db.rawInsert('INSERT INTO $callTable (id, uuid, groupId, callerName) VALUES(?, ?, ?, ?)',
+        [values[0], values[1], values[2], values[3]]);
+  }
+
+  callOne(String uuid) async {
+    Database db = await instance.database;
+    List<Map> list =
+    await db.query(callTable, where: 'uuid = ?', whereArgs: [uuid]);
+
+    return list.length > 0 ? list : null;
+  }
+
+  callQueryByStr(String condition) async {
+    Database db = await instance.database;
+    List<Map> list =
+    await db.rawQuery('SELECT * FROM $callTable WHERE $condition');
+
+    return list.length > 0 ? list : null;
   }
 }

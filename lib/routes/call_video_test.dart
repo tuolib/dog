@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:convert';
 import 'dart:core';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -55,8 +56,8 @@ void connectCall() async {
           callInfoSocket.updateInCalling(true);
           break;
         case SignalingState.CallStateBye:
-          // localRendererCall.srcObject = null;
-          // remoteRendererCall.srcObject = null;
+          localRendererCall.srcObject = null;
+          remoteRendererCall.srcObject = null;
           callInfoSocket.updateInCalling(false);
           break;
         case SignalingState.CallStateInvite:
@@ -75,22 +76,25 @@ void connectCall() async {
     });
 
     signalingCall.onLocalStream = ((stream) {
-      if (hasStartCall) {
-        localRendererCall.srcObject = stream;
-      }
+      // if (hasStartCall) {
+      //   localRendererCall.srcObject = stream;
+      // }
+      localRendererCall.srcObject = stream;
     });
 
     signalingCall.onAddRemoteStream = ((stream) {
-      if (hasStartCall) {
-        remoteRendererCall.srcObject = stream;
-        callInfoSocket.updateCall();
-      }
+      // if (hasStartCall) {
+      //   remoteRendererCall.srcObject = stream;
+      //   callInfoSocket.updateCall();
+      // }
+      remoteRendererCall.srcObject = stream;
     });
 
     signalingCall.onRemoveRemoteStream = ((stream) {
-      if (hasStartCall) {
-        remoteRendererCall.srcObject = null;
-      }
+      // if (hasStartCall) {
+      //   remoteRendererCall.srcObject = null;
+      // }
+      remoteRendererCall.srcObject = null;
     });
   }
   if (!hasStartCall) {
@@ -128,13 +132,16 @@ switchCamera() {
 
 videoSet() {
   bool enable = !callInfoSocket.videoEnable;
+  logger.d(enable);
+  callInfoSocket.updateVideo(enable);
   signalingCall.videoSet(enable);
 }
 
 muteMic(enable) {
-  signalingCall.voiceSet(enable);
   callInfoSocket.updateVoice(enable);
+  signalingCall.voiceSet(enable);
 }
+
 mutePhoneCall(enable) async {
   if (Platform.isAndroid) {
     // bool isBusy = await callKeepIn.isCallActive(currentCallUuid);
@@ -155,21 +162,10 @@ mutePhoneCall(enable) async {
 
 hangUpCall() async {
 
-  if (localRendererCall != null) {
-    logger.d('localRendererCall.close');
-    localRendererCall?.dispose();
-    localRendererCall = null;
-  }
-  if (remoteRendererCall != null) {
-    logger.d('remoteRendererCall.close');
-    remoteRendererCall?.dispose();
-    remoteRendererCall = null;
-  }
-
   hasStartCall = false;
   isInvite = false;
-  callInfoSocket.updateInCalling(false);
   callInfoSocket.updateFullScreen(false);
+  callInfoSocket.updateInCalling(false);
   TestOverLay.remove();
   socketInit.off('callDescriptionGet');
   socketInit.off('callCandidateGet');
@@ -179,10 +175,26 @@ hangUpCall() async {
   socketInit.off('callBye');
   socketInit.off('callClosed');
 
+
   if (signalingCall != null) {
     // logger.d('signalingCall.close');
     await signalingCall.close();
   }
+
+  if (localRendererCall != null) {
+    logger.d('localRendererCall.close');
+
+    // localRendererCall.srcObject = null;
+    await localRendererCall?.dispose();
+    localRendererCall = null;
+  }
+  if (remoteRendererCall != null) {
+    logger.d('remoteRendererCall.close');
+    // remoteRendererCall.srcObject = null;
+    await remoteRendererCall?.dispose();
+    remoteRendererCall = null;
+  }
+
 
 }
 
@@ -207,7 +219,6 @@ overCallAll({
       callKeepIn.endCall(Global.currentCallUuid);
     } else {
       callKitIn.endCall(Global.currentCallUuid);
-      // callKitIn.endAllCalls();
     }
   }
   if (view && hasStartCall) {
@@ -230,7 +241,22 @@ overCallAll({
   Global.saveHasCall('0');
 }
 
-createOverlayView(BuildContext context, bool invite) async {
+createOverlayView(BuildContext context, bool invite, {String uuid}) async {
+
+  if (Platform.isAndroid) {
+    final dbHelper = DatabaseHelper.instance;
+    var callInfo = await dbHelper.callOne(uuid);
+    logger.d(callInfo);
+    if (callInfo != null) {
+      var detailCall = callInfo[0];
+      Global.callGroupId = detailCall['groupId'];
+      Global.saveUuid(uuid);
+      Global.saveCallGroupId(detailCall['groupId']);
+      Global.saveCallerName(detailCall['callerName']);
+    }
+  }
+  // 还未拨通成功
+  callInfoSocket.updateInCalling(true);
   // 还未拨通成功
   callInfoSocket.updateCallSuccess(false);
   // 打开全屏幕
@@ -260,12 +286,13 @@ createOverlayView(BuildContext context, bool invite) async {
       // var remoteStream = callInfoModel.remoteStream;
       bool voiceMute = callInfoModel.voiceMute;
       bool videoEnable = callInfoModel.videoEnable;
+      bool inCalling = callInfoModel.inCalling;
       return Container(
         width: fullScreen ? MediaQuery.of(context).size.width : width,
         height: fullScreen ? MediaQuery.of(context).size.height : height,
         child: Scaffold(
           body: Container(
-            child: hasStartCall
+            child: inCalling
                 ? OrientationBuilder(builder: (context, orientation) {
                     return Container(
                       child: Stack(children: <Widget>[
@@ -339,7 +366,7 @@ createOverlayView(BuildContext context, bool invite) async {
           ),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
-          floatingActionButton: hasStartCall && fullScreen
+          floatingActionButton: inCalling && fullScreen
               ? Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
@@ -352,14 +379,6 @@ createOverlayView(BuildContext context, bool invite) async {
                 backgroundColor: videoEnable ? Colors.white : Colors.white24,
               ),
               FloatingActionButton(
-                child: Icon(
-                  Icons.switch_camera,
-                  color: Colors.white,
-                ),
-                onPressed: switchCamera,
-                backgroundColor: Colors.white24,
-              ),
-              FloatingActionButton(
                 child:  Icon(
                   Icons.mic_off,
                   color: voiceMute ? Colors.black38 : Colors.white,
@@ -367,10 +386,19 @@ createOverlayView(BuildContext context, bool invite) async {
                 onPressed: () {
                   bool enable = !callInfoSocket.voiceMute;
                   logger.d(enable);
-                  // muteMic(enable);
-                  mutePhoneCall(enable);
+                  // callInfoSocket.updateVoice(enable);
+                  muteMic(enable);
+                  // mutePhoneCall(enable);
                 },
                 backgroundColor: voiceMute ? Colors.white : Colors.white24,
+              ),
+              FloatingActionButton(
+                child: Icon(
+                  Icons.switch_camera,
+                  color: Colors.white,
+                ),
+                onPressed: switchCamera,
+                backgroundColor: Colors.white24,
               ),
               FloatingActionButton(
                 onPressed: () {
