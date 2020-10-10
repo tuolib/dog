@@ -562,10 +562,13 @@ Future<void> displayIncomingCall(String callerName, {String uuid}) async {
     // await Global.init();
 
     await Global.init().then((e) => runApp(MyApp()));
-    socketIoItem.initCommunication();
-    socketInit.on('connect', (_) async {
+    backFun() {
       displayConnectedCall(callerName, uuid: uuid);
-    });
+    }
+    socketIoItem.initCommunication(callback: backFun);
+    // socketInit.on('connect', (_) async {
+    //
+    // });
   }
   // return;
 }
@@ -580,32 +583,23 @@ displayConnectedCall(String callerName, {String uuid}) async {
     callKitIn.displayIncomingCall(uuid, "generic", callerName);
   } else {
     Global.hasCall = '1';
-    await Global.init().then((e) => runApp(MyApp()));
-    socketIoItem.initCommunication();
-    socketInit.on('connect', (_) async {
-      calls[Global.currentCallUuid] = Call(callerName);
-      bool hasPhoneAccount = await callKeepIn.hasPhoneAccount();
-      if (!hasPhoneAccount) {
-        await callKeepIn.hasDefaultPhoneAccount(mainScreePage, <String, dynamic>{
-          'alertTitle': 'Permissions required',
-          'alertDescription':
-          'This application needs to access your phone accounts',
-          'cancelButton': 'Cancel',
-          'okButton': 'ok',
-        });
-      }
-      // logger.d('hasPhoneAccount: $hasPhoneAccount');
+    calls[Global.currentCallUuid] = Call(callerName);
+    bool hasPhoneAccount = await callKeepIn.hasPhoneAccount();
+    if (!hasPhoneAccount) {
+      await callKeepIn.hasDefaultPhoneAccount(mainScreePage, <String, dynamic>{
+        'alertTitle': 'Permissions required',
+        'alertDescription':
+        'This application needs to access your phone accounts',
+        'cancelButton': 'Cancel',
+        'okButton': 'ok',
+      });
+    }
+    // logger.d('hasPhoneAccount: $hasPhoneAccount');
 
-      logger.d(
-          '[displayIncomingCall] ${Global.currentCallUuid} callerName: $callerName');
-      await callKeepIn.displayIncomingCall(Global.currentCallUuid, callerName,
-          handleType: 'generic', hasVideo: true);
-    });
-    // final String callUUID = newUUID();
-    // setState(() {
-    //   calls[callUUID] = Call(number);
-    // });
-    // currentCallUuid = callUUID;
+    logger.d(
+        '[displayIncomingCall] ${Global.currentCallUuid} callerName: $callerName');
+    await callKeepIn.displayIncomingCall(Global.currentCallUuid, callerName,
+        handleType: 'generic', hasVideo: true);
 
   }
 }
