@@ -23,23 +23,19 @@ class Call {
   bool muted = false;
 }
 
-// BuildContext mainContext;
-
-bool sendCallBye = false;
-int callFriendId;
-int callGroupId;
-// 是否通话中
-bool callingState = false;
+// int callFriendId;
+// int callGroupId;
 // 是否正有拨打过来的通话，但是还未接
-bool hasCall = false;
-FlutterCallkeep callKeepIn = FlutterCallkeep();
-Map<String, Call> calls = {};
+// bool hasCall;
+// bool _configured;
+// String callerName;
+// String currentCallUuid;
+
 // List callArr = [];
 String newUUID() => Uuid().v4();
+FlutterCallkeep callKeepIn = FlutterCallkeep();
+Map<String, Call> calls = {};
 
-// bool _configured;
-String callerName;
-String currentCallUuid;
 FlutterCallKit callKitIn = FlutterCallKit();
 
 class PushNotificationsManager {
@@ -103,14 +99,14 @@ class PushNotificationsManager {
       if (Platform.isIOS) {
         logger.d('old apns Token ${Global.apnsToken}');
         if (tokenNew != Global.apnsToken) {
-          logger.d('apns Token $tokenNew');
+          logger.d('new apns Token $tokenNew');
           Global.apnsToken = tokenNew;
           Global.saveApnsToken(tokenNew);
         }
       } else {
         logger.d('old firebase Token ${Global.firebaseToken}');
         if (tokenNew != Global.firebaseToken) {
-          logger.d('firebase Token $tokenNew');
+          logger.d('new firebase Token $tokenNew');
           Global.firebaseToken = tokenNew;
           Global.saveFirebaseToken(tokenNew);
         }
@@ -200,27 +196,29 @@ void onTokenVoip(String token) {
 Future<dynamic> onMessageVoip(bool isLocal, Map<String, dynamic> payload) {
   // handle foreground notification
   logger.d("received on foreground payload: $payload, isLocal=$isLocal");
-  logger.d("hasCall: $hasCall");
-  logger.d("callGroupId: $callGroupId");
+  logger.d("hasCall: ${Global.hasCall}");
+  logger.d("callGroupId: ${Global.callGroupId}");
   var data = payload['data'];
   if (data['type'] == 'callInvite') {
     // 如果正在通话中，则不显示新通知
-    if (!hasCall) {
-      currentCallUuid = data['uuid'];
-      callGroupId = int.parse(data['groupId']);
-      displayIncomingCall(data['callerName']);
+    if (Global.hasCall == '0') {
+      // currentCallUuid = data['uuid'];
+      Global.saveUuid(data['uuid']);
+      // callGroupId = int.parse(data['groupId']);
+      Global.saveCallGroupId(data['groupId']);
+      displayIncomingCall(data['callerName'], uuid: data['uuid']);
     }
   }
   if (data['type'] == "cancelInvite") {
-    if (hasCall && callGroupId == int.parse(data['groupId'])) {
-      logger.d('cancel call: $currentCallUuid');
+    if (Global.hasCall == '1' && Global.callGroupId == data['groupId']) {
+      logger.d('cancel call: ${Global.currentCallUuid}');
       if (Platform.isIOS) {
         // callKitIn.endCall(currentCallUuid);
         // reportEndCallWithUUID(currentCallUuid, EndReason.remoteEnded);
         callKitIn.endCall(data['uuid']);
         reportEndCallWithUUID(data['uuid'], EndReason.remoteEnded);
       } else {
-        callKeepIn.endCall(currentCallUuid);
+        callKeepIn.endCall(data['uuid']);
       }
     }
   }
@@ -236,27 +234,29 @@ Future<dynamic> onResumeVoip(bool isLocal, Map<String, dynamic> payload) {
   lifecycleState = AppLifecycleState.detached;
   // handle background notification
   logger.d("received on background payload: $payload, isLocal=$isLocal");
-  logger.d("hasCall: $hasCall");
-  logger.d("callGroupId: $callGroupId");
+  logger.d("hasCall: ${Global.hasCall}");
+  logger.d("callGroupId: ${Global.callGroupId}");
   var data = payload['data'];
   if (data['type'] == 'callInvite') {
     // 如果已经有通话中，则不显示新通知
-    if (!hasCall) {
-      currentCallUuid = data['uuid'];
-      callGroupId = int.parse(data['groupId']);
-      displayIncomingCall(data['callerName']);
+    if (Global.hasCall == '1') {
+      // currentCallUuid = data['uuid'];
+      Global.saveUuid(data['uuid']);
+      // callGroupId = int.parse(data['groupId']);
+      Global.saveCallGroupId(data['groupId']);
+      displayIncomingCall(data['callerName'], uuid: data['uuid']);
     }
   }
   if (data['type'] == "cancelInvite") {
-    if (hasCall && callGroupId == int.parse(data['groupId'])) {
-      logger.d('cancel call: $currentCallUuid');
+    if (Global.hasCall == '1' && Global.callGroupId == data['groupId']) {
+      logger.d('cancel call: ${Global.currentCallUuid}');
       if (Platform.isIOS) {
         // callKitIn.endCall(currentCallUuid);
         // reportEndCallWithUUID(currentCallUuid, EndReason.remoteEnded);
         callKitIn.endCall(data['uuid']);
         reportEndCallWithUUID(data['uuid'], EndReason.remoteEnded);
       } else {
-        callKeepIn.endCall(currentCallUuid);
+        callKeepIn.endCall(data['uuid']);
       }
     }
   }
@@ -269,13 +269,13 @@ Future<dynamic> onResume(Map<String, dynamic> payload) {
   logger.d("onResume payload: $payload");
   var data = payload['data'];
   if (data['type'] == "cancelInvite") {
-    if (hasCall && callGroupId == int.parse(data['groupId'])) {
-      logger.d('cancel call: $currentCallUuid');
+    if (Global.hasCall == '1' && Global.callGroupId == data['groupId']) {
+      logger.d('cancel call: ${Global.currentCallUuid}');
       if (Platform.isIOS) {
         callKitIn.endCall(data['uuid']);
         reportEndCallWithUUID(data['uuid'], EndReason.remoteEnded);
       } else {
-        callKeepIn.endCall(currentCallUuid);
+        callKeepIn.endCall(data['uuid']);
       }
     }
   }
@@ -317,19 +317,23 @@ Future<dynamic> onMessage(Map<String, dynamic> payload) {
   // logger.d('${data['groupId']}');
   if (Platform.isAndroid) {
     if (data['type'] == "callInvite") {
-      if (!hasCall) {
-        callGroupId = int.parse(data['groupId']);
-        logger.d(callGroupId);
-        callerName = data['callerName'];
-        currentCallUuid = data['uuid'];
-        displayIncomingCall(data['callerName']);
+      logger.d('Global.hasCall: ${Global.hasCall}');
+      if (Global.hasCall == '0') {
+        // callGroupId = int.parse(data['groupId']);
+        Global.saveCallGroupId(data['groupId']);
+        logger.d(Global.callGroupId);
+        // callerName = 'Dog call[${data['callerName']}]';
+        Global.saveCallerName('Dog call (${data['callerName']})');
+        // currentCallUuid = data['uuid'];
+        Global.saveUuid(data['uuid']);
+        displayIncomingCall(Global.callerName, uuid: data['uuid']);
       }
     }
   }
   if (data['type'] == "cancelInvite") {
 
-    if (hasCall && callGroupId == int.parse(data['groupId'])) {
-      logger.d('cancel call: $currentCallUuid');
+    if (Global.hasCall == '1' && Global.callGroupId == data['groupId']) {
+      logger.d('cancel call: ${Global.currentCallUuid}');
       if (Platform.isIOS) {
         callKitIn.endCall(data['uuid']);
         reportEndCallWithUUID(data['uuid'], EndReason.remoteEnded);
@@ -349,18 +353,34 @@ Future<dynamic> onLaunch(Map<String, dynamic> payload) {
 
 Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
   lifecycleState = AppLifecycleState.detached;
-  if (message.containsKey('data')) {
-// Handle data message
-    final dynamic data = message['data'];
-    logger.d(data);
-    if (!hasCall) {
-      callGroupId = int.parse(data['groupId']);
-      logger.d(callGroupId);
-      callerName = data['callerName'];
-      currentCallUuid = data['uuid'];
-      displayIncomingCall(data['callerName']);
+  final dynamic data = message['data'];
+  logger.d(data);
+  logger.d(' hasCall: ${Global.hasCall}');
+  logger.d(' callGroupId: ${Global.callGroupId}');
+  logger.d('cancel call: ${Global.currentCallUuid}');
+  if (data['type'] == "cancelInvite") {
+    await callKeepIn.endCall(data['uuid']);
+    // if (Global.hasCall == '1' && Global.callGroupId == data['groupId']) {
+    //   logger.d('cancel call: ${Global.currentCallUuid}');
+    //   await callKeepIn.endCall(data['uuid']);
+    // }
+  } else {
+    if (Global.hasCall == '0') {
+      // callGroupId = int.parse(data['groupId']);
+      Global.saveCallGroupId(data['groupId']);
+      logger.d(Global.callGroupId);
+      // callerName = data['callerName'];
+      Global.saveCallerName('Dog call (${data['callerName']})');
+      // callerName = 'Dog call[${data['callerName']}]';
+      // currentCallUuid = data['uuid'];
+      Global.saveUuid(data['uuid']);
+      displayIncomingCall(Global.callerName, uuid: data['uuid']);
     }
   }
+  // if (message.containsKey('data')) {
+// Handle data message
+
+  // }
 
 //   if (message.containsKey('notification')) {
 // // Handle notification message
@@ -394,9 +414,10 @@ void setCallMuted(String callUUID, bool muted) {
 Future<void> answerCall(CallKeepPerformAnswerCallAction event) async {
   final String callUUID = event.callUUID;
   // final String number = callerName;
-  logger.d('[answerCall] $callUUID, callerName: $callerName');
-  currentCallUuid = callUUID;
-  callKeepIn.startCall(event.callUUID, 'generic', callerName);
+  logger.d('[answerCall] $callUUID, callerName: ${Global.callerName}');
+  // currentCallUuid = callUUID;
+  Global.saveUuid(callUUID);
+  // callKeepIn.startCall(event.callUUID, 'generic', Global.callerName);
   Timer(const Duration(seconds: 1), () {
     // logger.d('[setCurrentCallActive] $callUUID, number: $number');
     callKeepIn.setCurrentCallActive(callUUID);
@@ -405,8 +426,8 @@ Future<void> answerCall(CallKeepPerformAnswerCallAction event) async {
   // navigatorKey.currentState.pushNamed('callVideo', arguments: {
   //   "invite": false,
   // });
-  logger.d('---------------hasCall: $hasCall');
-  logger.d('socketInit.connected: ${socketInit.connected}');
+  logger.d('---------------hasCall: ${Global.hasCall}');
+  // logger.d('socketInit.connected: ${socketInit?.connected}');
   bool result = await isLockScreen();
   if (!result) {
     callKeepIn.backToForeground();
@@ -414,12 +435,24 @@ Future<void> answerCall(CallKeepPerformAnswerCallAction event) async {
 
   // createOverlayView(mainScreePage, false);
 }
-
 Future<void> endCall(CallKeepPerformEndCallAction event) async {
   logger.d('endCall: ${event.callUUID}');
   removeCall(event.callUUID);
   // currentCallUuid = null;
-  overCallAll();
+  overCallAll(system: false);
+  // hasCall = false;
+  // callKeepIn.endCall(event.callUUID);
+  // currentCallUuid = null;
+  // if (hasStartCall) {
+  //   hangUpCall();
+  // }
+  //
+  // if (!callInfoSocket.callSuccess) {
+  //   // sendCallBye = true;
+  //   SocketIoEmit.callBye(
+  //     groupId: callGroupId,
+  //   );
+  // }
 }
 
 Future<void> didPerformDTMFAction(CallKeepDidPerformDTMFAction event) async {
@@ -500,16 +533,41 @@ Future<void> updateDisplay(String callUUID) async {
   logger.d('[updateDisplay: $number] $callUUID');
 }
 
-// Future<void> displayIncomingCallDelayed(String number) async {
-//   Timer(const Duration(seconds: 3), () {
-//     displayIncomingCall(number);
-//   });
-// }
-
 Future<void> displayIncomingCall(String callerName, {String uuid}) async {
-  hasCall = true;
-  logger.d('Call socketInit.connected: ${socketInit.connected}');
-  displayConnectedCall(callerName, uuid: uuid);
+  // hasCall = true;
+  Global.saveHasCall('1');
+  logger.d('hasCall: ${Global.hasCall}');
+  if (Platform.isIOS) {
+    // currentCallUuid = newUUID();
+    logger.d('Global.currentCallUuid: ${Global.currentCallUuid}');
+    logger.d('uuid: $uuid');
+    // startCall("generic", callerName, uuid: uuid);
+    callKitIn.displayIncomingCall(uuid, "generic", callerName);
+  } else {
+    // final String callUUID = newUUID();
+    // setState(() {
+    //   calls[callUUID] = Call(number);
+    // });
+    // currentCallUuid = callUUID;
+    calls[Global.currentCallUuid] = Call(callerName);
+    bool hasPhoneAccount = await callKeepIn.hasPhoneAccount();
+    if (!hasPhoneAccount) {
+      await callKeepIn.hasDefaultPhoneAccount(mainScreePage, <String, dynamic>{
+        'alertTitle': 'Permissions required',
+        'alertDescription':
+        'This application needs to access your phone accounts',
+        'cancelButton': 'Cancel',
+        'okButton': 'ok',
+      });
+    }
+    // logger.d('hasPhoneAccount: $hasPhoneAccount');
+
+    logger.d('[displayIncomingCall] ${Global.currentCallUuid} callerName: $callerName');
+    await callKeepIn.displayIncomingCall(Global.currentCallUuid, callerName,
+        handleType: 'generic', hasVideo: true);
+  }
+  // logger.d('Call socketInit.connected: ${socketInit?.connected}');
+  // displayConnectedCall(callerName, uuid: uuid);
   // if (socketInit != null) {
   //   // logger.d('has connect socket');
   //   displayConnectedCall(number);
@@ -539,42 +597,13 @@ Future<void> displayIncomingCall(String callerName, {String uuid}) async {
 
 }
 
-displayConnectedCall(String callerName, {String uuid}) async {
-  if (Platform.isIOS) {
-
-    // currentCallUuid = newUUID();
-    await startCall("generic", callerName);
-    await callKitIn.displayIncomingCall(currentCallUuid, "generic", callerName);
-  } else {
-    // final String callUUID = newUUID();
-    // setState(() {
-    //   calls[callUUID] = Call(number);
-    // });
-    // currentCallUuid = callUUID;
-    calls[currentCallUuid] = Call(callerName);
-    bool hasPhoneAccount = await callKeepIn.hasPhoneAccount();
-    if (!hasPhoneAccount) {
-      await callKeepIn.hasDefaultPhoneAccount(mainScreePage, <String, dynamic>{
-        'alertTitle': 'Permissions required',
-        'alertDescription':
-        'This application needs to access your phone accounts',
-        'cancelButton': 'Cancel',
-        'okButton': 'ok',
-      });
-    }
-    // logger.d('hasPhoneAccount: $hasPhoneAccount');
-
-    logger.d('[displayIncomingCall] $currentCallUuid callerName: $callerName');
-    await callKeepIn.displayIncomingCall(currentCallUuid, callerName,
-        handleType: 'generic', hasVideo: true);
-  }
-}
-
 
 /// Use startCall to ask the system to start a call - Initiate an outgoing call from this point
-Future<void> startCall(String handle, String localizedCallerName) async {
+Future<void> startCall(String handle, String localizedCallerName, {String uuid}) async {
   /// Your normal start call action
-  await callKitIn.startCall(currentCallId, handle, localizedCallerName);
+  // var startUuid = uuid;
+  // startUuid = Global.currentCallUuid;
+  await callKitIn.startCall(uuid, handle, localizedCallerName);
   logger.d('startCall');
 }
 
@@ -598,10 +627,11 @@ Future<void> _performAnswerCallAction(String uuid) async {
 }
 // iOS 点击 关闭
 Future<void> _performEndCallAction(String uuid) async {
-  await callKitIn.endCall(currentCallUuid);
-  currentCallUuid = null;
+  // await callKitIn.endCall(uuid);
+  // currentCallUuid = null;
+  // Global.saveUuid('');
   logger.d('_performEndCallAction');
-  overCallAll();
+  overCallAll(system: false);
 }
 
 Future<void> _didActivateAudioSession() async {
@@ -620,6 +650,7 @@ Future<void> _didDisplayIncomingCall(String error, String uuid, String handle,
 Future<void> _didPerformSetMutedCallAction(bool mute, String uuid) async {
   // Called when the system or user mutes a call
   logger.d('_didPerformSetMutedCallAction');
+  logger.d(mute);
   muteMic(mute);
 }
 
@@ -634,14 +665,14 @@ Future<void> _didToggleHoldAction(bool hold, String uuid) async {
   createOverlayView(mainScreePage, false);
 }
 
-String get currentCallId {
-  if (currentCallUuid == null) {
-    final uuid = new Uuid();
-    currentCallUuid = uuid.v4();
-  }
-
-  return currentCallUuid;
-}
+// String get currentCallId {
+//   if (currentCallUuid == null) {
+//     final uuid = new Uuid();
+//     currentCallUuid = uuid.v4();
+//   }
+//
+//   return currentCallUuid;
+// }
 //
 // enum HandleType {
 //   generic,

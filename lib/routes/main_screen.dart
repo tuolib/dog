@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 
 BuildContext mainScreePage;
 Timer timer;
+
 class MainScreen extends StatefulWidget {
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -39,14 +40,19 @@ class _MainScreenState extends State<MainScreen> {
         lifecycleState = AppLifecycleState.inactive;
         // await NotificationHelper().cancelAllNotifications();
         if (Platform.isAndroid) {
-          if (currentCallUuid != null) {
-            logger.d('---------------currentCallUuid: $currentCallUuid');
+          if (Global.currentCallUuid != '') {
+            logger
+                .d('---------------currentCallUuid: ${Global.currentCallUuid}');
             logger.d(mainScreePage);
-            logger.d('---------------hasCall: $hasCall');
-            logger.d('socketInit.connected: ${socketInit.connected}');
+            logger.d('---------------hasCall: ${Global.hasCall}');
+            logger.d('socketInit.connected: ${socketInit?.connected}');
             if (mainScreePage != null) {
-              Timer.periodic(const Duration(seconds: 1), (timer) {
-                if (socketInit.connected) {
+              Timer.periodic(const Duration(seconds: 1), (timer) async {
+                // var isAct = await callKeepIn.isCallActive(Global.currentCallUuid);
+                if (Global.hasCall == '1' &&
+                    !callInfoSocket.callSuccess &&
+                    socketInit != null &&
+                    socketInit.connected) {
                   timer.cancel();
                   createOverlayView(mainScreePage, false);
                 }
@@ -59,13 +65,30 @@ class _MainScreenState extends State<MainScreen> {
       //   logger.d('active life');
       // },
     ));
+  }
+
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  //   // _pageController.dispose();
+  // }
+
+  @override
+  Widget build(BuildContext context) {
+    mainScreePage = context;
     if (Platform.isAndroid) {
-      if (currentCallUuid != null) {
-        logger.d('---------------currentCallUuid: $currentCallUuid');
+      if (Global.currentCallUuid != '') {
+        logger.d('---------------currentCallUuid: ${Global.currentCallUuid}');
         logger.d(mainScreePage);
-        if (hasCall && mainScreePage != null) {
-          Timer.periodic(const Duration(seconds: 1), (timer) {
-            if (socketInit.connected) {
+        if (mainScreePage != null) {
+          Timer.periodic(const Duration(seconds: 1), (timer) async {
+            // var isAct = await callKeepIn.isCallActive(Global.currentCallUuid);
+            // logger.d(isAct);
+            if (Global.hasCall == '1' &&
+                socketInit != null &&
+                socketInit.connected &&
+                !callInfoSocket.callSuccess
+            ) {
               timer.cancel();
               createOverlayView(mainScreePage, false);
             }
@@ -73,18 +96,6 @@ class _MainScreenState extends State<MainScreen> {
         }
       }
     }
-  }
-
- // @override
- // void dispose() {
- //   super.dispose();
- //   // _pageController.dispose();
- // }
-
-  @override
-  Widget build(BuildContext context) {
-    mainScreePage = context;
-
     socketProviderChatListModel =
         Provider.of<ChatListModel>(context, listen: false);
     var info = Provider.of<ConversationListModel>(context, listen: false);

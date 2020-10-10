@@ -34,7 +34,7 @@ class Signaling {
   JsonDecoder _decoder = new JsonDecoder();
   String _selfId = randomNumeric(6);
   SimpleWebSocket _socket;
-  var _sessionId;
+  // var _sessionId;
   var _host;
   var _port = 8086;
   var _peerConnections = new Map<String, RTCPeerConnection>();
@@ -119,21 +119,23 @@ class Signaling {
   void voiceSet(bool enable) {
     if (_localStream != null) {
       _localStream.getAudioTracks()[0].setMicrophoneMute(enable);
+      _localStream.getAudioTracks()[0].enableSpeakerphone(enable);
     }
   }
 
+
   void videoSet(bool enable) async {
-    // if (enable) {
-    //   _localStream = await createStream('video', false);
-    // } else {
-    //   if (_localStream != null) {
-    //     _localStream.dispose();
-    //   }
-    // }
+    // var mediaT = MediaStreamTrack();
+    if (enable) {
+      // _localStream = await createStream('video', false);
+      _localStream.addTrack(_localStream.getVideoTracks()[0]);
+    } else {
+      _localStream.removeTrack(_localStream.getVideoTracks()[0]);
+    }
   }
 
   void invite(String peer_id, String media, use_screen) {
-    this._sessionId = this._selfId + '-' + peer_id;
+    // this._sessionId = this._selfId + '-' + peer_id;
 
     if (this.onStateChange != null) {
       this.onStateChange(SignalingState.CallStateNew);
@@ -141,18 +143,24 @@ class Signaling {
 
     // logger.d('invite emit');
     serverSendUuid = newUUID();
+    Global.saveUuid(serverSendUuid);
     String fullName = '';
     String firstName = Global.profile.user.firstName;
     String lastName = Global.profile.user.lastName;
     if (lastName != null) {
       fullName = '$firstName $lastName';
     }
+    if (Platform.isIOS) {
+      startCall("generic", Global.callerName, uuid: Global.currentCallUuid);
+    } else if (Platform.isAndroid) {
+      callKeepIn.startCall(Global.currentCallUuid, "generic", Global.callerName);
+    }
     SocketIoEmit.callInvite(
       fromId: Global.profile.user.userId,
       toId: chatInfoModelSocket.conversationInfo['contactId'],
-      groupId: callGroupId,
-      uuid: serverSendUuid,
-      handle: '',
+      groupId: int.parse(Global.callGroupId),
+      uuid: Global.currentCallUuid,
+      handle: 'generic',
       hasVideo: true,
       callerName: fullName,
     );
@@ -212,8 +220,8 @@ class Signaling {
           var id = data['from'].toString();
           var description = data['description'];
           var media = data['media'];
-          var sessionId = 'session_id';
-          this._sessionId = sessionId;
+          // var sessionId = 'session_id';
+          // this._sessionId = sessionId;
 
           if (this.onStateChange != null) {
             this.onStateChange(SignalingState.CallStateNew);
@@ -290,7 +298,7 @@ class Signaling {
           if (pc != null) {
             pc.close();
           }
-          this._sessionId = null;
+          // this._sessionId = null;
           if (this.onStateChange != null) {
             this.onStateChange(SignalingState.CallStateBye);
           }
@@ -299,8 +307,8 @@ class Signaling {
       case 'bye':
         {
           var to = data['from'].toString();
-          var sessionId = 'session_id';
-          print('bye: ' + sessionId);
+          // var sessionId = 'session_id';
+          // print('bye: ' + sessionId);
 
           if (_localStream != null) {
             _localStream.dispose();
@@ -319,7 +327,7 @@ class Signaling {
           //   _dataChannels.remove(to);
           // }
 
-          this._sessionId = null;
+          // this._sessionId = null;
           if (this.onStateChange != null) {
             this.onStateChange(SignalingState.CallStateBye);
           }
@@ -377,11 +385,11 @@ class Signaling {
     socketInit.on('callDescriptionGet', (data) async {
       logger.d('callDescriptionGet: ' + data);
 
-      var des = await _peerConnections['$callFriendId']
+      var des = await _peerConnections['${Global.callFriendId}']
           .getLocalDescription();
 
       SocketIoEmit.callOffer(
-        groupId: callGroupId,
+        groupId: int.parse(Global.callGroupId),
         description: {
           "type": des.type,
           "sdp": des.sdp,
@@ -391,7 +399,7 @@ class Signaling {
       // SocketIoEmit.callDescriptionGet(
       //   fromId: Global.profile.user.userId,
       //   // toId: chatInfoModelSocket.conversationInfo['contactId'],
-      //   groupId: callGroupId,
+      //   groupId: int.parse(Global.callGroupId),
       // );
     });
     socketInit.on('callCandidateGet', (data) async {
@@ -399,7 +407,7 @@ class Signaling {
       for (var i = 0; i < _localCandidates.length; i++) {
         var candidate = _localCandidates[i];
         SocketIoEmit.callCandidate(
-          groupId: callGroupId,
+          groupId: int.parse(Global.callGroupId),
           candidate: {
             'sdpMLineIndex': candidate.sdpMlineIndex,
             'sdpMid': candidate.sdpMid,
@@ -433,7 +441,7 @@ class Signaling {
       SocketIoEmit.callCandidateGet(
         fromId: Global.profile.user.userId,
         // toId: chatInfoModelSocket.conversationInfo['contactId'],
-        groupId: callGroupId,
+        groupId: int.parse(Global.callGroupId),
       );
     });
 
@@ -514,7 +522,7 @@ class Signaling {
       //   'session_id': this._sessionId,
       // });
       SocketIoEmit.callCandidate(
-        groupId: callGroupId,
+        groupId: int.parse(Global.callGroupId),
         fromId: Global.profile.user.userId,
         toId: int.parse(id),
         candidate: {
@@ -597,7 +605,7 @@ class Signaling {
           'type': s.type,
         },
         fromId: Global.profile.user.userId,
-        groupId: callGroupId,
+        groupId: int.parse(Global.callGroupId),
         toId: int.parse(id),
       );
     } catch (e) {
@@ -622,7 +630,7 @@ class Signaling {
           'type': s.type,
         },
         fromId: Global.profile.user.userId,
-        groupId: callGroupId,
+        groupId: int.parse(Global.callGroupId),
       );
     } catch (e) {
       print(e.toString());

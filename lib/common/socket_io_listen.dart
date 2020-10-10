@@ -2128,7 +2128,7 @@ class SocketIoListen {
         int userId = dataObj['userId'];
         int isOnline = dataObj['isOnline'] ? 1 : 0;
         int lastSeen = dataObj['lastSeen'];
-        if (userId == callFriendId &&
+        if (userId.toString() == Global.callFriendId &&
             callInfoSocket.inCalling &&
             callInfoSocket.callSuccess &&
             !dataObj['isOnline']) {

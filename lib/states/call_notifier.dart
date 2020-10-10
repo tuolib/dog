@@ -20,7 +20,7 @@ class CallInfoModel extends ChangeNotifier {
   var _remoteStream;
   bool _voiceMute = false;
   bool _videoEnable = true;
-  bool _callSuccess = true;
+  bool _callSuccess = false;
 
 
   Map<String, dynamic> get callInfo => _callInfo;
@@ -42,12 +42,12 @@ class CallInfoModel extends ChangeNotifier {
   }
 
   updateFullScreen(bool value) {
-    if (_fullScreen == value) return;
     if (value) {
       SystemChrome.setEnabledSystemUIOverlays([]);
     } else {
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     }
+    if (_fullScreen == value) return;
     _fullScreen = value;
     notifyListeners();
   }

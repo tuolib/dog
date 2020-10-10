@@ -46,7 +46,7 @@ void connectCall() async {
     signalingCall = Signaling();
     signalingCall.connect(
       invite: isInvite,
-      groupId: callGroupId,
+      groupId: int.parse(Global.callGroupId),
     );
 
     signalingCall.onStateChange = (SignalingState state) {
@@ -96,94 +96,30 @@ void connectCall() async {
   if (!hasStartCall) {
     hasStartCall = true;
     if (isInvite) {
-      invitePeer(callContext, '$callFriendId', false);
+      invitePeer(callContext, '${Global.callFriendId}', false);
     } else {
       logger.d('callDescriptionGet');
       SocketIoEmit.callDescriptionGet(
         fromId: Global.profile.user.userId,
         // toId: chatInfoModelSocket.conversationInfo['contactId'],
-        groupId: callGroupId,
+        groupId: int.parse(Global.callGroupId),
       );
 
       // SocketIoEmit.callCandidateGet(
       //   fromId: Global.profile.user.userId,
       //   // toId: chatInfoModelSocket.conversationInfo['contactId'],
-      //   groupId: callGroupId,
+      //   groupId: int.parse(Global.callGroupId),
       // );
     }
   }
 }
 
 invitePeer(context, peerId, use_screen) async {
-  if (signalingCall != null && peerId != selfIdCall) {
+  if (signalingCall != null) {
     // logger.d('signalingCall invite');
     signalingCall.invite(peerId, 'video', use_screen);
-  }
-}
-
-hangUpCall() async {
-  // hasCall = false;
-  hasStartCall = false;
-  isInvite = false;
-  callInfoSocket.updateInCalling(false);
-  TestOverLay.remove();
-  socketInit.off('callDescriptionGet');
-  socketInit.off('callCandidateGet');
-  socketInit.off('callCandidate');
-  socketInit.off('callOffer');
-  socketInit.off('callAnswer');
-  socketInit.off('callBye');
-  socketInit.off('callClosed');
-
-  if (signalingCall != null) {
-    logger.d('signalingCall.close');
-    await signalingCall.close();
-  }
-
-  if (localRendererCall != null) {
-    logger.d('localRendererCall.close');
-    localRendererCall?.dispose();
-    localRendererCall = null;
-  }
-  if (remoteRendererCall != null) {
-    logger.d('remoteRendererCall.close');
-    remoteRendererCall?.dispose();
-    remoteRendererCall = null;
-  }
-
-}
-
-overCallAll({
-  bool emit = true,
-  bool system = true,
-  bool view = true,
-}) {
-  hasCall = false;
-  if (system) {
-    // currentCallUuid = null;
-    if (Platform.isAndroid) {
-      // hangup(currentCallUuid);
-      callKeepIn.endAllCalls();
-    } else {
-      // callKitIn.endCall(currentCallUuid);
-      callKitIn.endAllCalls();
-    }
-
-    currentCallUuid = null;
-  }
-  if (view && hasStartCall) {
-    hangUpCall();
 
   }
-
-  if (emit && callInfoSocket.callSuccess) {
-    callInfoSocket.updateCallSuccess(false);
-    // sendCallBye = true;
-    SocketIoEmit.callBye(
-      groupId: callGroupId,
-    );
-  }
-
 }
 
 switchCamera() {
@@ -198,7 +134,6 @@ videoSet() {
 muteMic(enable) {
   signalingCall.voiceSet(enable);
   callInfoSocket.updateVoice(enable);
-
 }
 mutePhoneCall(enable) async {
   if (Platform.isAndroid) {
@@ -206,19 +141,103 @@ mutePhoneCall(enable) async {
     // if (isBusy) {
     //   setCallMuted(currentCallUuid, enable);
     // }
-    setCallMuted(currentCallUuid, enable);
+    // setCallMuted(Global.currentCallUuid, enable);
+    callKeepIn.setMutedCall(Global.currentCallUuid, enable);
   } else if (Platform.isIOS) {
     // callKitIn.
-    bool isBusy =  await callKitIn.checkIfBusy();
-    if (isBusy) {
-      callKitIn.setMutedCall(currentCallUuid, enable);
-    }
+    // bool isBusy =  await callKitIn.checkIfBusy();
+    // if (isBusy) {
+    //   callKitIn.setMutedCall(Global.currentCallUuid, enable);
+    // }
+    callKitIn.setMutedCall(Global.currentCallUuid, enable);
   }
 }
 
+hangUpCall() async {
+
+  if (localRendererCall != null) {
+    logger.d('localRendererCall.close');
+    localRendererCall?.dispose();
+    localRendererCall = null;
+  }
+  if (remoteRendererCall != null) {
+    logger.d('remoteRendererCall.close');
+    remoteRendererCall?.dispose();
+    remoteRendererCall = null;
+  }
+
+  hasStartCall = false;
+  isInvite = false;
+  callInfoSocket.updateInCalling(false);
+  callInfoSocket.updateFullScreen(false);
+  TestOverLay.remove();
+  socketInit.off('callDescriptionGet');
+  socketInit.off('callCandidateGet');
+  socketInit.off('callCandidate');
+  socketInit.off('callOffer');
+  socketInit.off('callAnswer');
+  socketInit.off('callBye');
+  socketInit.off('callClosed');
+
+  if (signalingCall != null) {
+    // logger.d('signalingCall.close');
+    await signalingCall.close();
+  }
+
+}
+
+overCallAll({
+  bool emit = true,
+  bool system = true,
+  bool view = true,
+}) {
+  // 接听的那一方，还未接通，挂断
+  // logger.d('hasCall ${Global.hasCall}');
+  // logger.d('hasStartCall $hasStartCall');
+  // logger.d('callSuccess ${callInfoSocket.callSuccess}');
+  if (emit && Global.hasCall == '1' && !hasStartCall && !callInfoSocket.callSuccess) {
+    // logger.d('bye call');
+    SocketIoEmit.callBye(
+      groupId: int.parse(Global.callGroupId),
+    );
+  }
+  // && Global.hasCall == '1'
+  if (system) {
+    if (Platform.isAndroid) {
+      callKeepIn.endCall(Global.currentCallUuid);
+    } else {
+      callKitIn.endCall(Global.currentCallUuid);
+      // callKitIn.endAllCalls();
+    }
+  }
+  if (view && hasStartCall) {
+    hangUpCall();
+  }
+
+  if (emit && callInfoSocket.callSuccess) {
+    callInfoSocket.updateCallSuccess(false);
+    // sendCallBye = true;
+    SocketIoEmit.callBye(
+      groupId: int.parse(Global.callGroupId),
+    );
+  }
+// 放在最后
+//   hasCall = false;
+
+  // Global.saveUuid('');
+  // Global.saveCallFriendId('0');
+  // Global.saveCallGroupId('0');
+  Global.saveHasCall('0');
+}
+
 createOverlayView(BuildContext context, bool invite) async {
+  // 还未拨通成功
   callInfoSocket.updateCallSuccess(false);
-  sendCallBye = false;
+  // 打开全屏幕
+  callInfoSocket.updateFullScreen(true);
+  // 打开声音
+  callInfoSocket.updateVoice(false);
+  // sendCallBye = false;
   isInvite = invite;
   // if (!inCalling) {
   //   if (!hasStartCall) {
@@ -347,7 +366,8 @@ createOverlayView(BuildContext context, bool invite) async {
                 ),
                 onPressed: () {
                   bool enable = !callInfoSocket.voiceMute;
-                  muteMic(enable);
+                  logger.d(enable);
+                  // muteMic(enable);
                   mutePhoneCall(enable);
                 },
                 backgroundColor: voiceMute ? Colors.white : Colors.white24,
@@ -356,10 +376,10 @@ createOverlayView(BuildContext context, bool invite) async {
                 onPressed: () {
                   if (!callInfoSocket.callSuccess) {
                     SocketIoEmit.cancelInvite(
-                      groupId: callGroupId,
+                      groupId: int.parse(Global.callGroupId),
                       fromId: Global.profile.user.userId,
-                      toId: callFriendId,
-                      uuid: serverSendUuid,
+                      toId: int.parse(Global.callFriendId),
+                      uuid: Global.currentCallUuid,
                     );
                   }
                   overCallAll();

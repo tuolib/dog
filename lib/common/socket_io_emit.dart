@@ -734,6 +734,7 @@ class SocketIoEmit {
     int fromId,
     int toId,
     int groupId,
+    bool reject = false,
   }) async {
 //    isUpdatingGroup = true;
     Map<String, dynamic> sendData = {

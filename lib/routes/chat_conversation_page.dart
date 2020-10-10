@@ -411,10 +411,13 @@ class _ConversationState extends State<Conversation> {
             // displayIncomingCall('123456');
             // displayOutCall();
             // callKitIn.endCall(currentCallKitId);
-            callGroupId = socketProviderConversationListModelGroupId;
-            callFriendId = conversionInfo['contactId'];
-            logger.d(callGroupId);
-            logger.d(callFriendId);
+            // callGroupId = socketProviderConversationListModelGroupId;
+            Global.saveCallGroupId(
+                socketProviderConversationListModelGroupId.toString());
+            // callFriendId = conversionInfo['contactId'];
+            Global.saveCallFriendId(conversionInfo['contactId'].toString());
+            logger.d(Global.callGroupId);
+            logger.d(Global.callFriendId);
             // return;
             createOverlayView(context, true);
           },
@@ -424,7 +427,7 @@ class _ConversationState extends State<Conversation> {
             Icons.videocam,
           ),
           onPressed: () async {
-            callGroupId = socketProviderConversationListModelGroupId;
+            // callGroupId = socketProviderConversationListModelGroupId;
             // Navigator.of(context).pushNamed("callVideo", arguments: {
             //   "invite": true,
             // });

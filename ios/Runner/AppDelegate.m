@@ -20,6 +20,10 @@
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
+-(void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+    NSLog(@"%@", error);
+}
+
 // flutter_voip_notification
 /* Add PushKit delegate method */
 
@@ -43,17 +47,16 @@
     NSLog(@"payload voip");
     
 //    NSString *uuid = payload.dictionaryPayload[@"uuid"];
-    NSString *uuid = payload.dictionaryPayload[@"uuid"];
-    NSUUID *uuidString = [[NSUUID alloc] initWithUUIDString:uuid];
+    NSString *uuid = payload.dictionaryPayload[@"data"][@"uuid"];
     NSLog(@"Value of uuid = %@", uuid);
 //    NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:uuidString];
 
-    NSString *handle = payload.dictionaryPayload[@"handle"];
-    bool hasVideo = payload.dictionaryPayload[@"hasVideo"];
+    NSString *handle = payload.dictionaryPayload[@"data"][@"handle"];
+    bool hasVideo = payload.dictionaryPayload[@"data"][@"hasVideo"];
 
   // Retrieve information like handle and callerName here
 //   NSString *uuid = /* fetch for payload or ...  [[[NSUUID UUID] UUIDString] lowercaseString];*/
-   NSString *callerName = payload.dictionaryPayload[@"callerName"];
+   NSString *callerName = payload.dictionaryPayload[@"data"][@"callerName"];
    NSLog(@"Value of callerName = %@", callerName);
 //   NSString *handle = @"+12011234567";
 

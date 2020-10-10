@@ -34,6 +34,17 @@ class Global {
   static String firebaseToken = '';
   static String apnsToken = '';
 
+  // 视频或者语音 uuid
+  static String currentCallUuid = '';
+  // 显示系统拨打电话界面 0 没有 1 有
+  static String hasCall = '0';
+  // 拨打朋友 ID
+  static String callFriendId = '0';
+  // 拨打 group ID
+  static String callGroupId = '0';
+  // 呼叫人 名字
+  static String callerName = '';
+
   //初始化全局信息，会在APP启动时执行
   static Future init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -48,8 +59,24 @@ class Global {
     voipToken = _prefs.getString("voipToken");
     firebaseToken = _prefs.getString("firebaseToken");
     apnsToken = _prefs.getString("apnsToken");
-//    chatPositionList = jsonDecode(_prefs.getString("chatPositionList"));
 
+    _prefs.setString("currentCallUuid", '');
+    _prefs.setString("hasCall", '0');
+    _prefs.setString("callFriendId", '0');
+    _prefs.setString("callGroupId", '0');
+    _prefs.setString("callerName", '');
+    // 视频或者语音 uuid
+    currentCallUuid = _prefs.getString("currentCallUuid");
+    // 是否显示系统拨打电话界面
+    hasCall = _prefs.getString("hasCall");
+    // 拨打朋友 ID
+    callFriendId = _prefs.getString("callFriendId");
+    // 拨打 group ID
+    callGroupId = _prefs.getString("callGroupId");
+    // 呼叫人 名字
+    callerName = _prefs.getString("callerName");
+
+//    chatPositionList = jsonDecode(_prefs.getString("chatPositionList"));
     // 如果没有缓存策略，设置默认缓存策略
 //    profile.cache = profile.cache ?? CacheConfig()
 //      ..enable = true
@@ -109,6 +136,28 @@ class Global {
   // apns notification device token
   static saveApnsToken(String apnsToken) =>
       _prefs.setString("apnsToken", apnsToken);
+
+  // call 类别
+  static saveUuid(String uuid) {
+    Global.currentCallUuid = uuid;
+    _prefs.setString("currentCallUuid", uuid);
+  }
+  static saveHasCall(String hasCall) {
+    Global.hasCall = hasCall;
+    _prefs.setString("hasCall", hasCall);
+  }
+  static saveCallFriendId(String callFriendId){
+    Global.callFriendId = callFriendId;
+    _prefs.setString("callFriendId", callFriendId);
+  }
+  static saveCallGroupId(String callGroupId) {
+    Global.callGroupId = callGroupId;
+    _prefs.setString("callGroupId", callGroupId);
+  }
+  static saveCallerName(String callerName) {
+    Global.callerName = callerName;
+    _prefs.setString("callerName", callerName);
+  }
 }
 
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
