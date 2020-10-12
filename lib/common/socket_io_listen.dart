@@ -6,6 +6,23 @@ import 'dart:convert';
 import '../index.dart';
 
 class SocketIoListen {
+  //login
+  static serverToken() async {
+    socketInit.on('serverToken', (data) async {
+
+      final parsed = json.decode(data);
+      var dataObj = Map<String, dynamic>.from(parsed);
+      if (dataObj['success'] == 0) {
+
+        Global.profile.user = null;
+        Global.profile.token = null;
+        Global.saveProfile();
+        socketInit.disconnect();
+        isSend = false;
+        navigatorKey.currentState.pushReplacementNamed('login');
+      }
+    });
+  }
   /// dialog
 // 获取dialog 列表
   static messageDialogsGet() async {

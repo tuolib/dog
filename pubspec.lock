@@ -395,6 +395,15 @@ packages:
       url: "https://github.com/peerwaya/flutter_call_kit.git"
     source: git
     version: "0.0.3"
+  flutter_incall_manager:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: d46c8bb225b8a0f6a75cd220a958f46c3537850b
+      url: "https://github.com/kangshaojun/flutter-incall-manager.git"
+    source: git
+    version: "0.1.0"
   flutter_launcher_icons:
     dependency: "direct main"
     description:

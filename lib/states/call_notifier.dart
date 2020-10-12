@@ -21,6 +21,8 @@ class CallInfoModel extends ChangeNotifier {
   bool _voiceMute = false;
   bool _videoEnable = true;
   bool _callSuccess = false;
+  bool _selfBig = true;
+  bool _showButton = true;
 
 
   Map<String, dynamic> get callInfo => _callInfo;
@@ -32,6 +34,8 @@ class CallInfoModel extends ChangeNotifier {
   bool get voiceMute => _voiceMute;
   bool get videoEnable => _videoEnable;
   bool get callSuccess => _callSuccess;
+  bool get selfBig => _selfBig;
+  bool get showButton => _showButton;
 
 
 
@@ -42,14 +46,21 @@ class CallInfoModel extends ChangeNotifier {
   }
 
   updateFullScreen(bool value) {
+    if (_fullScreen == value) return;
+    _fullScreen = value;
+    notifyListeners();
+  }
+
+  updateSystemFull(bool value, {bool noti = true}) {
     if (value) {
       SystemChrome.setEnabledSystemUIOverlays([]);
     } else {
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     }
-    if (_fullScreen == value) return;
-    _fullScreen = value;
-    notifyListeners();
+    if (noti) {
+      notifyListeners();
+    }
+
   }
 
   updateRemoteStream(stream) {
@@ -71,9 +82,21 @@ class CallInfoModel extends ChangeNotifier {
     _videoEnable = enable;
     notifyListeners();
   }
-  updateCallSuccess(bool enable) {
+  updateCallSuccess(bool enable, {bool noti = true}) {
     if (_callSuccess == enable) return;
     _callSuccess = enable;
+    if (noti) {
+      notifyListeners();
+    }
+  }
+  updateSelfBig(bool enable) {
+    if (_selfBig == enable) return;
+    _selfBig = enable;
+    notifyListeners();
+  }
+  updateShowButton(bool enable) {
+    if (_showButton == enable) return;
+    _showButton = enable;
     notifyListeners();
   }
 // 更新

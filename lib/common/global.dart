@@ -151,7 +151,7 @@ class Global {
     _prefs.setString("callFriendId", callFriendId);
   }
   static saveCallGroupId(String callGroupId) {
-    // Global.callGroupId = callGroupId;
+    Global.callGroupId = callGroupId;
     _prefs.setString("callGroupId", callGroupId);
   }
   static saveCallerName(String callerName) {

@@ -6,6 +6,7 @@ import '../index.dart';
 
 import 'package:uuid/uuid.dart';
 import 'package:socket_io_client/socket_io_client.dart';
+import 'package:flutter_incall_manager/flutter_incall_manager.dart';
 
 String serverSendUuid;
 enum SignalingState {
@@ -120,8 +121,14 @@ class Signaling {
   void voiceSet(bool mute) {
     if (_localStream != null) {
       // _localStream.getAudioTracks()[0].setMicrophoneMute(enable);
-      // _localStream.getAudioTracks()[0].enableSpeakerphone(enable);
+      // _localStream.getAudioTracks()[0].enableSpeakerphone(mute);
       _localStream.getAudioTracks()[0].enabled = !mute;
+    }
+  }
+  void voiceSpeaker(bool enable) {
+    if (_localStream != null) {
+      _localStream.getAudioTracks()[0].enableSpeakerphone(enable);
+      // _localStream.getAudioTracks()[1].enableSpeakerphone(enable);
     }
   }
 
@@ -469,8 +476,9 @@ class Signaling {
       //   "data": d,
       //   "type": "bye",
       // });
-
-      callInfoSocket.updateCallSuccess(false);
+      TestOverLay.remove();
+      callInfoSocket.updateSystemFull(false, noti: false);
+      // callInfoSocket.updateCallSuccess(false, noti: false);
       overCallAll(emit: false);
     });
     // socketInit.
@@ -547,7 +555,13 @@ class Signaling {
     pc.onIceConnectionState = (state) {
       // logger.d(state);
       if (state == RTCIceConnectionState.RTCIceConnectionStateConnected) {
+        logger.d(state);
         callInfoSocket.updateCallSuccess(true);
+        callInfoSocket.updateSelfBig(false);
+
+        // voiceSpeaker(true);
+        // incallManager.setSpeakerphoneOn(true);
+        // incallManager.setForceSpeakerphoneOn(flag: ForceSpeakerType.FORCE_ON);
       }
     };
 

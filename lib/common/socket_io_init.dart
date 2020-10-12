@@ -65,6 +65,7 @@ class SocketsIoNotify {
         }
         print(reason);
       });
+      SocketIoListen.serverToken();
       /// open
 //      SocketIoListen.serverOpenGroupTable();
 

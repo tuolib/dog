@@ -266,6 +266,8 @@ class MyApp extends StatelessWidget {
                         return CallVideoTest(
                           invite: invite,
                         );
+                      } else if (routeName == 'devices') {
+                        return DevicesPage();
                       } else {
                         return MainScreen();
 

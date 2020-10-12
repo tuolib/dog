@@ -27,3 +27,4 @@ export 'edit_contact_page.dart';
 export 'app_bar_demo.dart';
 export 'add_member_page.dart';
 export 'call_video_test.dart';
+export 'edit_devices.dart';

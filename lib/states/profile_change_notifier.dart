@@ -47,6 +47,11 @@ class UserModel extends ProfileChangeNotifier {
     _profile.user.avatarUrlLocal = avatarUrlLocal;
     notifyListeners();
   }
+
+  changeUser() {
+    notifyListeners();
+  }
+
 }
 
 class ThemeModel extends ProfileChangeNotifier {

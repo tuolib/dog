@@ -49,6 +49,7 @@ class TestOverLay {
         print('onDragEnd:${detail.offset}');
         if (detail.offset.dy.abs() > 100 || detail.offset.dx.abs() > 100) {
           callInfoSocket.updateFullScreen(false);
+          callInfoSocket.updateSystemFull(false);
         }
         createDragTarget(offset: detail.offset, context: context);
       },

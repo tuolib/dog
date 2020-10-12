@@ -109,24 +109,39 @@ class _LoginRouteState extends State<LoginRoute> {
       showLoading(context);
       User user;
       try {
+        final dbHelper = DatabaseHelper.instance;
         var resJson = await Git(context)
             .login(_unameController.text, _pwdController.text);
 
         // 因为登录页返回后，首页会build，所以我们传false，更新user后不触发更新
         print("${resJson['content']}");
         if (resJson['success'] == 1) {
-
           String avatarUrlLocal;
           var content = resJson['content'];
           print("${content['username']}");
           final dir = await Git(context).getSaveDirectory();
-          final isPermissionStatusGranted = await Git(context).requestPermissions();
+          final isPermissionStatusGranted =
+              await Git(context).requestPermissions();
           if (content["avatarUrl"] != null && content["avatarUrl"] != '') {
             var downloadInfo = Git(context)
                 .saveMyAvatar(content['avatarName'], content['avatarUrl']);
 //            if (downloadInfo != '') {
 //              avatarUrlLocal = downloadInfo;
 //            }
+            UserSql addInfo = UserSql(
+              username: content["username"],
+              firstName: content["firstName"],
+              lastName: content["lastName"],
+              id: content["userId"],
+              avatar: content["avatar"],
+              colorId: content["colorId"],
+              // bio: content["bio"],
+              // isOnline: true,
+              // lastSeen: content["lastSeen"],
+            );
+            await dbHelper.userUpdateOrInsert(addInfo);
+            Git(context).saveImageFileOrigin(
+                content["avatar"], content['avatarName'], content["avatarUrl"]);
           }
 
           user = User.fromJson({
@@ -151,7 +166,6 @@ class _LoginRouteState extends State<LoginRoute> {
           Global.saveProfile();
 //        Navigator.of(context).pop();
           print('username: ${Global.profile.user.userId}');
-
         } else {
           showToast(resJson['respMsg']);
         }

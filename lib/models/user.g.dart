@@ -32,7 +32,8 @@ User _$UserFromJson(Map<String, dynamic> json) {
     ..userId = json['userId'] as num
     ..username = json['username'] as String
     ..firstName = json['firstName'] as String
-    ..lastName = json['lastName'] as String;
+    ..lastName = json['lastName'] as String
+    ..colorId = json['colorId'] as int;
 }
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
@@ -60,5 +61,6 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'userId': instance.userId,
       'username': instance.username,
       'firstName': instance.firstName,
-      'lastName': instance.lastName
+      'lastName': instance.lastName,
+      'colorId': instance.colorId
     };

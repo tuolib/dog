@@ -281,21 +281,7 @@ Future<dynamic> onResume(Map<String, dynamic> payload) {
       }
     }
   }
-
-  // print("onResume: $payload");
-//          var payload = ;
-//          var decodeSucceeded = false;
   var channelInfo = payload['data'];
-  if (channelInfo == null) return null;
-//          try {
-////          var x = json.decode(payload) as Map<String, dynamic>;
-//            channelInfo = json.decode(payload) as Map<String, dynamic>;
-//            decodeSucceeded = true;
-//          } on FormatException catch (e) {
-//            print('The provided string is not valid JSON');
-//          }
-//          if (decodeSucceeded == false) return;
-//   print('groupId: ${channelInfo['groupId']}');
   if (channelInfo['groupId'] != null) {
     // navigatorKey.currentState.pushNamed('conversation', arguments: {
     //   'groupId': channelInfo['groupId'],

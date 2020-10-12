@@ -97,6 +97,8 @@ PODS:
     - Flutter
   - flutter_call_kit (0.0.1):
     - Flutter
+  - flutter_incall_manager (0.0.1):
+    - Flutter
   - flutter_local_notifications (0.0.1):
     - Flutter
   - flutter_voip_push_notification (0.0.1):
@@ -199,6 +201,7 @@ DEPENDENCIES:
   - flutter_apns (from `.symlinks/plugins/flutter_apns/ios`)
   - flutter_app_badger (from `.symlinks/plugins/flutter_app_badger/ios`)
   - flutter_call_kit (from `.symlinks/plugins/flutter_call_kit/ios`)
+  - flutter_incall_manager (from `.symlinks/plugins/flutter_incall_manager/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_voip_push_notification (from `.symlinks/plugins/flutter_voip_push_notification/ios`)
   - flutter_webrtc (from `.symlinks/plugins/flutter_webrtc/ios`)
@@ -270,6 +273,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_app_badger/ios"
   flutter_call_kit:
     :path: ".symlinks/plugins/flutter_call_kit/ios"
+  flutter_incall_manager:
+    :path: ".symlinks/plugins/flutter_incall_manager/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_voip_push_notification:
@@ -334,6 +339,7 @@ SPEC CHECKSUMS:
   flutter_apns: f516b118e423fe7c0a38771180549c4d6cb67c2f
   flutter_app_badger: 65de4d6f0c34a891df49e6cfb8a1c0496426fa68
   flutter_call_kit: 0598f2eec54579aa00b53fb68a622ccdb08fe4fe
+  flutter_incall_manager: 1a6aea8d37fb46d63aaa30ac7ea225e121704eab
   flutter_local_notifications: 9e4738ce2471c5af910d961a6b7eadcf57c50186
   flutter_voip_push_notification: f28f3ce1c6b835a3fa9e833f37f33dc1291ab888
   flutter_webrtc: 626ca239bcc4390a514a2ac2b21b16d0c58b33fe

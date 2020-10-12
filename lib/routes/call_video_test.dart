@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'dart:math';
 import 'dart:convert';
@@ -13,6 +12,7 @@ import '../index.dart';
 //BuildContext addContactContext;
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:socket_io_client/socket_io_client.dart';
+import 'package:flutter_incall_manager/flutter_incall_manager.dart';
 
 bool hasStartCall = false;
 bool isInvite = false;
@@ -23,6 +23,7 @@ RTCVideoRenderer localRendererCall = RTCVideoRenderer();
 RTCVideoRenderer remoteRendererCall = RTCVideoRenderer();
 String serverIP;
 BuildContext callContext;
+IncallManager incallManager = new IncallManager();
 
 initRenderers() async {
   await localRendererCall.initialize();
@@ -53,12 +54,12 @@ void connectCall() async {
     signalingCall.onStateChange = (SignalingState state) {
       switch (state) {
         case SignalingState.CallStateNew:
-          callInfoSocket.updateInCalling(true);
+          // callInfoSocket.updateInCalling(true);
           break;
         case SignalingState.CallStateBye:
-          localRendererCall.srcObject = null;
-          remoteRendererCall.srcObject = null;
-          callInfoSocket.updateInCalling(false);
+          // localRendererCall.srcObject = null;
+          // remoteRendererCall.srcObject = null;
+          // callInfoSocket.updateInCalling(false);
           break;
         case SignalingState.CallStateInvite:
         case SignalingState.CallStateConnected:
@@ -85,7 +86,7 @@ void connectCall() async {
     signalingCall.onAddRemoteStream = ((stream) {
       // if (hasStartCall) {
       //   remoteRendererCall.srcObject = stream;
-      //   callInfoSocket.updateCall();
+      //   // callInfoSocket.updateCall();
       // }
       remoteRendererCall.srcObject = stream;
     });
@@ -96,6 +97,7 @@ void connectCall() async {
       // }
       remoteRendererCall.srcObject = null;
     });
+    //
   }
   if (!hasStartCall) {
     hasStartCall = true;
@@ -122,7 +124,6 @@ invitePeer(context, peerId, use_screen) async {
   if (signalingCall != null) {
     // logger.d('signalingCall invite');
     signalingCall.invite(peerId, 'video', use_screen);
-
   }
 }
 
@@ -138,6 +139,7 @@ videoSet() {
 }
 
 muteMic(enable) {
+  logger.d('mute mic');
   callInfoSocket.updateVoice(enable);
   signalingCall.voiceSet(enable);
 }
@@ -161,11 +163,12 @@ mutePhoneCall(enable) async {
 }
 
 hangUpCall() async {
-
   hasStartCall = false;
   isInvite = false;
-  callInfoSocket.updateFullScreen(false);
-  callInfoSocket.updateInCalling(false);
+  // callInfoSocket.updateFullScreen(false);
+  // callInfoSocket.updateInCalling(false);
+
+  callInfoSocket.updateSystemFull(false, noti: false);
   TestOverLay.remove();
   socketInit.off('callDescriptionGet');
   socketInit.off('callCandidateGet');
@@ -174,7 +177,6 @@ hangUpCall() async {
   socketInit.off('callAnswer');
   socketInit.off('callBye');
   socketInit.off('callClosed');
-
 
   if (signalingCall != null) {
     // logger.d('signalingCall.close');
@@ -194,8 +196,6 @@ hangUpCall() async {
     await remoteRendererCall?.dispose();
     remoteRendererCall = null;
   }
-
-
 }
 
 overCallAll({
@@ -207,7 +207,10 @@ overCallAll({
   // logger.d('hasCall ${Global.hasCall}');
   // logger.d('hasStartCall $hasStartCall');
   // logger.d('callSuccess ${callInfoSocket.callSuccess}');
-  if (emit && Global.hasCall == '1' && !hasStartCall && !callInfoSocket.callSuccess) {
+  if (emit &&
+      Global.hasCall == '1' &&
+      !hasStartCall &&
+      !callInfoSocket.callSuccess) {
     // logger.d('bye call');
     SocketIoEmit.callBye(
       groupId: int.parse(Global.callGroupId),
@@ -226,7 +229,7 @@ overCallAll({
   }
 
   if (emit && callInfoSocket.callSuccess) {
-    callInfoSocket.updateCallSuccess(false);
+    callInfoSocket.updateCallSuccess(false, noti: false);
     // sendCallBye = true;
     SocketIoEmit.callBye(
       groupId: int.parse(Global.callGroupId),
@@ -242,8 +245,7 @@ overCallAll({
 }
 
 createOverlayView(BuildContext context, bool invite, {String uuid}) async {
-
-  if (Platform.isAndroid) {
+  if (Platform.isAndroid && uuid != null) {
     final dbHelper = DatabaseHelper.instance;
     var callInfo = await dbHelper.callOne(uuid);
     logger.d(callInfo);
@@ -261,6 +263,7 @@ createOverlayView(BuildContext context, bool invite, {String uuid}) async {
   callInfoSocket.updateCallSuccess(false);
   // 打开全屏幕
   callInfoSocket.updateFullScreen(true);
+  callInfoSocket.updateSystemFull(true);
   // 打开声音
   callInfoSocket.updateVoice(false);
   // sendCallBye = false;
@@ -276,6 +279,12 @@ createOverlayView(BuildContext context, bool invite, {String uuid}) async {
   remoteRendererCall = RTCVideoRenderer();
   await initRenderers();
   // logger.d('createOverlayView');
+  // incallManager.start(
+  //     media: MediaType.AUDIO, auto: false, ringback: '');
+  // incallManager.setSpeakerphoneOn(true);
+  // incallManager.setForceSpeakerphoneOn(flag: ForceSpeakerType.FORCE_ON);
+  // callKeepIn.
+  // callKitIn.
   TestOverLay.show(
     context: context,
     view: Consumer<CallInfoModel>(builder:
@@ -287,6 +296,9 @@ createOverlayView(BuildContext context, bool invite, {String uuid}) async {
       bool voiceMute = callInfoModel.voiceMute;
       bool videoEnable = callInfoModel.videoEnable;
       bool inCalling = callInfoModel.inCalling;
+      bool selfBig = callInfoModel.selfBig;
+      bool showButton = callInfoModel.showButton;
+      bool callSuccess = callInfoModel.callSuccess;
       return Container(
         width: fullScreen ? MediaQuery.of(context).size.width : width,
         height: fullScreen ? MediaQuery.of(context).size.height : height,
@@ -297,10 +309,11 @@ createOverlayView(BuildContext context, bool invite, {String uuid}) async {
                     return Container(
                       child: Stack(children: <Widget>[
                         Positioned(
-                            left: 0.0,
-                            right: 0.0,
-                            top: 0,
-                            bottom: 0.0,
+                          left: 0.0,
+                          right: 0.0,
+                          top: 0,
+                          bottom: 0.0,
+                          child: InkWell(
                             child: Container(
                               // margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                               width: fullScreen
@@ -309,25 +322,44 @@ createOverlayView(BuildContext context, bool invite, {String uuid}) async {
                               height: fullScreen
                                   ? MediaQuery.of(context).size.height
                                   : height,
-                              child: RTCVideoView(remoteRendererCall, objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,),
-                              decoration: BoxDecoration(color: Colors.black54),
-                            )),
-                        if (fullScreen)
-                          Positioned(
-                            left: 20.0,
-                            top: 80.0,
-                            child: Container(
-                              width: orientation == Orientation.portrait
-                                  ? 90.0
-                                  : 120.0,
-                              height: orientation == Orientation.portrait
-                                  ? 120.0
-                                  : 90.0,
-                              child: RTCVideoView(localRendererCall),
+                              child: RTCVideoView(
+                                !callSuccess || selfBig
+                                    ? localRendererCall
+                                    : remoteRendererCall,
+                                objectFit: RTCVideoViewObjectFit
+                                    .RTCVideoViewObjectFitCover,
+                              ),
                               decoration: BoxDecoration(color: Colors.black54),
                             ),
+                            onTap: () {
+                              callInfoSocket.updateShowButton(!showButton);
+                            },
                           ),
-                        if (fullScreen)
+                        ),
+                        if (fullScreen && callSuccess)
+                          Positioned(
+                            right: 20.0,
+                            bottom: showButton ? 80.0 : 20.0,
+                            child: InkWell(
+                              child: Container(
+                                width: orientation == Orientation.portrait
+                                    ? 90.0
+                                    : 120.0,
+                                height: orientation == Orientation.portrait
+                                    ? 120.0
+                                    : 90.0,
+                                child: RTCVideoView(!callSuccess || selfBig
+                                    ? remoteRendererCall
+                                    : localRendererCall),
+                                decoration:
+                                    BoxDecoration(color: Colors.black54),
+                              ),
+                              onTap: () {
+                                callInfoSocket.updateSelfBig(!selfBig);
+                              },
+                            ),
+                          ),
+                        if (fullScreen && showButton)
                           Positioned(
                             //左上角关闭按钮
                             left: 3,
@@ -340,6 +372,7 @@ createOverlayView(BuildContext context, bool invite, {String uuid}) async {
                               ),
                               onPressed: () {
                                 callInfoSocket.updateFullScreen(false);
+                                callInfoSocket.updateSystemFull(false);
                               },
                             ),
                           ),
@@ -352,6 +385,7 @@ createOverlayView(BuildContext context, bool invite, {String uuid}) async {
                             child: InkWell(
                               onTap: () {
                                 callInfoSocket.updateFullScreen(true);
+                                callInfoSocket.updateSystemFull(true);
                               },
                               child: Container(
                                 width: width,
@@ -366,58 +400,60 @@ createOverlayView(BuildContext context, bool invite, {String uuid}) async {
           ),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
-          floatingActionButton: inCalling && fullScreen
+          floatingActionButton: inCalling && fullScreen && showButton
               ? Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              FloatingActionButton(
-                child: Icon(
-                  Icons.videocam,
-                  color: videoEnable ? Colors.black38 : Colors.white,
-                ),
-                onPressed: videoSet,
-                backgroundColor: videoEnable ? Colors.white : Colors.white24,
-              ),
-              FloatingActionButton(
-                child:  Icon(
-                  Icons.mic_off,
-                  color: voiceMute ? Colors.black38 : Colors.white,
-                ),
-                onPressed: () {
-                  bool enable = !callInfoSocket.voiceMute;
-                  logger.d(enable);
-                  // callInfoSocket.updateVoice(enable);
-                  muteMic(enable);
-                  // mutePhoneCall(enable);
-                },
-                backgroundColor: voiceMute ? Colors.white : Colors.white24,
-              ),
-              FloatingActionButton(
-                child: Icon(
-                  Icons.switch_camera,
-                  color: Colors.white,
-                ),
-                onPressed: switchCamera,
-                backgroundColor: Colors.white24,
-              ),
-              FloatingActionButton(
-                onPressed: () {
-                  if (!callInfoSocket.callSuccess) {
-                    SocketIoEmit.cancelInvite(
-                      groupId: int.parse(Global.callGroupId),
-                      fromId: Global.profile.user.userId,
-                      toId: int.parse(Global.callFriendId),
-                      uuid: Global.currentCallUuid,
-                    );
-                  }
-                  overCallAll();
-                },
-                tooltip: 'Hangup',
-                child: Icon(Icons.call_end),
-                backgroundColor: Colors.pink,
-              ),
-            ],
-          )
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    FloatingActionButton(
+                      child: Icon(
+                        Icons.videocam,
+                        color: videoEnable ? Colors.black38 : Colors.white,
+                      ),
+                      onPressed: videoSet,
+                      backgroundColor:
+                          videoEnable ? Colors.white : Colors.white24,
+                    ),
+                    FloatingActionButton(
+                      child: Icon(
+                        Icons.mic_off,
+                        color: voiceMute ? Colors.black38 : Colors.white,
+                      ),
+                      onPressed: () {
+                        bool enable = !callInfoSocket.voiceMute;
+                        logger.d(enable);
+                        // callInfoSocket.updateVoice(enable);
+                        muteMic(enable);
+                        // mutePhoneCall(enable);
+                      },
+                      backgroundColor:
+                          voiceMute ? Colors.white : Colors.white24,
+                    ),
+                    FloatingActionButton(
+                      child: Icon(
+                        Icons.switch_camera,
+                        color: Colors.white,
+                      ),
+                      onPressed: switchCamera,
+                      backgroundColor: Colors.white24,
+                    ),
+                    FloatingActionButton(
+                      onPressed: () {
+                        if (!callInfoSocket.callSuccess) {
+                          SocketIoEmit.cancelInvite(
+                            groupId: int.parse(Global.callGroupId),
+                            fromId: Global.profile.user.userId,
+                            toId: int.parse(Global.callFriendId),
+                            uuid: Global.currentCallUuid,
+                          );
+                        }
+                        overCallAll();
+                      },
+                      tooltip: 'Hangup',
+                      child: Icon(Icons.call_end),
+                      backgroundColor: Colors.pink,
+                    ),
+                  ],
+                )
               : SizedBox(),
         ),
       );
