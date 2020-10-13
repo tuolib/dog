@@ -59,6 +59,10 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => CallInfoModel(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => DeviceModel(),
+        ),
+
 
       ],
       child: Consumer2<ThemeModel, LocaleModel>(

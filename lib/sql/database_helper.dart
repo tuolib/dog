@@ -10,7 +10,7 @@ class DatabaseHelper {
   static final _databaseName = "MyDatabase.db";
 
 //  static final _databaseVersion = 1;
-  static final _databaseVersion = 46;
+  static final _databaseVersion = 49;
   static final table = 'my_table';
 
   static final columnId = '_id';
@@ -24,6 +24,7 @@ class DatabaseHelper {
   var contactsTable = 'contacts_table';
   var fileTable = 'file_table';
   var callTable = 'call_table';
+  var deviceTable = 'device_table';
 
 //  static final tableChatList = 'tableChatList';
 
@@ -212,6 +213,15 @@ class DatabaseHelper {
 //      CREATE INDEX index_name ON $groupMessage(createdDate,groupId)
 //    ''');
     // await db.execute('CREATE INDEX test_groupId ON $groupMessage(groupId)');
+    await db.execute('''
+        CREATE TABLE $deviceTable (
+          id INTEGER,
+          authtoken TEXT,
+          userId INTEGER,
+          loginType INTEGER,
+          deviceInfo TEXT
+        )
+        ''');
     print("Created tables");
 //    update table_name set
 //    content_url = replace(content_url, '', '')
@@ -221,15 +231,16 @@ class DatabaseHelper {
 
   _onUpgrade(Database db, int oldVersion, int newVersion) async {
    await db.execute("DROP TABLE IF EXISTS $chatListTable");
-   await db.execute("DROP TABLE IF EXISTS $groupRoom");
-   await db.execute("DROP TABLE IF EXISTS $groupUser");
-   await db.execute("DROP TABLE IF EXISTS $groupMessage");
-   await db.execute("DROP TABLE IF EXISTS $contactsTable");
-   await db.execute("DROP TABLE IF EXISTS $userTable");
-   await db.execute("DROP TABLE IF EXISTS $fileTable");
-   await db.execute("DROP TABLE IF EXISTS $table");
-   await db.execute("DROP TABLE IF EXISTS $callTable");
-   await _onCreate(db, newVersion);
+    await db.execute("DROP TABLE IF EXISTS $groupRoom");
+    await db.execute("DROP TABLE IF EXISTS $groupUser");
+    await db.execute("DROP TABLE IF EXISTS $groupMessage");
+    await db.execute("DROP TABLE IF EXISTS $contactsTable");
+    await db.execute("DROP TABLE IF EXISTS $userTable");
+    await db.execute("DROP TABLE IF EXISTS $fileTable");
+    await db.execute("DROP TABLE IF EXISTS $table");
+    await db.execute("DROP TABLE IF EXISTS $callTable");
+    await db.execute("DROP TABLE IF EXISTS $deviceTable");
+    await _onCreate(db, newVersion);
     if (oldVersion < newVersion) {
       // await db.execute("ALTER TABLE $groupRoom ADD COLUMN pts INTEGER DEFAULT 0");
 //      await db.execute('CREATE INDEX test_createdDate ON $groupMessage(createdDate)');
@@ -237,6 +248,15 @@ class DatabaseHelper {
 //      await db
 //          .execute("ALTER TABLE $groupUser ADD COLUMN pts INTEGER DEFAULT 0");
       logger.d('_onUpgrade');
+      // await db.execute('''
+      //     CREATE TABLE $deviceTable (
+      //       id INTEGER,
+      //       authtoken TEXT,
+      //       userId INTEGER,
+      //       loginType INTEGER,
+      //       deviceInfo TEXT
+      //     )
+      //     ''');
     }
   }
 
@@ -1594,4 +1614,76 @@ class DatabaseHelper {
 
     return list.length > 0 ? list : null;
   }
+
+  deviceAll() async {
+    Database db = await instance.database;
+    var res = await db.query(deviceTable);
+    return res;
+  }
+
+  deviceOne(int id) async {
+    Database db = await instance.database;
+    var res = await db.query(deviceTable, where: "id = ?", whereArgs: [id]);
+    return res.isNotEmpty ? DeviceSql.fromMap(res.first) : null;
+  }
+
+  deviceOneCondition(List conditionArr, List conditionValueArr) async {
+    Database db = await instance.database;
+    var conditionStr = '';
+    for (var i = 0; i < conditionArr.length; i++) {
+      if (i == conditionArr.length - 1) {
+        conditionStr += conditionArr[i] + '=?';
+      } else {
+        conditionStr += conditionArr[i] + '=?, ';
+      }
+    }
+    var res = await db.query(deviceTable,
+        where: "$conditionStr", whereArgs: [conditionValueArr]);
+    return res.isNotEmpty ? DeviceSql.fromMap(res.first) : null;
+  }
+
+  deviceAdd(DeviceSql row) async {
+    Database db = await instance.database;
+    return await db.insert(deviceTable, row.toMap());
+  }
+
+  deviceUpdate(DeviceSql row) async {
+    Database db = await instance.database;
+    var res;
+    try {
+      res = await db
+          .update(deviceTable, row.toMap(), where: "id = ?", whereArgs: [row.id]);
+    } catch (e) {
+      print(e);
+    }
+    return res;
+  }
+
+  deviceUpdateOrInsert(DeviceSql row) async {
+    var index = await deviceOne(row.id);
+    var res;
+    if (index != null) {
+      res = await deviceUpdate(row);
+    } else {
+      res = await deviceAdd(row);
+    }
+    return res;
+  }
+
+  deviceDelete(int id) async {
+    Database db = await instance.database;
+    return await db.delete(deviceTable, where: 'id = ?', whereArgs: [id]);
+  }
+  deviceDeleteByUser(int id) async {
+    Database db = await instance.database;
+    return await db.delete(deviceTable, where: 'userId = ?', whereArgs: [id]);
+  }
+  deviceGetByUser(int id) async {
+    Database db = await instance.database;
+    var res;
+    res = await db.query(deviceTable, where: 'userId = ?', whereArgs: [id]);
+    return res.length > 0 ? res : null;
+  }
+
+
 }

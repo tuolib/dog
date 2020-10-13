@@ -402,7 +402,8 @@ class _ConversationState extends State<Conversation> {
         ],
       ),
       actions: <Widget>[
-        IconButton(
+        if (conversionInfo['groupType'] == 2)
+          IconButton(
           icon: Icon(
             Icons.call,
           ),
@@ -422,7 +423,8 @@ class _ConversationState extends State<Conversation> {
             createOverlayView(context, true);
           },
         ),
-        IconButton(
+        if (conversionInfo['groupType'] == 2)
+          IconButton(
           icon: Icon(
             Icons.videocam,
           ),

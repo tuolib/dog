@@ -52,6 +52,7 @@ class SocketsIoNotify {
           SocketIoEmit.clientGetContacts();
           SocketIoEmit.contactStatusGet();
           SocketIoEmit.messageDialogsGet();
+          SocketIoEmit.deviceGet();
         }
 
       });
@@ -105,6 +106,9 @@ class SocketsIoNotify {
 
       /// other
       SocketIoListen.serverUserOnline();
+
+      /// device
+      SocketIoListen.deviceGet();
     } catch (e) {
       print(e);
 //

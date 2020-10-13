@@ -2199,4 +2199,48 @@ class SocketIoListen {
       }
     });
   }
+
+  static deviceGet() async {
+    final dbHelper = DatabaseHelper.instance;
+    socketInit.on('deviceGet', (data) async {
+      print('------------------deviceGet data: ');
+      final parsed = json.decode(data);
+      var dataObj = Map<String, dynamic>.from(parsed);
+
+      var futuresLocalUpdate = <Future>[];
+      if (dataObj['success'] == 1) {
+        await dbHelper.deviceDeleteByUser(Global.profile.user.userId);
+
+        List device = dataObj['devices'];
+        bool inDevice = false;
+        for(var i = 0; i < device.length; i++) {
+          var jsonObj = device[i];
+          if (jsonObj['id'] == Global.profile.user.tokenId) {
+            inDevice = true;
+          }
+          var de = DeviceSql(
+            id: jsonObj['id'],
+            userId: Global.profile.user.userId,
+            loginType: jsonObj['loginType'],
+            deviceInfo: jsonObj['deviceInfo'],
+            authtoken: '',
+          );
+          futuresLocalUpdate.add(dbHelper.deviceUpdateOrInsert(de));
+          // await dbHelper.deviceUpdateOrInsert(de);
+          // deviceSocket.updateDeviceList();
+        }
+        await Future.wait(futuresLocalUpdate);
+        if (!inDevice) {
+          Global.profile.user = null;
+          Global.profile.token = null;
+          Global.saveProfile();
+          socketInit.disconnect();
+          isSend = false;
+          navigatorKey.currentState.pushReplacementNamed('login');
+        }
+        deviceSocket.getDevice();
+      }
+    });
+  }
+
 }

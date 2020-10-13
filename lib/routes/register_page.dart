@@ -123,6 +123,7 @@ class _RegisterRouteState extends State<RegisterRoute> {
       showLoading(context);
       User user;
       try {
+        final dbHelper = DatabaseHelper.instance;
         var resJson = await Git(context).register(
             _unameController.text,
             _pwdController.text,
@@ -146,6 +147,19 @@ class _RegisterRouteState extends State<RegisterRoute> {
 ////              avatarUrlLocal = downloadInfo['filePath'];
 ////            }
 //          }
+
+          UserSql addInfo = UserSql(
+            username: content["username"],
+            firstName: content["firstName"],
+            lastName: content["lastName"],
+            id: content["userId"],
+            avatar: content["avatar"],
+            colorId: content["colorId"],
+            bio: content["bio"],
+            isOnline: true,
+            lastSeen: content["lastSeen"],
+          );
+          await dbHelper.userUpdateOrInsert(addInfo);
           user = User.fromJson({
             "username": content["username"],
             "firstName": content["firstName"],
@@ -155,6 +169,7 @@ class _RegisterRouteState extends State<RegisterRoute> {
             "avatarUrl": content["avatarUrl"],
             "avatarUrlLocal": avatarUrlLocal,
             "token": content["token"],
+            "tokenId": content["tokenId"],
           });
           Provider.of<UserModel>(context, listen: false).user = user;
 //        Global.profile.user = user;

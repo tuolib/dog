@@ -111,6 +111,8 @@ class _MainScreenState extends State<MainScreen> {
 //    socketProviderChatListModel.getChatList();
     var callInfo = Provider.of<CallInfoModel>(context, listen: false);
     callInfoSocket = callInfo;
+    var deviceInfo = Provider.of<DeviceModel>(context, listen: false);
+    deviceSocket = deviceInfo;
     // if (!hasStartCall) {
     //   createOverlayView(mainScreePage, false);
     // }

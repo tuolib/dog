@@ -17,6 +17,7 @@ class _SettingsPageState extends State<SettingsPage> {
     // TODO: implement initState
     super.initState();
     getMyInfo();
+
   }
 
   @override
@@ -30,6 +31,7 @@ class _SettingsPageState extends State<SettingsPage> {
       lastName: user.lastName,
       avatarUrl: user.avatarUrl,
       avatarLocal: user.avatarUrlLocal,
+      // avatarLocal: '/var/sdfdf.jpg',
       colorId: user.colorId,
       width: 60,
       height: 60,
@@ -227,7 +229,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   getMyInfo() async {
-    logger.d('get info');
+    // logger.d('get info');
     final dbHelper = DatabaseHelper.instance;
     var myInfo = await dbHelper.userOne(Global.profile.user.userId);
     // logger.d(myInfo);

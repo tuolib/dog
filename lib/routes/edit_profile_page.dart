@@ -689,6 +689,7 @@ class _EditProfileState extends State<EditProfileRoute> {
 //                            socketInit.destroy();
 //                            socketInit = null;
                             isSend = false;
+                            Git(context).logOut();
                             Navigator.pop(context);
                             Navigator.of(context).pushReplacementNamed("login");
                           },

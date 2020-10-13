@@ -12,6 +12,7 @@ import 'package:dio/adapter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path/path.dart' as path;
+import 'package:device_info/device_info.dart';
 
 class Git {
   final dbHelper = DatabaseHelper.instance;
@@ -76,6 +77,25 @@ class Git {
   // 注册接口，注册成功后返回用户信息
   Future register(String login, String pwd, String confirmPassword,
       String firstName, String lastName) async {
+
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    var info;
+    var machine;
+    int loginType = 1;
+    if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      // logger.d(_readIosDeviceInfo(iosInfo));
+      machine = iosInfo.utsname.machine;
+      info = "${iosInfo.systemName}" + " ${iosInfo.systemVersion}";
+    } else {
+      loginType = 2;
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      // logger.d(_readAndroidBuildData(androidInfo));
+      info = "${androidInfo.brand}" +
+          " ${androidInfo.model}" +
+          " Android ${androidInfo.version.release}" +
+          "(${androidInfo.version.sdkInt})";
+    }
     Response r = await dio.post(
       "/system/user/userSignUp",
       data: {
@@ -83,7 +103,10 @@ class Git {
         "password": "$pwd",
         "confirmPassword": "$confirmPassword",
         "firstName": "$firstName",
-        "lastName": "$lastName"
+        "lastName": "$lastName",
+        "loginType": loginType,
+        "deviceInfo": info,
+        "machine": machine,
       },
     );
     Global.netCache.cache.clear();
@@ -96,10 +119,83 @@ class Git {
   Future login(String login, String pwd) async {
     print(login);
     print(pwd);
+    Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
+      return <String, dynamic>{
+        'version.securityPatch': build.version.securityPatch,
+        'version.sdkInt': build.version.sdkInt,
+        'version.release': build.version.release,
+        'version.previewSdkInt': build.version.previewSdkInt,
+        'version.incremental': build.version.incremental,
+        'version.codename': build.version.codename,
+        'version.baseOS': build.version.baseOS,
+        'board': build.board,
+        'bootloader': build.bootloader,
+        'brand': build.brand,
+        'device': build.device,
+        'display': build.display,
+        'fingerprint': build.fingerprint,
+        'hardware': build.hardware,
+        'host': build.host,
+        'id': build.id,
+        'manufacturer': build.manufacturer,
+        'model': build.model,
+        'product': build.product,
+        'supported32BitAbis': build.supported32BitAbis,
+        'supported64BitAbis': build.supported64BitAbis,
+        'supportedAbis': build.supportedAbis,
+        'tags': build.tags,
+        'type': build.type,
+        'isPhysicalDevice': build.isPhysicalDevice,
+        'androidId': build.androidId,
+        'systemFeatures': build.systemFeatures,
+      };
+    }
 
+    Map<String, dynamic> _readIosDeviceInfo(IosDeviceInfo data) {
+      return <String, dynamic>{
+        'name': data.name,
+        'systemName': data.systemName,
+        'systemVersion': data.systemVersion,
+        'model': data.model,
+        'localizedModel': data.localizedModel,
+        'identifierForVendor': data.identifierForVendor,
+        'isPhysicalDevice': data.isPhysicalDevice,
+        'utsname.sysname:': data.utsname.sysname,
+        'utsname.nodename:': data.utsname.nodename,
+        'utsname.release:': data.utsname.release,
+        'utsname.version:': data.utsname.version,
+        'utsname.machine:': data.utsname.machine,
+      };
+    }
+
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    var info;
+    var machine;
+    int loginType = 1;
+    if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      // logger.d(_readIosDeviceInfo(iosInfo));
+      machine = iosInfo.utsname.machine;
+      info = "${iosInfo.systemName}" + " ${iosInfo.systemVersion}";
+    } else {
+      loginType = 2;
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      // logger.d(_readAndroidBuildData(androidInfo));
+      info = "${androidInfo.brand}" +
+          " ${androidInfo.model}" +
+          " Android ${androidInfo.version.release}" +
+          "(${androidInfo.version.sdkInt})";
+    }
+    // return;
     Response r = await dio.post(
       "/system/userLogin/login",
-      data: {"username": "$login", "password": "$pwd"},
+      data: {
+        "username": "$login",
+        "password": "$pwd",
+        "loginType": loginType,
+        "deviceInfo": info,
+        "machine": machine,
+      },
     );
 //    print(r.data);
     //清空所有缓存
@@ -118,7 +214,16 @@ class Git {
 //    }
     return responseData;
   }
-
+  // 登录接口，登录成功后返回用户信息
+  Future logOut() async {
+    logger.d('log out');
+    // return;
+    Response r = await dio.post(
+      "/system/userLogin/logout",
+    );
+    Map<String, dynamic> responseData = json.decode(r.toString());
+    return responseData;
+  }
 
   // 登录接口，登录成功后返回用户信息
   Future loginVideo(String login, String pwd) async {
@@ -487,6 +592,7 @@ class Git {
       if (Platform.isAndroid) {
         return await getApplicationSupportDirectory();
       }
+
       /// ios library 目录
       return await getLibraryDirectory();
     } else {
@@ -513,10 +619,9 @@ class Git {
         status = await Permission.storage.status;
         // Either the permission was already granted before or the user just granted it.
       }
-
     } else {
       if (!status.isGranted) {
-        String tip = "Dog needs storage access"  +
+        String tip = "Dog needs storage access" +
             " so that you can send and save photos, videos, music, and other media." +
             "  Please go to your device's settings and set Dog to ON.";
         showDeleteConfirmGroup(tip);
@@ -535,6 +640,7 @@ class Git {
 //    }
 //    return permission == PermissionStatus.granted;
   }
+
   Future<bool> requestPermissionsPhone() async {
     var status = await Permission.phone.status;
     if (status.isUndetermined) {
@@ -544,7 +650,6 @@ class Git {
         status = await Permission.phone.status;
         // Either the permission was already granted before or the user just granted it.
       }
-
     } else {
       // if (!status.isGranted) {
       //   String tip = "Dog needs storage access"  +
@@ -577,14 +682,13 @@ class Git {
         status = await Permission.microphone.status;
         // Either the permission was already granted before or the user just granted it.
       }
-
     } else {
       if (!status.isGranted) {
         String access = 'send voice message';
         if (type == 'video') {
           access = 'record videos';
         }
-        String tip = "Dog needs access to your microphone"  +
+        String tip = "Dog needs access to your microphone" +
             " so that you can $access." +
             " Please go to your device's settings and set Dog to ON.";
         showDeleteConfirmGroup(tip);
@@ -592,7 +696,6 @@ class Git {
       status = await Permission.microphone.status;
     }
     return status == PermissionStatus.granted;
-
 
 //    var permission = await PermissionHandler()
 //        .checkPermissionStatus(PermissionGroup.microphone);
@@ -606,6 +709,7 @@ class Git {
 //
 //    return permission == PermissionStatus.granted;
   }
+
   //  弹出对话框 去设置对话框
   Future<bool> showDeleteConfirmGroup(String tip) {
     return showDialog<bool>(
@@ -646,7 +750,6 @@ class Git {
     );
   }
 
-
   Future<bool> requestCameraPermissions() async {
     var status = await Permission.camera.status;
 
@@ -657,10 +760,9 @@ class Git {
         status = await Permission.camera.status;
         // Either the permission was already granted before or the user just granted it.
       }
-
     } else {
       if (!status.isGranted) {
-        String tip = "Dog needs camera access"  +
+        String tip = "Dog needs camera access" +
             " so that you can take photos and videos." +
             "  Please go to your device's settings and set Dog to ON.";
         showDeleteConfirmGroup(tip);

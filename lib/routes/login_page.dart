@@ -128,22 +128,22 @@ class _LoginRouteState extends State<LoginRoute> {
 //            if (downloadInfo != '') {
 //              avatarUrlLocal = downloadInfo;
 //            }
-            UserSql addInfo = UserSql(
-              username: content["username"],
-              firstName: content["firstName"],
-              lastName: content["lastName"],
-              id: content["userId"],
-              avatar: content["avatar"],
-              colorId: content["colorId"],
-              // bio: content["bio"],
-              // isOnline: true,
-              // lastSeen: content["lastSeen"],
-            );
-            await dbHelper.userUpdateOrInsert(addInfo);
             Git(context).saveImageFileOrigin(
                 content["avatar"], content['avatarName'], content["avatarUrl"]);
           }
 
+          UserSql addInfo = UserSql(
+            username: content["username"],
+            firstName: content["firstName"],
+            lastName: content["lastName"],
+            id: content["userId"],
+            avatar: content["avatar"],
+            colorId: content["colorId"],
+            bio: content["bio"],
+            isOnline: true,
+            lastSeen: content["lastSeen"],
+          );
+          await dbHelper.userUpdateOrInsert(addInfo);
           user = User.fromJson({
             "username": content["username"],
             "firstName": content["firstName"],
@@ -153,7 +153,9 @@ class _LoginRouteState extends State<LoginRoute> {
             "avatarUrl": content["avatarUrl"],
             "avatarUrlLocal": avatarUrlLocal,
             "token": content["token"],
+            "tokenId": content["tokenId"],
           });
+          logger.d(content['tokenId']);
 //        Global.profile.user = user;
 //        Global.profile.user.username = user.username;
 //        Global.profile.user.userId = user.userId;

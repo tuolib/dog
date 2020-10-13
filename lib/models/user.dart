@@ -32,6 +32,7 @@ class User {
     String firstName;
     String lastName;
     int colorId;
+    int tokenId;
     
     factory User.fromJson(Map<String,dynamic> json) => _$UserFromJson(json);
     Map<String, dynamic> toJson() => _$UserToJson(this);

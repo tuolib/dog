@@ -25,4 +25,5 @@
   "firstName": "firstName",
   "lastName": "lastName",
   "colorId": 0,
+  "tokenId": 0
 }

@@ -7,3 +7,4 @@ export 'group_room_sql.dart';
 export 'group_message_sql.dart';
 export 'group_user_sql.dart';
 export 'file_sql.dart';
+export 'device_sql.dart';

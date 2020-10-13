@@ -34,6 +34,15 @@ class _AvatarWidgetState extends State<AvatarWidget> {
   List colors = Colors.primaries;
   static Random random = Random();
   int rNum = random.nextInt(18);
+  String localUrl;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    localUrl = widget.avatarLocal;
+    judgeFile(localUrl);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,17 +54,16 @@ class _AvatarWidgetState extends State<AvatarWidget> {
     Widget gAvatar;
     if (widget.firstName != null && widget.firstName != '') {
 //      nameStr += widget.firstName.substring(0, 1);
-      nameStr += String.fromCharCode(widget.firstName.runes.first).toUpperCase();
+      nameStr +=
+          String.fromCharCode(widget.firstName.runes.first).toUpperCase();
     }
     if (widget.lastName != null && widget.lastName != '') {
 //      nameStr += widget.lastName.substring(0, 1);
       nameStr += String.fromCharCode(widget.lastName.runes.first).toUpperCase();
-
     }
     if (widget.avatarUrl == null ||
-        widget.avatarUrl == '' &&
-        widget.avatarLocal == null  ||
-        widget.avatarLocal == '') {
+        widget.avatarUrl == '' && localUrl == null ||
+        localUrl == '') {
 //      logger.d(rNum);
       gAvatar = Container(
         width: widget.width,
@@ -76,7 +84,7 @@ class _AvatarWidgetState extends State<AvatarWidget> {
         ),
       );
     } else {
-      if (widget.avatarLocal != null && widget.avatarLocal != '') {
+      if (localUrl != null && localUrl != '') {
         gAvatar = Container(
           width: widget.width,
           height: widget.height,
@@ -85,7 +93,7 @@ class _AvatarWidgetState extends State<AvatarWidget> {
             image: DecorationImage(
               colorFilter: ColorFilter.mode(
                   Colors.black.withOpacity(1), BlendMode.dstATop),
-              image: FileImage(File("${widget.avatarLocal}")),
+              image: FileImage(File("$localUrl")),
               fit: BoxFit.cover,
 //                      new AssetImage("/storage/emulated/0/DCIM/Camera/IMG_20200206_201702_BURST001_COVER.jpg")
 //          FileImage(File("/storage/emulated/0/DCIM/Camera/IMG_20200206_201702_BURST001_COVER.jpg"))
@@ -102,5 +110,15 @@ class _AvatarWidgetState extends State<AvatarWidget> {
       }
     }
     return gAvatar;
+  }
+
+  judgeFile(String fileUrl) async {
+    if(fileUrl == null) return;
+    bool exists = await File(fileUrl).exists();
+    if (!exists) {
+      setState(() {
+        localUrl = null;
+      });
+    }
   }
 }

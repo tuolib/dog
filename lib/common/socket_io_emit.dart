@@ -746,4 +746,25 @@ class SocketIoEmit {
     };
     socketInit.emit('msg', _encoder.convert(sendData));
   }
+
+  // setting
+
+  static deviceGet() async {
+//    isUpdatingGroup = true;
+    Map<String, dynamic> sendData = {
+      'type': 'deviceGet',
+      'authtoken': Global.profile.token,
+    };
+    socketInit.emit('msg', json.encode(sendData));
+  }
+  static deviceDelete(List<int> id) async {
+//    isUpdatingGroup = true;
+    Map<String, dynamic> sendData = {
+      'type': 'deviceDelete',
+      'authtoken': Global.profile.token,
+      'id': id,
+    };
+    socketInit.emit('msg', json.encode(sendData));
+  }
+
 }
