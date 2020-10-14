@@ -112,6 +112,7 @@ dependencies:
   is_lock_screen: ^1.0.0
   flutter_incall_manager:
     git: https://github.com/kangshaojun/flutter-incall-manager.git
+  hexcolor: ^1.0.6
 
 dev_dependencies:
   flutter_test:

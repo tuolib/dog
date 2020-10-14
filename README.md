@@ -32,6 +32,24 @@ flutter packages pub run json_model
 flutter pub run flutter_launcher_icons:main
 ```
 
+flutter_linkify
+animated_splash
+flappy_search_bar
+flutter_tags
+like_button
+skeleton_text
+implicitly_animated_reorderable_list
+flutter_styled_toast
+auto_animated
+adaptive_dialog
+device_simulator
+clipboard
+extended_text_field
+nice_button
+material_floating_search_bar
+progressive_image
+appbar_textfield
+search_app_bar_page
 
 
 

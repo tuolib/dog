@@ -16,40 +16,48 @@ class _DevicesPageState extends State<DevicesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // backgroundColor: Colors.grey,
-      appBar: AppBar(
-        title: InkWell(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "Devices",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+    return CupertinoPageScaffold(
+//       navigationBar: AppBar(
+//         title: InkWell(
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: <Widget>[
+//               Container(
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: <Widget>[
+//                     Text(
+//                       "Devices",
+//                       style: TextStyle(
+//                         fontWeight: FontWeight.bold,
+// //                        fontSize: 14,
+//                       ),
+//                     )
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//           onTap: () {},
+//         ),
+//       ),
+      navigationBar: CupertinoNavigationBar(
+        middle: Text(
+          "Devices",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
 //                        fontSize: 14,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ],
           ),
-          onTap: () {},
         ),
       ),
-      body: SafeArea(
+      child: SafeArea(
         child: CustomScrollView(slivers: <Widget>[
           SliverToBoxAdapter(
             child: _buildSelf(context),
           ),
-          SliverToBoxAdapter(
-            child: _buildMenus(),
-          ),
+          // SliverToBoxAdapter(
+          //   child: _buildMenus(),
+          // ),
           SliverToBoxAdapter(
             child: Container(
               child: Divider(
@@ -59,6 +67,7 @@ class _DevicesPageState extends State<DevicesPage> {
           )
         ]),
       ),
+
     );
   }
 
@@ -91,100 +100,83 @@ class _DevicesPageState extends State<DevicesPage> {
           padding: EdgeInsets.only(top: 30, left: 15, bottom: 6),
           width: MediaQuery.of(context).size.width,
           // color: Colors.white10,
-          // decoration: BoxDecoration(
-          //   // borderRadius: BorderRadius.circular(16.0),
-          //   color: Colors.black12,
-          // ),
-          child: Text('Current session'),
-        ),
-        Container(
-          padding: EdgeInsets.only(left: 15,),
           decoration: BoxDecoration(
             // borderRadius: BorderRadius.circular(16.0),
-            // color: Colors.white,
-            color: HexColor.fromHex('#FFFFFF'),
+            color: Colors.black12,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(top: 10, bottom: 10),
-                    // decoration: BoxDecoration(
-                    //   // borderRadius: BorderRadius.circular(16.0),
-                    //   color: Colors.white,
-                    // ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextOneLine(
-                                "$dogClient",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                '$dogInfo',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                            ],
-                          ),
+          child: Text('Current session'),
+        ),
+        Column(
+          children: [
+            Container(
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextOneLine(
+                        "$dogClient",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
                         ),
-                        Container(
-                          padding: EdgeInsets.only(left: 15, right: 10),
-                          child: Text(
-                            'online',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ),
-                      ],
-                    ),
-                    // child: ListTile(
-                    //   title: Text('$dogClient'),
-                    //   subtitle: Text('$dogInfo'),
-                    //   trailing: Text(
-                    //     'online',
-                    //     style: TextStyle(color: Colors.blue),
-                    //   ),
-                    // ),
-                  ),
-                  if (showT)
-                    Container(
-                      child: Divider(
-                        height: 2,
                       ),
-                    ),
-                ],
-              ),
-              if (showT)
-                Container(
-                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                  child: GestureDetector(
-                    child: Text(
-                      'Terminate all other sessions',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    onTap: () {
-                      showModelAll(allOtherId);
-                    },
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        '$dogInfo',
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ],
                   ),
                 ),
-            ],
-          ),
+                Container(
+                  padding: EdgeInsets.only(left: 15, right: 10),
+                  child: Text(
+                    'online',
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                ),
+              ],
+            )
+                // child: ListTile(
+                //   title: Text('$dogClient'),
+                //   subtitle: Text('$dogInfo'),
+                //   trailing: Text(
+                //     'online',
+                //     style: TextStyle(color: Colors.blue),
+                //   ),
+                // ),
+                ),
+            if (showT)
+              Container(
+                padding: EdgeInsets.only(left: 15),
+                child: Divider(
+                  height: 2,
+                ),
+              ),
+          ],
         ),
+        if (showT)
+          Container(
+            padding: EdgeInsets.only(left: 15, top: 10, bottom: 10),
+            child: GestureDetector(
+              child: Text(
+                'Terminate all other sessions',
+                style: TextStyle(color: Colors.red),
+              ),
+              onTap: () {
+                showModelAll(allOtherId);
+              },
+            ),
+          ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -193,10 +185,10 @@ class _DevicesPageState extends State<DevicesPage> {
               padding: EdgeInsets.only(top: 6, left: 15, bottom: 6),
               width: MediaQuery.of(context).size.width,
               // color: Colors.white10,
-              // decoration: BoxDecoration(
-              //   // borderRadius: BorderRadius.circular(16.0),
-              //   color: Colors.black12,
-              // ),
+              decoration: BoxDecoration(
+                // borderRadius: BorderRadius.circular(16.0),
+                color: Colors.black12,
+              ),
               child: showT
                   ? Text('Logs out all devices except for this one.')
                   : SizedBox(),
@@ -208,10 +200,10 @@ class _DevicesPageState extends State<DevicesPage> {
             padding: EdgeInsets.only(top: 30, left: 15, bottom: 6),
             width: MediaQuery.of(context).size.width,
             // color: Colors.white10,
-            // decoration: BoxDecoration(
-            //   // borderRadius: BorderRadius.circular(16.0),
-            //   color: Colors.black12,
-            // ),
+            decoration: BoxDecoration(
+              // borderRadius: BorderRadius.circular(16.0),
+              color: Colors.black12,
+            ),
             child: Text('Active session'),
           ),
       ],
@@ -243,14 +235,9 @@ class _DevicesPageState extends State<DevicesPage> {
     // ArrayUtil.sortArray(myList, sortOrder: 0, property: 'isOnline');
     var allMember = <Widget>[];
     for (var i = 0; i < myList.length; i++) {
-      bool isLast = myList.length - 1 == i;
       var item = Container(
 //        height: 80,
-        child: _buildItem(myList[i], isLast),
-        decoration: BoxDecoration(
-          // borderRadius: BorderRadius.circular(16.0),
-          color: Colors.white,
-        ),
+        child: _buildItem(myList[i]),
       );
       allMember.add(item);
     }
@@ -259,7 +246,7 @@ class _DevicesPageState extends State<DevicesPage> {
     );
   }
 
-  Widget _buildItem(Map device, bool last) {
+  Widget _buildItem(Map device) {
     var dogClient = device['loginType'] == 0
         ? 'Dog web'
         : device['loginType'] == 1 ? 'Dog IOS' : 'Dog Android';
@@ -307,11 +294,9 @@ class _DevicesPageState extends State<DevicesPage> {
         ),
         Container(
           padding: EdgeInsets.only(left: 15),
-          child: !last
-              ? Divider(
-                  height: 1,
-                )
-              : SizedBox(),
+          child: Divider(
+            height: 1,
+          ),
         ),
       ],
     );
