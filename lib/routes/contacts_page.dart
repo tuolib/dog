@@ -43,18 +43,46 @@ class _ContactsPageState extends State<ContactsPage> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text('Contacts'),
+        backgroundColor: DataUtil.iosBarBgColor(),
+        // textTheme: Theme.of(context).primaryColor,
+        brightness: Brightness.light,
+        shadowColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 48,
+        titleSpacing: 0,
+        bottom: PreferredSize(
+          child: Container(
+            color: DataUtil.iosBorderGreyShallow(),
+            height: 0.5,
+          ),
+          preferredSize: Size.fromHeight(0.5),
+        ),
+        centerTitle: true,
+        title: Text(
+          'Contacts',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            // fontSize: 16,
+            color: DataUtil.iosLightTextBlack(),
+          ),
+        ),
         actions: <Widget>[
           // 非隐藏的菜单
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(
+              Icons.add,
+              color: DataUtil.iosLightTextBlue(),
+            ),
             onPressed: () {
               _addContacts(context);
             },
           ),
           sortByLastSeen
               ? IconButton(
-                  icon: Icon(Icons.timer),
+                  icon: Icon(
+                    Icons.timer,
+                    color: DataUtil.iosLightTextBlue(),
+                  ),
                   onPressed: () {
                     setState(() {
                       sortByLastSeen = false;
@@ -62,7 +90,10 @@ class _ContactsPageState extends State<ContactsPage> {
                   },
                 )
               : IconButton(
-                  icon: Icon(Icons.sort_by_alpha),
+                  icon: Icon(
+                    Icons.sort_by_alpha,
+                    color: DataUtil.iosLightTextBlue(),
+                  ),
                   onPressed: () {
                     setState(() {
                       sortByLastSeen = true;

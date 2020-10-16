@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'dart:math';
 import 'dart:convert';
@@ -12,6 +13,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:audio_recorder/audio_recorder.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
@@ -337,8 +339,8 @@ class _ConversationState extends State<Conversation> {
       avatarLocal: conversionInfo['fileCompressLocal'],
       firstName: conversionInfo['firstName'],
       lastName: conversionInfo['lastName'],
-      width: 45,
-      height: 45,
+      width: 40,
+      height: 40,
       colorId: conversionInfo['colorId'],
     );
 
@@ -349,8 +351,31 @@ class _ConversationState extends State<Conversation> {
       showBigImage = false;
     }
     return AppBar(
-      elevation: 3,
+      backgroundColor: DataUtil.iosBarBgColor(),
+      // textTheme: Theme.of(context).primaryColor,
+      brightness: Brightness.light,
+      shadowColor: Colors.white,
+      elevation: 0,
+      toolbarHeight: 48,
       titleSpacing: 0,
+      bottom: PreferredSize(
+        child: Container(
+          color: DataUtil.iosBorderGreyShallow(),
+          height: 0.5,
+        ),
+        preferredSize: Size.fromHeight(0.5),
+      ),
+      leading: IconButton(
+        icon: Icon(
+          CupertinoIcons.back,
+          color: DataUtil.iosLightTextBlue(),
+          size: 34,
+        ),
+        onPressed: () {
+          // Navigator.of(context).pushNamed("newMessage");
+          Navigator.of(context).pop();
+        },
+      ),
       title: Row(
         children: <Widget>[
           Padding(
@@ -373,6 +398,7 @@ class _ConversationState extends State<Conversation> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
+                      color: DataUtil.iosLightTextBlack(),
                     ),
                   ),
                   SizedBox(height: 5),
@@ -382,6 +408,9 @@ class _ConversationState extends State<Conversation> {
                           style: TextStyle(
                             fontWeight: FontWeight.w400,
                             fontSize: 11,
+                            color: conversionInfo['isOnline']
+                                ? DataUtil.iosLightTextBlue()
+                                : DataUtil.iosLightTextBlack(),
                           ),
                         )
                       : Text(
@@ -389,6 +418,7 @@ class _ConversationState extends State<Conversation> {
                           style: TextStyle(
                             fontWeight: FontWeight.w400,
                             fontSize: 11,
+                            color: DataUtil.iosLightTextBlack(),
                           ),
                         ),
                 ],
@@ -404,37 +434,41 @@ class _ConversationState extends State<Conversation> {
       actions: <Widget>[
         if (conversionInfo['groupType'] == 2)
           IconButton(
-          icon: Icon(
-            Icons.call,
+            icon: Icon(
+              // Icons.call,
+              CupertinoIcons.phone_solid,
+              color: DataUtil.iosLightTextBlue(),
+            ),
+            onPressed: () async {
+              // Navigator.of(context).pushNamed("callVideo");
+              // displayIncomingCall('123456');
+              // displayOutCall();
+              // callKitIn.endCall(currentCallKitId);
+              // callGroupId = socketProviderConversationListModelGroupId;
+              Global.saveCallGroupId(
+                  socketProviderConversationListModelGroupId.toString());
+              // callFriendId = conversionInfo['contactId'];
+              Global.saveCallFriendId(conversionInfo['contactId'].toString());
+              logger.d(Global.callGroupId);
+              logger.d(Global.callFriendId);
+              // return;
+              createOverlayView(context, true);
+            },
           ),
-          onPressed: () async {
-            // Navigator.of(context).pushNamed("callVideo");
-            // displayIncomingCall('123456');
-            // displayOutCall();
-            // callKitIn.endCall(currentCallKitId);
-            // callGroupId = socketProviderConversationListModelGroupId;
-            Global.saveCallGroupId(
-                socketProviderConversationListModelGroupId.toString());
-            // callFriendId = conversionInfo['contactId'];
-            Global.saveCallFriendId(conversionInfo['contactId'].toString());
-            logger.d(Global.callGroupId);
-            logger.d(Global.callFriendId);
-            // return;
-            createOverlayView(context, true);
-          },
-        ),
         if (conversionInfo['groupType'] == 2)
           IconButton(
-          icon: Icon(
-            Icons.videocam,
+            icon: Icon(
+              // Icons.videocam,
+              CupertinoIcons.video_camera_solid,
+              color: DataUtil.iosLightTextBlue(),
+            ),
+            onPressed: () async {
+              // callGroupId = socketProviderConversationListModelGroupId;
+              // Navigator.of(context).pushNamed("callVideo", arguments: {
+              //   "invite": true,
+              // });
+            },
           ),
-          onPressed: () async {
-            // callGroupId = socketProviderConversationListModelGroupId;
-            // Navigator.of(context).pushNamed("callVideo", arguments: {
-            //   "invite": true,
-            // });
-          },
-        ),
       ],
     );
   }

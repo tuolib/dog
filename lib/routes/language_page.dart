@@ -1,4 +1,5 @@
 import '../index.dart';
+import 'package:flutter/cupertino.dart';
 
 class LanguageRoute extends StatelessWidget {
   @override
@@ -25,7 +26,40 @@ class LanguageRoute extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(gm.language),
+        backgroundColor: DataUtil.iosBarBgColor(),
+        // textTheme: Theme.of(context).primaryColor,
+        brightness: Brightness.light,
+        shadowColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 48,
+        titleSpacing: 0,
+        bottom: PreferredSize(
+          child: Container(
+            color: DataUtil.iosBorderGreyShallow(),
+            height: 0.5,
+          ),
+          preferredSize: Size.fromHeight(0.5),
+        ),
+        leading: IconButton(
+          icon: Icon(
+            CupertinoIcons.back,
+            color: DataUtil.iosLightTextBlue(),
+            size: 34,
+          ),
+          onPressed: () {
+            // Navigator.of(context).pushNamed("newMessage");
+            Navigator.of(context).pop();
+          },
+        ),
+        centerTitle: true,
+        title: Text(
+          "${gm.language}",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: DataUtil.iosLightTextBlack(),
+            //                        fontSize: 14,
+          ),
+        ),
       ),
       body: ListView(
         children: <Widget>[

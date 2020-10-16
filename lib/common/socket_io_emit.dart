@@ -16,6 +16,13 @@ Map<String, dynamic> messageDialogsGetState = {
 };
 
 class SocketIoEmit {
+  static logOut() async {
+    var sendData = json.encode({
+      'type': 'logOut',
+      'authtoken': Global.profile.token,
+    });
+    socketInit.emit('msg', sendData);
+  }
   static connectInfoSend() async {
     var connectInfo = json.encode({
       'type': 'connectInfo',

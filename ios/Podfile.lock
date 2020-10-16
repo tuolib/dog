@@ -101,6 +101,8 @@ PODS:
     - Flutter
   - flutter_local_notifications (0.0.1):
     - Flutter
+  - flutter_statusbarcolor (0.0.1):
+    - Flutter
   - flutter_voip_push_notification (0.0.1):
     - Flutter
   - flutter_webrtc (0.2.2):
@@ -134,6 +136,8 @@ PODS:
   - GoogleUtilities/UserDefaults (6.7.2):
     - GoogleUtilities/Logger
   - GoogleWebRTC (1.1.29400)
+  - hexcolor (0.0.1):
+    - Flutter
   - image_cropper (0.0.3):
     - Flutter
     - TOCropViewController (~> 2.5.4)
@@ -203,10 +207,12 @@ DEPENDENCIES:
   - flutter_call_kit (from `.symlinks/plugins/flutter_call_kit/ios`)
   - flutter_incall_manager (from `.symlinks/plugins/flutter_incall_manager/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - flutter_statusbarcolor (from `.symlinks/plugins/flutter_statusbarcolor/ios`)
   - flutter_voip_push_notification (from `.symlinks/plugins/flutter_voip_push_notification/ios`)
   - flutter_webrtc (from `.symlinks/plugins/flutter_webrtc/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - gallery_saver (from `.symlinks/plugins/gallery_saver/ios`)
+  - hexcolor (from `.symlinks/plugins/hexcolor/ios`)
   - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - is_lock_screen (from `.symlinks/plugins/is_lock_screen/ios`)
@@ -277,6 +283,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_incall_manager/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  flutter_statusbarcolor:
+    :path: ".symlinks/plugins/flutter_statusbarcolor/ios"
   flutter_voip_push_notification:
     :path: ".symlinks/plugins/flutter_voip_push_notification/ios"
   flutter_webrtc:
@@ -285,6 +293,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/fluttertoast/ios"
   gallery_saver:
     :path: ".symlinks/plugins/gallery_saver/ios"
+  hexcolor:
+    :path: ".symlinks/plugins/hexcolor/ios"
   image_cropper:
     :path: ".symlinks/plugins/image_cropper/ios"
   image_picker:
@@ -341,6 +351,7 @@ SPEC CHECKSUMS:
   flutter_call_kit: 0598f2eec54579aa00b53fb68a622ccdb08fe4fe
   flutter_incall_manager: 1a6aea8d37fb46d63aaa30ac7ea225e121704eab
   flutter_local_notifications: 9e4738ce2471c5af910d961a6b7eadcf57c50186
+  flutter_statusbarcolor: 8afb1071ed8c58be929f1e32b36c629771fd2259
   flutter_voip_push_notification: f28f3ce1c6b835a3fa9e833f37f33dc1291ab888
   flutter_webrtc: 626ca239bcc4390a514a2ac2b21b16d0c58b33fe
   fluttertoast: b644586ef3b16f67fae9a1f8754cef6b2d6b634b
@@ -349,6 +360,7 @@ SPEC CHECKSUMS:
   GoogleDataTransport: b7f406340a291370045a270c599e53c6fa6ec20f
   GoogleUtilities: 7f2f5a07f888cdb145101d6042bc4422f57e70b3
   GoogleWebRTC: cfb83bc346435a17fe06bb05f04ad826b858a7fb
+  hexcolor: fdfb9c4258ad96e949c2dbcdf790a62194b8aa89
   image_cropper: c8f9b4157933c7bb965a66d1c5e6c8fd408c6eb4
   image_picker: 9c3312491f862b28d21ecd8fdf0ee14e601b3f09
   is_lock_screen: 3312dcce52245e965b893a7886bb1b260ed51472

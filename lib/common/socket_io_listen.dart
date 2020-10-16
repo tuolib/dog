@@ -6,6 +6,7 @@ import 'dart:convert';
 import '../index.dart';
 
 class SocketIoListen {
+
   //login
   static serverToken() async {
     socketInit.on('serverToken', (data) async {

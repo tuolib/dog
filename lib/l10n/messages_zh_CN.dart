@@ -39,7 +39,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "personal" : MessageLookupByLibrary.simpleMessage("我的"),
     "remainingEmailsMessage" : m0,
     "theme" : MessageLookupByLibrary.simpleMessage("主题"),
-    "title" : MessageLookupByLibrary.simpleMessage("Flutter应用"),
+    "title" : MessageLookupByLibrary.simpleMessage("Dog"),
     "userName" : MessageLookupByLibrary.simpleMessage("用户名"),
     "userNameOrEmail" : MessageLookupByLibrary.simpleMessage("用户名或邮箱"),
     "userNameOrPasswordWrong" : MessageLookupByLibrary.simpleMessage("用户名或者密码错误"),

@@ -5,3 +5,4 @@ export 'random_string.dart';
 export 'device_info.dart';
 export 'turn.dart';
 export 'websocket.dart';
+export 'data.dart';

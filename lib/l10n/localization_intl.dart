@@ -62,7 +62,7 @@ class GmLocalizations {
 
   String get theme {
     return Intl.message(
-      'Theme',
+      'Appearance',
       name: 'theme',
       desc: 'Theme',
     );

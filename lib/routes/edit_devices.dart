@@ -17,29 +17,42 @@ class _DevicesPageState extends State<DevicesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.grey,
+      backgroundColor: DataUtil.iosLightGrey(),
+      // backgroundColor: CupertinoColors.lightBackgroundGray,
       appBar: AppBar(
-        title: InkWell(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "Devices",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-//                        fontSize: 14,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ],
+        backgroundColor: DataUtil.iosBarBgColor(),
+        // textTheme: Theme.of(context).primaryColor,
+        brightness: Brightness.light,
+        shadowColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 48,
+        titleSpacing: 0,
+        bottom: PreferredSize(
+          child: Container(
+            color: DataUtil.iosBorderGreyShallow(),
+            height: 0.5,
           ),
-          onTap: () {},
+          preferredSize: Size.fromHeight(0.5),
+        ),
+        leading: IconButton(
+          icon: Icon(
+            CupertinoIcons.back,
+            color: DataUtil.iosLightTextBlue(),
+            size: 34,
+          ),
+          onPressed: () {
+            // Navigator.of(context).pushNamed("newMessage");
+            Navigator.of(context).pop();
+          },
+        ),
+        centerTitle: true,
+        title: Text(
+          "Devices",
+          style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: DataUtil.iosLightTextBlack(),
+      //                        fontSize: 14,
+          ),
         ),
       ),
       body: SafeArea(
@@ -50,13 +63,13 @@ class _DevicesPageState extends State<DevicesPage> {
           SliverToBoxAdapter(
             child: _buildMenus(),
           ),
-          SliverToBoxAdapter(
-            child: Container(
-              child: Divider(
-                height: 2,
-              ),
-            ),
-          )
+          // SliverToBoxAdapter(
+          //   child: Container(
+          //     child: Divider(
+          //       height: 2,
+          //     ),
+          //   ),
+          // )
         ]),
       ),
     );
@@ -97,13 +110,21 @@ class _DevicesPageState extends State<DevicesPage> {
           // ),
           child: Text('Current session'),
         ),
+        Divider(
+          height: 2,
+          color: Color.fromRGBO(207, 206, 213, 1),
+        ),
         Container(
-          padding: EdgeInsets.only(left: 15,),
-          decoration: BoxDecoration(
-            // borderRadius: BorderRadius.circular(16.0),
-            // color: Colors.white,
-            color: HexColor.fromHex('#FFFFFF'),
+          padding: EdgeInsets.only(
+            left: 15,
           ),
+          // color: Color.fromRGBO(255, 255, 255, 1),
+          color: Colors.white,
+          // decoration: BoxDecoration(
+          //   // borderRadius: BorderRadius.circular(16.0),
+          //   // color: Colors.white,
+          //   color: HexColor.fromHex('#FFFFFF'),
+          // ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -165,25 +186,36 @@ class _DevicesPageState extends State<DevicesPage> {
                     Container(
                       child: Divider(
                         height: 2,
+                        color: Color.fromRGBO(201, 200, 205, 1.000),
                       ),
                     ),
                 ],
               ),
               if (showT)
-                Container(
-                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                  child: GestureDetector(
-                    child: Text(
-                      'Terminate all other sessions',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    onTap: () {
-                      showModelAll(allOtherId);
-                    },
+                GestureDetector(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                          child: Text(
+                            'Terminate all other sessions',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
+                  onTap: () {
+                    showModelAll(allOtherId);
+                  },
                 ),
             ],
           ),
+        ),
+        Divider(
+          height: 2,
+          color: Color.fromRGBO(207, 206, 213, 1),
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,6 +246,11 @@ class _DevicesPageState extends State<DevicesPage> {
             // ),
             child: Text('Active session'),
           ),
+        if (showT)
+          Divider(
+            height: 1,
+            color: Color.fromRGBO(207, 206, 213, 1),
+          ),
       ],
     );
   }
@@ -233,6 +270,7 @@ class _DevicesPageState extends State<DevicesPage> {
     // logger.d(Global.profile.user.tokenId);
     int tokenId = Global.profile.user.tokenId;
     List myList = [];
+    if (devices.length <= 1) return SizedBox();
     for (var i = 0; i < devices.length; i++) {
       if (devices[i]['id'] != tokenId) {
         myList.add(devices[i]);
@@ -271,32 +309,75 @@ class _DevicesPageState extends State<DevicesPage> {
           actionExtentRatio: 0.25,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.0),
-            child: ListTile(
-              contentPadding: EdgeInsets.only(left: 6),
-              title: Row(
+            child: Container(
+              padding: EdgeInsets.only(
+                left: 6,
+              ),
+              // color: Color.fromRGBO(255, 255, 255, 1),
+              color: Colors.white,
+              // decoration: BoxDecoration(
+              //   // borderRadius: BorderRadius.circular(16.0),
+              //   // color: Colors.white,
+              //   color: HexColor.fromHex('#FFFFFF'),
+              // ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('$dogClient'),
+                  Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                        // decoration: BoxDecoration(
+                        //   // borderRadius: BorderRadius.circular(16.0),
+                        //   color: Colors.white,
+                        // ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextOneLine(
+                                    "$dogClient",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    '$dogInfo',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Container(
+                            //   padding: EdgeInsets.only(left: 15, right: 10),
+                            //   child: Text(
+                            //     'online',
+                            //     style: TextStyle(color: Colors.blue),
+                            //   ),
+                            // ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
-              subtitle: TextOneLine(
-                "$dogInfo",
-                overflow: TextOverflow.ellipsis,
-              ),
-              // trailing: Column(
-              //   crossAxisAlignment: CrossAxisAlignment.end,
-              //   children: <Widget>[
-              //     SizedBox(height: 10),
-              //     Container(
-              //       height: 16,
-              //       child: Text('sdf'),
-              //     ),
-              //   ],
-              // ),
             ),
           ),
           secondaryActions: <Widget>[
             IconSlideAction(
-              caption: 'Delete',
+              caption: 'Terminate',
               color: Colors.red,
               icon: Icons.delete,
               onTap: () {
@@ -310,9 +391,15 @@ class _DevicesPageState extends State<DevicesPage> {
           child: !last
               ? Divider(
                   height: 1,
+                  color: DataUtil.iosBorderGreyDeep(),
                 )
               : SizedBox(),
         ),
+        if (last)
+          Divider(
+            height: 1,
+            color: DataUtil.iosBorderGreyDeep(),
+          ),
       ],
     );
   }

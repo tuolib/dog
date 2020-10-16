@@ -3,6 +3,8 @@ import 'dart:math';
 import 'dart:core';
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
+
 import '../index.dart';
 import 'package:badges/badges.dart';
 import 'package:flutter/services.dart';
@@ -17,7 +19,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   PageController _pageController;
-  int _page = 0;
+  int _page = 1;
   DateTime _lastPressedAt;
 
   List colors = Colors.primaries;
@@ -33,7 +35,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
 //    isSend = false; , keepPage: true, viewportFraction: 1
-    _pageController = PageController(initialPage: 0, keepPage: true);
+    _pageController = PageController(initialPage: 1, keepPage: true);
 //    监听 手机打开，进入后台
     WidgetsBinding.instance.addObserver(LifecycleEventHandler(
       resumeCallBack: () async {
@@ -206,63 +208,74 @@ class _MainScreenState extends State<MainScreen> {
 //            value: ChatListModel(),
 //            child: HomeRoute(),
 //          ),
-            HomeRoute(),
             ContactsPage(),
+            HomeRoute(),
 //          DiscoveryPage(),
 //            TestSqlRoute(),
 //            CustomScrollViewTestRoute(),
-            DbPage(),
             SettingsPage(),
+            DbPage(),
           ],
         ),
         bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(
             // sets the background color of the `BottomNavigationBar`
-            canvasColor: Theme.of(context).primaryColor,
+            // canvasColor: DataUtil.iosBarBgColor(),
             // sets the active color of the `BottomNavigationBar` if `Brightness` is light
 //          primaryColor: Theme.of(context).accentColor,
-            primaryColor: Colors.pink,
-            textTheme: Theme.of(context).textTheme.copyWith(
-//                caption: TextStyle(color: Colors.grey[500]),
-                  caption: TextStyle(color: Colors.white),
-                ),
+//             primaryColor: DataUtil.iosActiveBlue(),
+//             textTheme: Theme.of(context).textTheme.copyWith(
+// //                caption: TextStyle(color: Colors.grey[500]),
+//                   caption: TextStyle(color: Colors.white),
+//                 ),
+//             textTheme: DataUtil.iosLightTextColor(),
           ),
-          child: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: IconBadge(
-                  icon: Icons.message,
-                ),
+          child: Container(
+            child: CupertinoTabBar(
+              onTap: navigationTapped,
+              currentIndex: _page,
+              items: [
+                BottomNavigationBarItem(
+                  icon: Icon(DefineIcons.personCircleFill),
 //              title: Container(height: 0.0),
-                title: Text('Chats'),
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.group,
+                  title: Text(GmLocalizations.of(context).contacts),
                 ),
+                BottomNavigationBarItem(
+                  icon: IconBadge(
+                    // icon: Icons.message,
+                    icon: DefineIcons.chats,
+                  ),
 //              title: Container(height: 0.0),
-                title: Text(GmLocalizations.of(context).contacts),
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.sentiment_satisfied,
+                  title: Text('Chats'),
                 ),
-//              title: Container(height: 0.0),
-                title: Text(GmLocalizations.of(context).discovery),
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.settings,
+                BottomNavigationBarItem(
+                  icon: Icon(
+                    // Icons.settings,
+                    // CupertinoIcons.settings_solid,
+                    DefineIcons.settingFill,
+                  ),
+                  title: Text('Settings'),
                 ),
-//gAvatar
-//                backgroundColor: Colors.pink,
+                BottomNavigationBarItem(
+                  icon: Icon(
+                    CupertinoIcons.book_solid,
+                  ),
 //              title: Container(height: 0.0),
-                title: Text('Settings'),
-              ),
-            ],
-            onTap: navigationTapped,
-            currentIndex: _page,
+                  title: Text(GmLocalizations.of(context).discovery),
+                ),
+              ],
+            ),
+            // constraints: BoxConstraints(
+            //   maxHeight: 49.0,
+            // ),
+            // decoration: BoxDecoration(
+            //   border: Border(
+            //     top: BorderSide( //                    <--- top side
+            //       color: DataUtil.iosBorderGreyShallow(),
+            //       width: 1.0,
+            //     ),
+            //   ),
+            // ),
           ),
         ),
       ),

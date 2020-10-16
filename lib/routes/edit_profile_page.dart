@@ -679,17 +679,18 @@ class _EditProfileState extends State<EditProfileRoute> {
                         FlatButton(
                           child: Text(gm.yes),
                           onPressed: () {
+                            SocketIoEmit.logOut();
+                            socketInit.disconnect();
                             //该赋值语句会触发MaterialApp rebuild
                             userModel.user = null;
                             Global.profile.token = null;
                             Global.saveProfile();
-                            socketInit.disconnect();
 //                            socketInit.close();
 //                            socketInit = null;
 //                            socketInit.destroy();
 //                            socketInit = null;
                             isSend = false;
-                            Git(context).logOut();
+                            // Git(context).logOut();
                             Navigator.pop(context);
                             Navigator.of(context).pushReplacementNamed("login");
                           },

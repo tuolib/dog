@@ -1,7 +1,7 @@
 {
   "@@locale":"en",
   "@@last_modified": "2020-06-27T20:43:52.703264",
-  "title": "Flutter APP",
+  "title": "Dog",
   "@title": {
     "description": "Title for the Demo application",
     "type": "text",
@@ -35,7 +35,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "theme": "Theme",
+  "theme": "Appearance",
   "@theme": {
     "description": "Theme",
     "type": "text",

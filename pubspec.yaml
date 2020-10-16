@@ -113,6 +113,7 @@ dependencies:
   flutter_incall_manager:
     git: https://github.com/kangshaojun/flutter-incall-manager.git
   hexcolor: ^1.0.6
+  flutter_statusbarcolor: ^0.2.3
 
 dev_dependencies:
   flutter_test:
@@ -142,6 +143,9 @@ flutter:
     - family: defineIcon  #指定一个字体名
       fonts:
         - asset: fonts/iconfont.ttf
+    - family: ionicons  #指定一i个字体名
+      fonts:
+        - asset: fonts/Ionicons.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

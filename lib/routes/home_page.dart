@@ -8,6 +8,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 bool isOnChatsPage = false;
 BuildContext chatsPageContext;
+
 class HomeRoute extends StatefulWidget {
   @override
   _HomeRouteState createState() => _HomeRouteState();
@@ -50,6 +51,9 @@ class _HomeRouteState extends State<HomeRoute> {
 //      getChat = true;
 //      socketProviderChatListModel.getChatList();
 //    }
+//     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+//         statusBarColor: Colors.white
+//     ));
   }
 
   @override
@@ -70,10 +74,26 @@ class _HomeRouteState extends State<HomeRoute> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: DataUtil.iosBarBgColor(),
+        // textTheme: Theme.of(context).primaryColor,
+        brightness: Brightness.light,
+        shadowColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 48,
+        bottom: PreferredSize(
+          child: Container(
+            color: DataUtil.iosBorderGreyShallow(),
+            height: 0.5,
+          ),
+          preferredSize: Size.fromHeight(0.5),
+        ),
         title: InkWell(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              // Container(
+              //   width: 16,
+              // ),
               Container(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,12 +105,14 @@ class _HomeRouteState extends State<HomeRoute> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,
                                   fontSize: 16,
+                                  color: DataUtil.iosLightTextBlack(),
                                 ),
                               )
                             : Text(
                                 "Chats",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
+                                  color: DataUtil.iosLightTextBlack(),
 //                        fontSize: 14,
                                 ),
                               )
@@ -99,6 +121,7 @@ class _HomeRouteState extends State<HomeRoute> {
                             style: TextStyle(
                               fontWeight: FontWeight.w400,
                               fontSize: 16,
+                              color: DataUtil.iosLightTextBlack(),
                             ),
                           )
                   ],
@@ -111,10 +134,22 @@ class _HomeRouteState extends State<HomeRoute> {
 //            conversion.updateInfoProperty('groupName', '123132');
           },
         ),
+        leading: IconButton(
+          icon: Icon(
+            CupertinoIcons.search,
+            color: DataUtil.iosLightTextBlue(),
+          ),
+          onPressed: () {
+            Navigator.of(context).pushNamed("newMessage");
+          },
+        ),
         actions: <Widget>[
           // 非隐藏的菜单
-          new IconButton(
-            icon: new Icon(Icons.edit),
+          IconButton(
+            icon: Icon(
+              DefineIcons.compose,
+              color: DataUtil.iosLightTextBlue(),
+            ),
             onPressed: () {
               Navigator.of(context).pushNamed("newMessage");
             },
@@ -219,7 +254,6 @@ class _HomeRouteState extends State<HomeRoute> {
       });
     });
   }
-
 }
 
 class MyDrawer extends StatelessWidget {

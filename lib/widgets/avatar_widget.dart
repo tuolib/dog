@@ -116,6 +116,7 @@ class _AvatarWidgetState extends State<AvatarWidget> {
     if(fileUrl == null) return;
     bool exists = await File(fileUrl).exists();
     if (!exists) {
+      if (!mounted) return;
       setState(() {
         localUrl = null;
       });
