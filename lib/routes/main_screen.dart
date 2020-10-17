@@ -198,30 +198,38 @@ class _MainScreenState extends State<MainScreen> {
 //        Navigator.of(context).popUntil((route) => route.isFirst);
 //        return false;
       },
-      child: Scaffold(
-        body: PageView(
-          physics: NeverScrollableScrollPhysics(),
-          controller: _pageController,
-          onPageChanged: onPageChanged,
-          children: <Widget>[
+      child: Localizations(
+        locale: Locale('en', 'US'),
+        delegates: <LocalizationsDelegate<dynamic>>[
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          DefaultCupertinoLocalizations.delegate,
+          GmLocalizationsDelegate()
+        ],
+        child: Scaffold(
+          body: PageView(
+            physics: NeverScrollableScrollPhysics(),
+            controller: _pageController,
+            onPageChanged: onPageChanged,
+            children: <Widget>[
 //          ChangeNotifierProvider.value(
 //            value: ChatListModel(),
 //            child: HomeRoute(),
 //          ),
-            ContactsPage(),
-            HomeRoute(),
+              ContactsPage(),
+              HomeRoute(),
 //          DiscoveryPage(),
 //            TestSqlRoute(),
 //            CustomScrollViewTestRoute(),
-            SettingsPage(),
-            DbPage(),
-          ],
-        ),
-        bottomNavigationBar: Theme(
-          data: Theme.of(context).copyWith(
-            // sets the background color of the `BottomNavigationBar`
-            // canvasColor: DataUtil.iosBarBgColor(),
-            // sets the active color of the `BottomNavigationBar` if `Brightness` is light
+              SettingsPage(),
+              DbPage(),
+            ],
+          ),
+          bottomNavigationBar: Theme(
+            data: Theme.of(context).copyWith(
+              // sets the background color of the `BottomNavigationBar`
+              // canvasColor: DataUtil.iosBarBgColor(),
+              // sets the active color of the `BottomNavigationBar` if `Brightness` is light
 //          primaryColor: Theme.of(context).accentColor,
 //             primaryColor: DataUtil.iosActiveBlue(),
 //             textTheme: Theme.of(context).textTheme.copyWith(
@@ -229,56 +237,58 @@ class _MainScreenState extends State<MainScreen> {
 //                   caption: TextStyle(color: Colors.white),
 //                 ),
 //             textTheme: DataUtil.iosLightTextColor(),
-          ),
-          child: Container(
-            child: CupertinoTabBar(
-              onTap: navigationTapped,
-              currentIndex: _page,
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(DefineIcons.personCircleFill),
-//              title: Container(height: 0.0),
-                  title: Text(GmLocalizations.of(context).contacts),
-                ),
-                BottomNavigationBarItem(
-                  icon: IconBadge(
-                    // icon: Icons.message,
-                    icon: DefineIcons.chats,
-                  ),
-//              title: Container(height: 0.0),
-                  title: Text('Chats'),
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    // Icons.settings,
-                    // CupertinoIcons.settings_solid,
-                    DefineIcons.settingFill,
-                  ),
-                  title: Text('Settings'),
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    CupertinoIcons.book_solid,
-                  ),
-//              title: Container(height: 0.0),
-                  title: Text(GmLocalizations.of(context).discovery),
-                ),
-              ],
             ),
-            // constraints: BoxConstraints(
-            //   maxHeight: 49.0,
-            // ),
-            // decoration: BoxDecoration(
-            //   border: Border(
-            //     top: BorderSide( //                    <--- top side
-            //       color: DataUtil.iosBorderGreyShallow(),
-            //       width: 1.0,
-            //     ),
-            //   ),
-            // ),
+            child: Container(
+              child: CupertinoTabBar(
+                onTap: navigationTapped,
+                currentIndex: _page,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: Icon(DefineIcons.personCircleFill),
+//              title: Container(height: 0.0),
+                    title: Text(GmLocalizations.of(context).contacts),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: IconBadge(
+                      // icon: Icons.message,
+                      icon: DefineIcons.chats,
+                    ),
+//              title: Container(height: 0.0),
+                    title: Text('Chats'),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      // Icons.settings,
+                      // CupertinoIcons.settings_solid,
+                      DefineIcons.settingFill,
+                    ),
+                    title: Text('Settings'),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      CupertinoIcons.book_solid,
+                    ),
+//              title: Container(height: 0.0),
+                    title: Text(GmLocalizations.of(context).discovery),
+                  ),
+                ],
+              ),
+              // constraints: BoxConstraints(
+              //   maxHeight: 49.0,
+              // ),
+              // decoration: BoxDecoration(
+              //   border: Border(
+              //     top: BorderSide( //                    <--- top side
+              //       color: DataUtil.iosBorderGreyShallow(),
+              //       width: 1.0,
+              //     ),
+              //   ),
+              // ),
+            ),
           ),
         ),
       ),
+
     );
   }
 

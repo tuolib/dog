@@ -51,7 +51,6 @@ class UserModel extends ProfileChangeNotifier {
   changeUser() {
     notifyListeners();
   }
-
 }
 
 class ThemeModel extends ProfileChangeNotifier {
@@ -71,23 +70,32 @@ class ThemeModel extends ProfileChangeNotifier {
 class LocaleModel extends ProfileChangeNotifier {
   // 获取当前用户的APP语言配置Locale类，如果为null，则语言跟随系统语言
   Locale getLocale() {
-    if (_profile.locale == null) return null;
+    if (_profile.locale == null) {
+      _profile.locale = 'en_US';
+      return Locale('en', 'US');
+    }
     var t = _profile.locale.split("_");
     return Locale(t[0], t[1]);
   }
 
+  String _localeName = 'English';
+
   // 获取当前Locale的字符串表示
   String get locale => _profile.locale;
+
+  // 获取当前Locale的 名称表示
+  String get localeName => _localeName;
 
   // 用户改变APP语言后，通知依赖项更新，新语言会立即生效
   set locale(String locale) {
     if (locale != _profile.locale) {
       _profile.locale = locale;
+      if (locale == 'zh_CN') {
+        _localeName = '中文简体';
+      } else {
+        _localeName = 'English';
+      }
       notifyListeners();
     }
   }
 }
-
-
-
-

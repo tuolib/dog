@@ -12,6 +12,10 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+
+  User user;
+  var gAvatar;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -22,8 +26,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     var userInfo = Provider.of<UserModel>(context);
-    var gAvatar;
-    User user = userInfo.user;
+    user = userInfo.user;
     // logger.d(user.avatarUrlLocal);
     gAvatar = AvatarWidget(
       firstName: user.firstName,
@@ -79,79 +82,95 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       body: CustomScrollView(slivers: <Widget>[
         SliverToBoxAdapter(
+          child: _buildSelf(),
+        ),
+        SliverToBoxAdapter(
           child: Container(
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Column(
-                  children: [
-                    InkWell(
-                      child: Padding(
-                        padding: EdgeInsets.all(5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.all(8),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
+            height: 30,
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: _buildMenus(),
+        ),
+      ]),
+    );
+  }
+  Widget _buildSelf() {
+    return Container(
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Column(
+            children: [
+              InkWell(
+                child: Padding(
+                  padding: EdgeInsets.all(5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              gAvatar,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                                   children: [
-                                    gAvatar,
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Flexible(
-                                                child: Container(
-                                                  padding:
-                                                      EdgeInsets.only(left: 10),
-                                                  child: Text(
-                                                    "${user.firstName} ${user?.lastName}",
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 18),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.only(left: 10),
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: Container(
+                                            padding:
+                                            EdgeInsets.only(left: 10),
                                             child: Text(
-                                              "@${user.username}",
+                                              "${user.firstName} ${user?.lastName}",
                                               maxLines: 1,
+                                              overflow:
+                                              TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
+                                                  fontWeight:
+                                                  FontWeight.bold,
                                                   fontSize: 18),
                                             ),
                                           ),
-                                        ],
+                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        "@${user.username}",
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                            color: DataUtil.iosLightTextGrey()
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              color: DataUtil.iosLightTextGrey(),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                      onTap: () {
-                        Navigator.of(context).pushNamed("editProfile");
-                      },
-                    ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        color: DataUtil.iosLightTextGrey(),
+                      ),
+                    ],
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).pushNamed("editProfile");
+                },
+              ),
 //                Row(
 //                  children: [
 //                    SizedBox(width: 13, height: 1,),
@@ -206,28 +225,16 @@ class _SettingsPageState extends State<SettingsPage> {
 //                    Navigator.of(context).pushNamed("editUsername");
 //                  },
 //                ),
-                  ],
-                ),
-                Divider(
-                  height: 1,
-                  color: DataUtil.iosBorderGreyDeep(),
-                ),
-              ],
-            ),
+            ],
           ),
-        ),
-        SliverToBoxAdapter(
-          child: Container(
-            height: 30,
+          Divider(
+            height: 1,
+            color: DataUtil.iosBorderGreyDeep(),
           ),
-        ),
-        SliverToBoxAdapter(
-          child: _buildMenus(),
-        ),
-      ]),
+        ],
+      ),
     );
   }
-
   // 构建菜单项
   Widget _buildMenus() {
     var devicesObj = Provider.of<DeviceModel>(context);
@@ -242,6 +249,8 @@ class _SettingsPageState extends State<SettingsPage> {
         double iconBorderWidth = 4;
         double dividerLeft = iconWidth + iconMargin * 2;
         Color forwardColor = DataUtil.iosLightTextGrey();
+        var localeModel = Provider.of<LocaleModel>(context);
+
 
         return Container(
           color: Colors.white,
@@ -330,9 +339,21 @@ class _SettingsPageState extends State<SettingsPage> {
                               fontSize: 16,
                             ),
                           ),
-                          Icon(
-                            CupertinoIcons.forward,
-                            color: forwardColor,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                '${localeModel.localeName}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: forwardColor,
+                                ),
+                              ),
+                              Icon(
+                                CupertinoIcons.forward,
+                                color: forwardColor,
+                              ),
+                            ],
                           ),
                         ],
                       ),

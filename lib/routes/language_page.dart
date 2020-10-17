@@ -18,6 +18,7 @@ class LanguageRoute extends StatelessWidget {
         trailing:
         localeModel.locale == value ? Icon(Icons.done, color: color) : null,
         onTap: () {
+          logger.d(value);
           // 更新locale后MaterialApp会重新build
           localeModel.locale = value;
         },
@@ -65,7 +66,7 @@ class LanguageRoute extends StatelessWidget {
         children: <Widget>[
           _buildLanguageItem("中文简体", "zh_CN"),
           _buildLanguageItem("English", "en_US"),
-          _buildLanguageItem(gm.auto, null),
+          // _buildLanguageItem(gm.auto, null),
         ],
       ),
     );
