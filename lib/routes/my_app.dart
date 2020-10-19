@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:cupertino_back_gesture/cupertino_back_gesture.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 
 import '../index.dart';
 
@@ -87,9 +88,15 @@ class MyApp extends StatelessWidget {
         builder: (BuildContext context, themeModel, localeModel, Widget child) {
           return CupertinoApp(
             title: 'Dog',
+            // theme: theme,
+
             theme: CupertinoThemeData(
-              brightness: Brightness.light,
-              scaffoldBackgroundColor: DataUtil.iosLightGrey(),
+              brightness: themeModel.themeMode == 1
+                  ? Brightness.light
+                  : Brightness.dark,
+              barBackgroundColor: DataUtil.iosBarBgColor(),
+              // primaryColor: Theme.of(context).primaryColor,
+              // scaffoldBackgroundColor: DataUtil.iosLightGrey(),
             ),
 //             theme: ThemeData(
 //               platform: TargetPlatform.iOS,

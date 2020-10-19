@@ -16,6 +16,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:keyboard_utils/keyboard_utils.dart';
+import 'package:keyboard_utils/keyboard_listener.dart';
+import 'package:keyboard_utils/widgets.dart';
 
 int preOffset = 0;
 Timer getHistoryTime;
@@ -38,6 +41,33 @@ bool hasGetHistoryDownOver = false;
 
 // 是否还在渲染中
 bool afterBuilding = false;
+
+class KeyboardBloc {
+  KeyboardUtils _keyboardUtils = KeyboardUtils();
+  StreamController<double> _streamController = StreamController<double>();
+  Stream<double> get stream => _streamController.stream;
+
+  KeyboardUtils get keyboardUtils => _keyboardUtils;
+
+  int _idKeyboardListener;
+
+  void start() {
+    _idKeyboardListener = _keyboardUtils.add(
+        listener: KeyboardListener(willHideKeyboard: () {
+          _streamController.sink.add(_keyboardUtils.keyboardHeight);
+        }, willShowKeyboard: (double keyboardHeight) {
+          _streamController.sink.add(keyboardHeight);
+        }));
+  }
+
+  void dispose() {
+    _keyboardUtils.unsubscribeListener(subscribingId: _idKeyboardListener);
+    if (_keyboardUtils.canCallDispose()) {
+      _keyboardUtils.dispose();
+    }
+    _streamController.close();
+  }
+}
 
 class Conversation extends StatefulWidget {
   final int groupId;
@@ -109,6 +139,7 @@ class _ConversationState extends State<Conversation> {
   ConversationListModel conversionBox;
   TextEditingController _unameController = TextEditingController();
   FocusNode focusNode1 = new FocusNode();
+  bool showInputTopLine = false;
   String groupName;
   bool isSendConversation = false;
   int lastReadId;
@@ -127,7 +158,6 @@ class _ConversationState extends State<Conversation> {
   bool _loadingPath = false;
   bool _multiPick = false;
   FileType _pickingType = FileType.any;
-  TextEditingController _controller = new TextEditingController();
 
   Map<String, dynamic> arguments;
 
@@ -151,21 +181,35 @@ class _ConversationState extends State<Conversation> {
   BuildContext pageContext;
   ChatInfoModel chatInfo;
 
+  // 显示发送图标
+  bool showSend = false;
+
+
+  KeyboardBloc _bloc = KeyboardBloc();
+
   @override
   void initState() {
     super.initState();
     scrollWidgetList = [];
+    logger.d(1);
     //监听滚动事件，打印滚动位置
     _sliverController.addListener(() {
       FloatButtonModel fbModel =
           Provider.of<FloatButtonModel>(context, listen: false);
       if (_sliverController.position.extentBefore < 30) {
-        if (fbModel.showFloatButton) {
-          fbModel.setButtonState(false);
-        }
+        fbModel.setButtonState(false);
+      }
+      // logger.d(_sliverController.position.extentBefore);
+      if (_sliverController.position.extentBefore == 0) {
+        fbModel.setTopLine(false);
+      } else {
+        fbModel.setTopLine(true);
       }
       _scrollPosition();
     });
+    //
+    setTopLine();
+    _bloc.start();
   }
 
   @override
@@ -178,10 +222,17 @@ class _ConversationState extends State<Conversation> {
 //    logger.d(converList.length);
     recodeTimeout?.cancel();
     _sliverController.dispose();
+    _bloc.dispose();
 
 //    if (_isRecording) {
 //      AudioRecorder.stop();
 //    }
+  }
+
+  setTopLine() {
+    FloatButtonModel fbModel =
+        Provider.of<FloatButtonModel>(context, listen: false);
+    fbModel.setTopLine(false, noti: false);
   }
 
   @override
@@ -216,19 +267,7 @@ class _ConversationState extends State<Conversation> {
                   Expanded(
                     child: _buildListBox(conversationList),
                   ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: BottomAppBar(
-                      elevation: 10,
-                      color: Theme.of(context).primaryColor,
-                      child: Container(
-                        constraints: BoxConstraints(
-                          maxHeight: 100,
-                        ),
-                        child: _buildBottomInput(),
-                      ),
-                    ),
-                  ),
+                  _buildBottomInput(),
                 ],
               ),
             ),
@@ -261,14 +300,18 @@ class _ConversationState extends State<Conversation> {
       builder: (BuildContext context, FloatButtonModel floatButtonModel,
           Widget child) {
         return Container(
-          margin: EdgeInsets.only(bottom: 60),
-          width: 40,
-          height: 40,
+          margin: EdgeInsets.only(bottom: 150),
+          width: 36,
+          height: 36,
 //      color: Colors.blue,
           child: floatButtonModel.showFloatButton
               ? FloatingActionButton(
-                  child: Icon(Icons.keyboard_arrow_down),
-                  backgroundColor: Theme.of(context).primaryColor,
+                  child: Icon(
+                    Icons.keyboard_arrow_down,
+                    color: DataUtil.iosLightTextColor(),
+                    size: 30,
+                  ),
+                  backgroundColor: CupertinoColors.lightBackgroundGray,
                   onPressed: () {
 //          final double offset =
 //              DefaultStickyHeaderController.of(context).stickyHeaderScrollOffset;
@@ -473,45 +516,90 @@ class _ConversationState extends State<Conversation> {
     );
   }
 
+  _inputTextChange(String text) {
+    if (text.length > 0) {
+      setState(() {
+        showSend = true;
+      });
+    } else {
+      setState(() {
+        showSend = false;
+      });
+    }
+  }
+
   _buildBottomInput() {
     if (_isResetRecord) {
-      bottomWidget = Container(
-        height: 48,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.add,
+      bottomWidget = OrientationBuilder(
+        builder: (context, orientation) {
+          double mH = MediaQuery.of(context).size.height;
+          double mW = MediaQuery.of(context).size.width;
+          logger.d(mH);
+          logger.d(mW);
+          // _bloc.keyboardUtils.
+          return Container(
+            // height: 48,
+            constraints: BoxConstraints(
+              maxHeight: mH > mW ? 150 : 48,
+              minHeight: 48,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Container(
+                  // padding: EdgeInsets.only(top: 10, bottom: 10),
+                  width: 38,
+                  // height: 28,
+                  child: IconButton(
+                    padding: EdgeInsets.only(left: 4, right: 4),
+                    icon: Icon(
+                      Icons.add,
+                      color: DataUtil.iosLightTextColor(),
 //                          color: Theme.of(context).accentColor,
-              ),
-              onPressed: () {
+                    ),
+                    onPressed: () {
 //                            getImage();
 //                            getFilePath();
-                showAttachmentBottomSheet(context);
-              },
-            ),
-            Flexible(
-              child: TextField(
-                controller: _unameController,
-                focusNode: focusNode1,
-                style: TextStyle(
-                  fontSize: 15.0,
-                  color: Theme.of(context).textTheme.title.color,
-                ),
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.all(10.0),
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  hintText: "Write your message...",
-                  hintStyle: TextStyle(
-                    fontSize: 15.0,
-                    color: Theme.of(context).textTheme.title.color,
+                      showAttachmentBottomSheet(context);
+                    },
                   ),
                 ),
-                maxLines: null,
-              ),
-            ),
+                Flexible(
+                  child: Container(
+                    padding: EdgeInsets.only(top: 8, bottom: 8),
+                    child: CupertinoTextField(
+                      padding:
+                      EdgeInsets.only(left: 10, right: 10, top: 6, bottom: 6),
+                      expands: true,
+                      controller: _unameController,
+                      focusNode: focusNode1,
+                      placeholder: 'Message',
+                      style: TextStyle(
+                        fontSize: 15.0,
+                        color: Theme.of(context).textTheme.title.color,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          width: 1,
+                          color: DataUtil.iosBorderGreyShallow(),
+                        ),
+                      ),
+                      // decoration: InputDecoration(
+                      //   contentPadding: EdgeInsets.all(10.0),
+                      //   border: InputBorder.none,
+                      //   enabledBorder: InputBorder.none,
+                      //   hintText: "Write your message...",
+                      //   hintStyle: TextStyle(
+                      //     fontSize: 15.0,
+                      //     color: Theme.of(context).textTheme.title.color,
+                      //   ),
+                      // ),
+                      maxLines: null,
+                      onChanged: _inputTextChange,
+                    ),
+                  ),
+                ),
 //                            IconButton(
 //                              icon: Icon(
 //                                Icons.mic,
@@ -520,33 +608,54 @@ class _ConversationState extends State<Conversation> {
 //                              onPressed: () {},
 //                            ),
 //                            AudioCoders(),
-            IconButton(
-              icon: Icon(
-                Icons.mic,
-                color: Theme.of(context).textTheme.title.color,
-              ),
-              onPressed: () {
-                _start();
-              },
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.send,
+                !showSend
+                    ? Container(
+                  // padding: EdgeInsets.only(top: 10, bottom: 10),
+                  width: 34,
+                  // height: 28,
+                  child: IconButton(
+                    padding: EdgeInsets.only(left: 4, right: 4),
+                    icon: Icon(
+                      Icons.mic,
+                      color: DataUtil.iosLightTextColor(),
+                    ),
+                    onPressed: () {
+                      _start();
+                    },
+                  ),
+                )
+                    : Container(
+                  // padding: EdgeInsets.only(top: 10, bottom: 10),
+                  width: 34,
+                  // height: 28,
+                  child: IconButton(
+                    padding: EdgeInsets.only(left: 4, right: 4),
+                    icon: Icon(
+                      Icons.send,
 //                          color: Theme.of(context).accentColor,
-              ),
-              onPressed: () {
-                var textInput = _unameController.text.trim();
-                if (textInput == null || textInput == '') {
-                  return;
-                }
+                    ),
+                    onPressed: () {
+                      var textInput = _unameController.text.trim();
+                      if (textInput == null || textInput == '') {
+                        return;
+                      }
 //              focusNode1.unfocus();
-                _unameController.clear();
-                sendWordMessage(
-                    groupId: conversionInfo['groupId'], textInput: textInput);
-              },
+                      _unameController.clear();
+                      sendWordMessage(
+                          groupId: conversionInfo['groupId'],
+                          textInput: textInput);
+                    },
+                  ),
+                )
+              ],
             ),
-          ],
-        ),
+          );
+          // return GridView.count(
+          //   // Create a grid with 2 columns in portrait mode,
+          //   // or 3 columns in landscape mode.
+          //   crossAxisCount: orientation == Orientation.portrait ? 2 : 3,
+          // );
+        },
       );
     } else {
       bottomWidget = Container(
@@ -616,7 +725,37 @@ class _ConversationState extends State<Conversation> {
         ),
       );
     }
-    return bottomWidget;
+    return Consumer<FloatButtonModel>(
+      builder: (BuildContext context, FloatButtonModel floatButtonModel,
+          Widget child) {
+        bool showInputTopLine = floatButtonModel.showInputTopLine;
+
+        return Align(
+          alignment: Alignment.bottomCenter,
+          child: BottomAppBar(
+            elevation: 0,
+            color: CupertinoTheme.of(context).barBackgroundColor,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    //                    <--- top side
+                    color: DataUtil.iosBorderGreyDeep(),
+                    width: showInputTopLine ? 1.0 : 0,
+                    style:
+                        showInputTopLine ? BorderStyle.solid : BorderStyle.none,
+                  ),
+                ),
+              ),
+              constraints: BoxConstraints(
+                maxHeight: 150,
+              ),
+              child: bottomWidget,
+            ),
+          ),
+        );
+      },
+    );
   }
 
   List keyList = [];

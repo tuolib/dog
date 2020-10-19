@@ -14,7 +14,7 @@ class DataUtil {
   static Color iosBarBgColor() {
     Color colorValue;
     colorValue = CupertinoColors.secondarySystemBackground;
-    // colorValue = CupertinoColors.systemBackground;
+    // colorValue = CupertinoTheme.of(mainScreePage).barBackgroundColor;
     return colorValue;
   }
   //144, 144, 144

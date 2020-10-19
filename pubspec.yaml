@@ -114,6 +114,8 @@ dependencies:
     git: https://github.com/kangshaojun/flutter-incall-manager.git
   hexcolor: ^1.0.6
   flutter_statusbarcolor: ^0.2.3
+  dynamic_theme: ^1.0.1
+  keyboard_utils: ^1.2.4
 
 dev_dependencies:
   flutter_test:

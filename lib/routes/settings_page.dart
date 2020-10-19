@@ -12,7 +12,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-
   User user;
   var gAvatar;
 
@@ -95,6 +94,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ]),
     );
   }
+
   Widget _buildSelf() {
     return Container(
       color: Colors.white,
@@ -118,23 +118,19 @@ class _SettingsPageState extends State<SettingsPage> {
                               gAvatar,
                               Expanded(
                                 child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
                                       children: [
                                         Flexible(
                                           child: Container(
-                                            padding:
-                                            EdgeInsets.only(left: 10),
+                                            padding: EdgeInsets.only(left: 10),
                                             child: Text(
                                               "${user.firstName} ${user?.lastName}",
                                               maxLines: 1,
-                                              overflow:
-                                              TextOverflow.ellipsis,
+                                              overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                  fontWeight:
-                                                  FontWeight.bold,
+                                                  fontWeight: FontWeight.bold,
                                                   fontSize: 18),
                                             ),
                                           ),
@@ -147,9 +143,10 @@ class _SettingsPageState extends State<SettingsPage> {
                                         "@${user.username}",
                                         maxLines: 1,
                                         style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18,
-                                            color: DataUtil.iosLightTextGrey()
+                                          // fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                          // color: DataUtil.iosLightTextGrey(),
+                                          color: CupertinoTheme.of(context).primaryColor,
                                         ),
                                       ),
                                     ),
@@ -235,6 +232,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
+
   // 构建菜单项
   Widget _buildMenus() {
     var devicesObj = Provider.of<DeviceModel>(context);
@@ -250,7 +248,6 @@ class _SettingsPageState extends State<SettingsPage> {
         double dividerLeft = iconWidth + iconMargin * 2;
         Color forwardColor = DataUtil.iosLightTextGrey();
         var localeModel = Provider.of<LocaleModel>(context);
-
 
         return Container(
           color: Colors.white,
@@ -416,7 +413,6 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ],
                           ),
-
                         ],
                       ),
                     ),

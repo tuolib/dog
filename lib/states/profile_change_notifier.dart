@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import '../index.dart';
 
 class ProfileChangeNotifier extends ChangeNotifier {
@@ -54,17 +55,52 @@ class UserModel extends ProfileChangeNotifier {
 }
 
 class ThemeModel extends ProfileChangeNotifier {
-  // 获取当前主题，如果为设置主题，则默认使用蓝色主题
-  ColorSwatch get theme => Global.themes
-      .firstWhere((e) => e.value == _profile.theme, orElse: () => Colors.blue);
+  // // 获取当前主题，如果为设置主题，则默认使用蓝色主题
+  // Color get theme => Global.themes
+  //     .firstWhere((e) => e.value == _profile.theme, orElse: () => themesAll[0]);
+  //
+  int get theme => _profile.theme == null
+      ? 0
+      : _profile.theme > themesAll.length ? 0 : _profile.theme;
+
+  //_profile.theme == null ? 0 : _profile.theme;
+
+  num get themeMode => _profile.themeMode == null ? 1 : _profile.themeMode;
 
   // 主题改变后，通知其依赖项，新主题会立即生效
-  set theme(ColorSwatch color) {
+  set theme(int color) {
     if (color != theme) {
-      _profile.theme = color[500].value;
+      _profile.theme = color;
+      Global.saveProfile();
       notifyListeners();
     }
   }
+
+  set themeMode(num mode) {
+    if (mode != themeMode) {
+      _profile.themeMode = mode;
+      Global.saveProfile();
+      notifyListeners();
+    }
+  }
+}
+
+CupertinoThemeData generalTheme(
+  Brightness brightness,
+  primaryColor,
+  primaryContrastingColor,
+  textTheme,
+  barBackgroundColor,
+  scaffoldBackgroundColor,
+) {
+  CupertinoThemeData _basicCupertinoTheme = CupertinoThemeData.raw(
+    brightness,
+    primaryColor,
+    primaryContrastingColor,
+    textTheme,
+    barBackgroundColor,
+    scaffoldBackgroundColor,
+  );
 }
 
 class LocaleModel extends ProfileChangeNotifier {
