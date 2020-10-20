@@ -89,12 +89,13 @@ class MyApp extends StatelessWidget {
           return CupertinoApp(
             title: 'Dog',
             // theme: theme,
-
             theme: CupertinoThemeData(
               brightness: themeModel.themeMode == 1
                   ? Brightness.light
                   : Brightness.dark,
-              barBackgroundColor: DataUtil.iosBarBgColor(),
+              barBackgroundColor: themeModel.barBackgroundColor,
+              primaryColor: themeModel.primaryColor,
+              scaffoldBackgroundColor: themeModel.scaffoldBackgroundColor,
               // primaryColor: Theme.of(context).primaryColor,
               // scaffoldBackgroundColor: DataUtil.iosLightGrey(),
             ),
@@ -176,35 +177,36 @@ class MyApp extends StatelessWidget {
                     var goPage;
                     if (!userModel.isLogin) {
                       if (routeName == 'register') {
-                        return RegisterRoute();
+                        goPage = RegisterRoute();
+                      } else {
+                        goPage = LoginRoute();
                       }
-                      return LoginRoute();
-//                      return LoginRoute();
+//                      goPage = LoginRoute();
                     } else {
                       if (routeName == 'themes') {
-                        return ThemeChangeRoute();
-//                        return ThemeChangeRoute();
+                        goPage = ThemeChangeRoute();
+//                        goPage = ThemeChangeRoute();
                       } else if (routeName == 'language') {
-                        return LanguageRoute();
-//                        return LanguageRoute();
+                        goPage = LanguageRoute();
+//                        goPage = LanguageRoute();
                       } else if (routeName == 'conversation') {
 //                        不能这样做:
-//                        return ChangeNotifierProvider(
+//                        goPage = ChangeNotifierProvider(
 //                          create: (_) => ConversationListModel(),
 //                          child: Conversation(),
 //                        );
 
 //                      这样: 问题见 https://github.com/rrousselGit/provider/issues/168
-//                        return ChangeNotifierProvider.value(
+//                        goPage = ChangeNotifierProvider.value(
 //                          value: ConversationListModel(),
 //                          child: Conversation(),
 //                        );
-//                        return ChangeNotifierProvider.value(
+//                        goPage = ChangeNotifierProvider.value(
 //                          value: ConversationListModel(),
 //                          child: Conversation(),
 //                        );
                         Map<String, dynamic> arg = settings.arguments;
-                        return Conversation(
+                        goPage = Conversation(
 //                          groupId: arg['groupId'],
 //                          groupType: arg['groupType'],
 //                          groupName: arg['groupName'],
@@ -219,20 +221,20 @@ class MyApp extends StatelessWidget {
                         Map<String, dynamic> arg =
                             json.decode(settings.arguments);
                         if (arg['type'] == 'local') {
-                          return PhotoViewSimpleScreen(
+                          goPage = PhotoViewSimpleScreen(
                             imageProvider:
                                 FileImage(File("${arg['imageProvider']}")),
                             heroTag: 'PhotoView',
                             fileId: arg['fileId'],
                           );
                         } else {
-                          return PhotoViewSimpleScreen(
+                          goPage = PhotoViewSimpleScreen(
                             imageProvider: NetworkImage(arg['imageProvider']),
                             heroTag: 'PhotoView',
                             fileId: arg['fileId'],
                           );
                         }
-//                        return PhotoViewSimpleScreen(
+//                        goPage = PhotoViewSimpleScreen(
 //                          imageProvider:NetworkImage(arg['imageProvider']),
 //                          heroTag: arg['heroTag'],
 //                        );
@@ -240,28 +242,28 @@ class MyApp extends StatelessWidget {
                         Map<String, dynamic> arg =
                             json.decode(settings.arguments);
                         var videoUrl = arg['videoUrl'];
-                        return VideoPlayRoute(videoUrl);
-//                        return PhotoViewSimpleScreen(
+                        goPage = VideoPlayRoute(videoUrl);
+//                        goPage = PhotoViewSimpleScreen(
 //                          imageProvider:NetworkImage(arg['imageProvider']),
 //                          heroTag: arg['heroTag'],
 //                        );
                       } else if (routeName == 'testSql') {
-                        return TestSqlRoute();
+                        goPage = TestSqlRoute();
                       } else if (routeName == 'editProfile') {
-                        return EditProfileRoute();
+                        goPage = EditProfileRoute();
                       } else if (routeName == 'editUsername') {
-                        return EditUsernameRoute();
+                        goPage = EditUsernameRoute();
                       } else if (routeName == 'addContact') {
-                        return AddContactRoute();
+                        goPage = AddContactRoute();
                       } else if (routeName == 'newMessage') {
-                        return NewMessagePage();
+                        goPage = NewMessagePage();
                       } else if (routeName == 'newGroup') {
-                        return NewGroupPage();
+                        goPage = NewGroupPage();
                       } else if (routeName == 'newGroupInfo') {
-                        return NewGroupInfoPage();
+                        goPage = NewGroupInfoPage();
                       } else if (routeName == 'editGroupInfo') {
                         Map<String, dynamic> arg = settings.arguments;
-                        return EditGroupInfoRoute(
+                        goPage = EditGroupInfoRoute(
                           groupId: arg['groupId'],
                           firstName: arg['firstName'],
                           lastName: arg['lastName'],
@@ -277,15 +279,15 @@ class MyApp extends StatelessWidget {
                         if (arg['personFromGroup'] == true) {
                           personFromGroup = true;
                         }
-                        return ShowGroupInfoRoute(
+                        goPage = ShowGroupInfoRoute(
                           showBigImage: arg['showBigImage'],
                           personFromGroup: personFromGroup,
                         );
                       } else if (routeName == 'addMember') {
-                        return AddMemberRoute();
+                        goPage = AddMemberRoute();
                       } else if (routeName == 'editContact') {
                         Map<String, dynamic> arg = settings.arguments;
-                        return EditContactRoute(
+                        goPage = EditContactRoute(
                             firstName: arg['firstName'],
                             lastName: arg['lastName'],
                             colorId: arg['colorId'],
@@ -299,22 +301,22 @@ class MyApp extends StatelessWidget {
                         Map<String, dynamic> arg = settings.arguments;
                         bool invite =
                             arg == null || arg['invite'] == null ? false : true;
-                        return CallVideoTest(
+                        goPage = CallVideoTest(
                           invite: invite,
                         );
                       } else if (routeName == 'devices') {
-                        return DevicesPage();
+                        goPage = DevicesPage();
                       } else {
-                        return MainScreen();
+                        goPage = MainScreen();
 
-//                        return ChangeNotifierProvider.value(
+//                        goPage = ChangeNotifierProvider.value(
 //                          value: ChatListModel(),
 //                          child: HomeRoute(),
 //                        );
                       }
-//                      return HomeRoute();
+//                      goPage = HomeRoute();
                     }
-//                    return goPage;
+                    return CupertinoScaffold(body: goPage);
                   });
             },
           );

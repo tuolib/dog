@@ -187,6 +187,8 @@ class _ConversationState extends State<Conversation> {
 
   KeyboardBloc _bloc = KeyboardBloc();
 
+  ThemeModel themeObj;
+
   @override
   void initState() {
     super.initState();
@@ -229,14 +231,9 @@ class _ConversationState extends State<Conversation> {
 //    }
   }
 
-  setTopLine() {
-    FloatButtonModel fbModel =
-        Provider.of<FloatButtonModel>(context, listen: false);
-    fbModel.setTopLine(false, noti: false);
-  }
-
   @override
   Widget build(BuildContext context) {
+    themeObj = Provider.of<ThemeModel>(context);
     pageContext = context;
     addPeople = Provider.of<AddPeopleModel>(context, listen: false);
     socketProviderAddPeopleModel = addPeople;
@@ -259,6 +256,7 @@ class _ConversationState extends State<Conversation> {
             focusNode1.unfocus();
           },
           child: Scaffold(
+            backgroundColor: themeObj.scaffoldBackgroundColor,
             appBar: _buildAppBar(),
             body: Container(
               height: MediaQuery.of(context).size.height,
@@ -394,16 +392,16 @@ class _ConversationState extends State<Conversation> {
       showBigImage = false;
     }
     return AppBar(
-      backgroundColor: DataUtil.iosBarBgColor(),
+      backgroundColor: themeObj.barBackgroundColor,
       // textTheme: Theme.of(context).primaryColor,
-      brightness: Brightness.light,
-      shadowColor: Colors.white,
+      brightness: themeObj.brightness,
+      shadowColor: null,
       elevation: 0,
       toolbarHeight: 48,
       titleSpacing: 0,
       bottom: PreferredSize(
         child: Container(
-          color: DataUtil.iosBorderGreyShallow(),
+          color: themeObj.borderColor,
           height: 0.5,
         ),
         preferredSize: Size.fromHeight(0.5),
@@ -534,8 +532,8 @@ class _ConversationState extends State<Conversation> {
         builder: (context, orientation) {
           double mH = MediaQuery.of(context).size.height;
           double mW = MediaQuery.of(context).size.width;
-          logger.d(mH);
-          logger.d(mW);
+          // logger.d(mH);
+          // logger.d(mW);
           // _bloc.keyboardUtils.
           return Container(
             // height: 48,
@@ -576,13 +574,13 @@ class _ConversationState extends State<Conversation> {
                       placeholder: 'Message',
                       style: TextStyle(
                         fontSize: 15.0,
-                        color: Theme.of(context).textTheme.title.color,
+                        color: themeObj.normalColor,
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           width: 1,
-                          color: DataUtil.iosBorderGreyShallow(),
+                          color: themeObj.borderColor,
                         ),
                       ),
                       // decoration: InputDecoration(
@@ -734,13 +732,13 @@ class _ConversationState extends State<Conversation> {
           alignment: Alignment.bottomCenter,
           child: BottomAppBar(
             elevation: 0,
-            color: CupertinoTheme.of(context).barBackgroundColor,
+            color: themeObj.scaffoldBackgroundColor,
             child: Container(
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
                     //                    <--- top side
-                    color: DataUtil.iosBorderGreyDeep(),
+                    color: themeObj.borderColor,
                     width: showInputTopLine ? 1.0 : 0,
                     style:
                         showInputTopLine ? BorderStyle.solid : BorderStyle.none,
@@ -2069,5 +2067,11 @@ class _ConversationState extends State<Conversation> {
         fbModel.setButtonState(false);
       }
     }
+  }
+
+  setTopLine() {
+    FloatButtonModel fbModel =
+    Provider.of<FloatButtonModel>(context, listen: false);
+    fbModel.setTopLine(false, noti: false);
   }
 }

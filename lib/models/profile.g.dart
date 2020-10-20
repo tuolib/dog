@@ -13,7 +13,14 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) {
         : User.fromJson(json['user'] as Map<String, dynamic>)
     ..token = json['token'] as String
     ..theme = json['theme'] as int
-    ..themeMode = json['themeMode'] as num
+    ..themeMode = json['themeMode'] as int
+    ..themeDark = json['themeMode'] as int
+    ..themesDay = json['themesDay'] as List
+    ..themesDark = json['themesDark'] as List
+    ..themesDayMessage = json['themesDayMessage'] as List
+    ..themesDarkMessage = json['themesDarkMessage'] as List
+    ..themesDayBg = json['themesDayBg'] as List
+    ..themesDarkBg = json['themesDarkBg'] as List
     ..cache = json['cache'] == null
         ? null
         : CacheConfig.fromJson(json['cache'] as Map<String, dynamic>)
@@ -25,7 +32,14 @@ Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
       'user': instance.user,
       'token': instance.token,
       'theme': instance.theme,
+      'themeDark': instance.themeDark,
       'themeMode': instance.themeMode,
+      'themesDay': instance.themesDay,
+      'themesDark': instance.themesDark,
+      'themesDayMessage': instance.themesDayMessage,
+      'themesDarkMessage': instance.themesDarkMessage,
+      'themesDayBg': instance.themesDayBg,
+      'themesDarkBg': instance.themesDarkBg,
       'cache': instance.cache,
       'lastLogin': instance.lastLogin,
       'locale': instance.locale

@@ -10,11 +10,18 @@ class Profile {
     User user;
     String token;
     int theme;
+    int themeDark;
     CacheConfig cache;
     String lastLogin;
     String locale;
     // 1 light 2 dark
-    num themeMode;
+    int themeMode;
+    List themesDay;
+    List themesDark;
+    List themesDayMessage;
+    List themesDarkMessage;
+    List themesDayBg;
+    List themesDarkBg;
     
     factory Profile.fromJson(Map<String,dynamic> json) => _$ProfileFromJson(json);
     Map<String, dynamic> toJson() => _$ProfileToJson(this);

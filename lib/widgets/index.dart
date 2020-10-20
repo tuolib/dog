@@ -16,3 +16,5 @@ export 'avatar_widget.dart';
 export 'request_permission.dart';
 export 'signaling.dart';
 export 'overlay_view.dart';
+export 'circle_widget.dart';
+export 'modal_fit.dart';

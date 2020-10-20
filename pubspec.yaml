@@ -62,7 +62,7 @@ dependencies:
     git: https://github.com/tuolib/audio_recorder.git
   flutter_launcher_icons: ^0.7.5
   badges: ^1.1.1
-  modal_bottom_sheet: ^0.2.0
+  modal_bottom_sheet: ^0.2.2
   alphabet_list_scroll_view: ^1.0.6
   image_cropper: ^1.3.1
   animations: ^1.1.1
@@ -116,6 +116,7 @@ dependencies:
   flutter_statusbarcolor: ^0.2.3
   dynamic_theme: ^1.0.1
   keyboard_utils: ^1.2.4
+  flutter_colorpicker: ^0.3.4
 
 dev_dependencies:
   flutter_test:

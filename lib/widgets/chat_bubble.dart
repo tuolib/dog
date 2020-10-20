@@ -92,6 +92,8 @@ class ChatBubble extends StatefulWidget {
 }
 
 class _ChatBubbleState extends State<ChatBubble> {
+  ThemeModel themeObj;
+
 //  final exampleAudioFilePath = this.message;
   List colors = Colors.primaries;
   static Random random = Random();
@@ -122,6 +124,7 @@ class _ChatBubbleState extends State<ChatBubble> {
   String localFilePath;
 
   GlobalKey _keyRed = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -172,6 +175,7 @@ class _ChatBubbleState extends State<ChatBubble> {
 
   @override
   Widget build(BuildContext context) {
+    themeObj = Provider.of<ThemeModel>(context);
     final align =
         widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
     final radius = widget.isMe
@@ -253,7 +257,10 @@ class _ChatBubbleState extends State<ChatBubble> {
               margin: const EdgeInsets.all(3.0),
               padding: const EdgeInsets.all(5.0),
               decoration: BoxDecoration(
-                color: chatBubbleColor(),
+                // color: chatBubbleColor(),
+                color: widget.isMe
+                    ? themeObj.messagesColor
+                    : themeObj.messagesColorSide,
                 borderRadius: radius,
               ),
               constraints: BoxConstraints(
@@ -365,8 +372,9 @@ class _ChatBubbleState extends State<ChatBubble> {
                               Text(
                                 '${TimeUtil.formatTime(widget.time, 1, 'HH:mm')}',
                                 style: TextStyle(
-                                  color:
-                                      Theme.of(context).textTheme.title.color,
+                                  color: widget.isMe
+                                      ? themeObj.inactiveColorMessageSelf
+                                      : themeObj.inactiveColorMessage,
                                   fontSize: 10.0,
                                 ),
                               ),
@@ -376,6 +384,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                                         child: Icon(
                                           Icons.access_time,
                                           size: 10,
+                                          color: themeObj.messagesWordSelf,
                                         ),
                                         height: 10.0,
                                         width: 10.0,
@@ -383,10 +392,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                                     : widget.success
                                         ? Icon(
                                             Icons.check,
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .title
-                                                .color,
+                                            color: themeObj.messagesWordSelf,
                                             size: 10.0,
                                           )
                                         : Icon(
@@ -436,14 +442,16 @@ class _ChatBubbleState extends State<ChatBubble> {
                 text: '${widget.message}',
                 style: TextStyle(
                   color: widget.isMe
-                      ? Colors.white
-                      : Theme.of(context).textTheme.title.color,
+                      ? themeObj.messagesWordSelf
+                      : themeObj.messagesWordSide,
                 ),
               ),
               TextSpan(
                 text: '_________',
                 style: TextStyle(
-                  color: chatBubbleColor(),
+                  color: widget.isMe
+                      ? themeObj.messagesColor
+                      : themeObj.messagesColorSide,
                 ),
               ),
             ],
@@ -804,7 +812,8 @@ class _ChatBubbleState extends State<ChatBubble> {
         child: loadingW,
       );
     }
-    return Padding(
+    return Container(
+      color: widget.isMe ? themeObj.messagesColor : themeObj.messagesColorSide,
       padding: EdgeInsets.all(widget.type == 1 ? 1 : 0),
       child: contentWidget,
     );
@@ -818,7 +827,6 @@ class _ChatBubbleState extends State<ChatBubble> {
         });
   }
 
-
   void _afterLayout(_) {
     _getPositions();
   }
@@ -829,7 +837,7 @@ class _ChatBubbleState extends State<ChatBubble> {
     final sizeRed = renderBoxRed?.size;
     //输出背景为红色的widget的宽高
     if (_keyRed.currentContext != null) {
-      Map <String, dynamic> scrollItem = {
+      Map<String, dynamic> scrollItem = {
         "key": _keyRed,
         "createdDate": widget.time,
         "dy": positionsRed.dy,
