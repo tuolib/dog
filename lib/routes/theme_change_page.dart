@@ -462,6 +462,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
   _colorItem(int colorItem, int index) {
     // logger.d(themeObj.theme);
     int themeIndex;
+    bool selected = false;
 
     bool showLitter = false;
     Color litterCirBg;
@@ -470,20 +471,26 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
       themeIndex = themeObj.theme;
       litterValue = Global.profile.themesDayMessage[index];
       litterCirBg = Color(litterValue);
+      if (index == themeObj.theme) {
+        selected = true;
+      }
     } else if (Global.profile.themeMode == 2) {
       themeIndex = themeObj.themeDark;
       litterValue = Global.profile.themesDarkMessage[index];
       litterCirBg = Color(litterValue);
+      if (index == themeObj.themeDark) {
+        selected = true;
+      }
     } else {
       themeIndex = 0;
     }
     if (litterValue != colorItem) {
       showLitter = true;
     }
-    bool selected = false;
-    if (colorItem == Global.themes[themeIndex]) {
-      selected = true;
-    }
+    // if (colorItem == Global.themes[themeIndex]) {
+    //   selected = true;
+    // }
+
     // if ()
     return Container(
       margin: EdgeInsets.only(left: 10, right: 10),
@@ -532,17 +539,23 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
                         color: Colors.white,
                       )
                     : showLitter
-                      ? Container(
-                          child: Container(
-                            width: 2,
-                            height: 2,
+                        ? Container(
+                            // color: Color(colorItem),
                             decoration: BoxDecoration(
-                              color: litterCirBg,
+                              color: Color(colorItem),
                               shape: BoxShape.circle,
                             ),
-                          ),
-                        )
-                      : SizedBox()
+                            alignment: Alignment.center,
+                            child: Container(
+                              width: 19,
+                              height: 19,
+                              decoration: BoxDecoration(
+                                color: litterCirBg,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          )
+                        : SizedBox(),
               ),
             ],
           ),
