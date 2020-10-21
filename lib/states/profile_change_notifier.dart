@@ -93,170 +93,309 @@ class ThemeModel extends ProfileChangeNotifier {
     }
   }
 
-  set themeMode(num mode) {
+  set themeMode(int mode) {
     if (mode != themeMode) {
       _profile.themeMode = mode;
       Global.saveProfile();
       notifyListeners();
     }
   }
+  //修改value
+  themeColorValue(int color, int type) {
+    // type 0 accent themesDay
+    // 1 background themesDayBg
+    // 2 messages themesDayMessage
+    if (themeMode == 1) {
+      if (type == 0) {
+        Global.profile.themesDay[theme] = color;
+      } else if (type == 1) {
+        Global.profile.themesDayBg[theme] = color;
+      } else if (type == 2) {
+        Global.profile.themesDayMessage[theme] = color;
+      }
+    } else if (themeMode == 2) {
+      if (type == 0) {
+        Global.profile.themesDark[themeDark] = color;
+      } else if (type == 1) {
+        Global.profile.themesDarkBg[themeDark] = color;
+      } else if (type == 2) {
+        Global.profile.themesDarkMessage[themeDark] = color;
+      }
+    }
+    // _profile.themeMode = mode;
+    Global.saveProfile();
+    notifyListeners();
+  }
+
+  // 新增
+  themeColorAdd(int color, int type) {
+    logger.d('$color/$type');
+    // type 0 accent themesDay
+    // 1 background themesDayBg
+    // 2 messages themesDayMessage
+    if (themeMode == 1) {
+      // Global.profile.themesDay.insert(0, color);
+      // Global.profile.themesDayBg.insert(0, color);
+      // Global.profile.themesDayMessage.insert(0, color);
+      if (type == 0) {
+        Global.profile.themesDay.insert(0, color);
+      } else if (type == 1) {
+        Global.profile.themesDayBg.insert(0, color);
+      } else if (type == 2) {
+        Global.profile.themesDayMessage.insert(0, color);
+      }
+      theme = 0;
+    } else if (themeMode == 2) {
+      // Global.profile.themesDark.insert(0, color);
+      // Global.profile.themesDarkBg.insert(0, color);
+      // Global.profile.themesDarkMessage.insert(0, color);
+      if (type == 0) {
+        Global.profile.themesDark.insert(0, color);
+      } else if (type == 1) {
+        Global.profile.themesDarkBg.insert(0, color);
+      } else if (type == 2) {
+        Global.profile.themesDarkMessage.insert(0, color);
+      }
+      themeDark = 0;
+    }
+    // _profile.themeMode = mode;
+    Global.saveProfile();
+    notifyListeners();
+  }
+
+  // 删除
+  themeColorDelete(int color, int type) {
+    // type 0 accent themesDay
+    // 1 background themesDayBg
+    // 2 messages themesDayMessage
+    if (themeMode == 1) {
+      Global.profile.themesDay.removeAt(theme);
+      Global.profile.themesDayBg.removeAt(theme);
+      Global.profile.themesDayMessage.removeAt(theme);
+      // if (type == 0) {
+      //   Global.profile.themesDay.removeAt(theme);
+      // } else if (type == 1) {
+      //   Global.profile.themesDayBg.removeAt(theme);
+      // } else if (type == 2) {
+      //   Global.profile.themesDayMessage.removeAt(theme);
+      // }
+    } else if (themeMode == 2) {
+      Global.profile.themesDark.removeAt(themeDark);
+      Global.profile.themesDarkBg.removeAt(themeDark);
+      Global.profile.themesDarkMessage.removeAt(themeDark);
+      // if (type == 0) {
+      //   Global.profile.themesDark.removeAt(themeDark);
+      // } else if (type == 1) {
+      //   Global.profile.themesDarkBg.removeAt(themeDark);
+      // } else if (type == 2) {
+      //   Global.profile.themesDarkMessage.removeAt(themeDark);
+      // }
+    }
+    // _profile.themeMode = mode;
+    Global.saveProfile();
+    notifyListeners();
+  }
 
   Brightness get brightness {
-    Brightness colorValue;
-    colorValue = themeMode == 1 ? Brightness.light : Brightness.dark;
-    return colorValue;
+    Brightness colorObj;
+    colorObj = themeMode == 1 ? Brightness.light : Brightness.dark;
+    return colorObj;
   }
 
   // 主颜色 themes
   Color get primaryColor {
-    Color colorValue;
-    colorValue = Color(Global.themes[themeMode == 1 ? theme : themeDark]);
-    return colorValue;
+    Color colorObj;
+    colorObj = Color(Global.themes[themeMode == 1 ? theme : themeDark]);
+    return colorObj;
   }
 
   //其他主题颜色
 // scaffoldBackgroundColor
   Color get scaffoldBackgroundColor {
-    Color colorValue;
+    Color colorObj;
     if (themeMode == 1) {
       //239, 239, 244
-      colorValue = Color.fromRGBO(239, 239, 244, 1);
+      colorObj = Color.fromRGBO(239, 239, 244, 1);
     } else if (themeMode == 2) {
-      colorValue = Color.fromRGBO(0, 0, 0, 1);
+      colorObj = Color.fromRGBO(0, 0, 0, 1);
     }
-    return colorValue;
+    return colorObj;
   }
 
 //bar Background
   Color get barBackgroundColor {
-    Color colorValue;
+    Color colorObj;
     if (themeMode == 1) {
       //246, 246, 248
-      colorValue = Color.fromRGBO(248, 248, 248, 1);
+      colorObj = Color.fromRGBO(248, 248, 248, 1);
     } else if (themeMode == 2) {
-      colorValue = Color.fromRGBO(28, 28, 29, 1);
+      colorObj = Color.fromRGBO(28, 28, 29, 1);
     }
-    return colorValue;
+    return colorObj;
   }
 
 //bar Background
   Color get menuBackgroundColor {
-    Color colorValue;
+    Color colorObj;
     if (themeMode == 1) {
       //246, 246, 248
-      colorValue = Color.fromRGBO(255, 255, 255, 1);
+      colorObj = Color.fromRGBO(255, 255, 255, 1);
     } else if (themeMode == 2) {
-      colorValue = Color.fromRGBO(28, 28, 29, 1);
+      colorObj = Color.fromRGBO(28, 28, 29, 1);
     }
-    return colorValue;
+    return colorObj;
+  }
+
+  Color get inputBackgroundColor {
+    Color colorObj;
+    if (themeMode == 1) {
+      // 241, 241, 241
+      //246, 246, 248
+      colorObj = Color.fromRGBO(255, 255, 255, 1);
+    } else if (themeMode == 2) {
+      colorObj = Color.fromRGBO(15, 15, 15, 1);
+    }
+    return colorObj;
   }
 
   // 自己消息背景 themesMessage
   Color get messagesColor {
-    Color colorValue;
+    Color colorObj;
     if (themeMode == 1) {
-      colorValue = Color(Global.themesMessage[theme]);
+      colorObj = Color(Global.themesMessage[theme]);
     } else if (themeMode == 2) {
       var newValue = Global.themesMessage[themeDark];
-      if (Color(newValue).red > 177 && Color(newValue).green > 177 && Color(newValue).blue > 177) {
-        colorValue = Color.fromRGBO(40, 40, 48, 1);
+      if (Color(newValue).red > 177 &&
+          Color(newValue).green > 177 &&
+          Color(newValue).blue > 177) {
+        colorObj = Color.fromRGBO(40, 40, 48, 1);
       } else {
-        colorValue = Color(newValue);
+        colorObj = Color(newValue);
       }
       // if (newValue > Color.fromRGBO(177, 177, 177, 1).value) {
-      //   colorValue = Color.fromRGBO(40, 40, 48, 1);
+      //   colorObj = Color.fromRGBO(40, 40, 48, 1);
       // } else {
-      //   colorValue = Color(newValue);
+      //   colorObj = Color(newValue);
       // }
     }
-    return colorValue;
+    return colorObj;
   }
 
   // 对方消息背景 固定
   Color get messagesColorSide {
-    Color colorValue;
+    Color colorObj;
     if (themeMode == 1) {
       //214, 221, 229
-      colorValue = Color.fromRGBO(214, 221, 229, 1);
+      colorObj = Color.fromRGBO(214, 221, 229, 1);
     } else if (themeMode == 2) {
       //38, 38, 40
-      colorValue = Color.fromRGBO(38, 38, 40, 1);
+      colorObj = Color.fromRGBO(38, 38, 40, 1);
     }
-    return colorValue;
+    return colorObj;
   }
 
   // 聊天页面背景颜色 themesBg
   Color get messagesChatBg {
-    Color colorValue;
+    Color colorObj;
     if (themeMode == 1) {
-      colorValue = Color(Global.themesBg[theme]);
+      colorObj = Color(Global.themesBg[theme]);
     } else if (themeMode == 2) {
-      colorValue = Color(Global.themesBg[themeDark]);
+      colorObj = Color(Global.themesBg[themeDark]);
     }
-    return colorValue;
+    return colorObj;
   }
 
-  // 黑色文字 bar menuList normal
+  // 聊天页面底部tab背景
+  Color get messagesChatBgBottom {
+    Color colorObj;
+    if (themeMode == 1) {
+      // messagesChatBg
+      // colorObj = Color(Global.themesBg[theme]);
+      var newValue = messagesChatBg.value;
+      if (Color(newValue).red > 177 &&
+          Color(newValue).green > 177 &&
+          Color(newValue).blue > 177) {
+        colorObj = Color(newValue);
+      } else {
+        colorObj = barBackgroundColor;
+      }
+    } else if (themeMode == 2) {
+      // colorObj = Color(Global.themesBg[themeDark]);
+      var newValue = messagesChatBg.value;
+      if (Color(newValue).red < 25 &&
+          Color(newValue).green < 25 &&
+          Color(newValue).blue < 25) {
+        colorObj = Color(newValue);
+      } else {
+        colorObj = barBackgroundColor;
+      }
+    }
+    return colorObj;
+  }
+
+  // 聊天界面 自己文字颜色
   Color get messagesWordSelf {
-    Color colorValue;
+    Color colorObj;
     // if (themeMode == 1) {
-    //   colorValue = Color.fromRGBO(0, 0, 0, 1);
+    //   colorObj = Color.fromRGBO(0, 0, 0, 1);
     // } else if (themeMode == 2) {
     //   //152, 152, 157
-    //   colorValue = Color.fromRGBO(255, 255, 255, 1);
+    //   colorObj = Color.fromRGBO(255, 255, 255, 1);
     // }
 
-    colorValue = Color.fromRGBO(255, 255, 255, 1);
-    return colorValue;
+    colorObj = Color.fromRGBO(255, 255, 255, 1);
+    return colorObj;
   }
+
+  // 聊天界面其他人 自己文字颜色
   Color get messagesWordSide {
-    Color colorValue;
+    Color colorObj;
     if (themeMode == 1) {
-      colorValue = Color.fromRGBO(0, 0, 0, 1);
+      colorObj = Color.fromRGBO(0, 0, 0, 1);
     } else if (themeMode == 2) {
       //152, 152, 157
-      colorValue = Color.fromRGBO(255, 255, 255, 1);
+      colorObj = Color.fromRGBO(255, 255, 255, 1);
     }
-    return colorValue;
+    return colorObj;
   }
 
   // 黑色文字 bar menuList normal
   Color get normalColor {
-    Color colorValue;
+    Color colorObj;
     if (themeMode == 1) {
-      colorValue = Color.fromRGBO(0, 0, 0, 1);
+      colorObj = Color.fromRGBO(0, 0, 0, 1);
     } else if (themeMode == 2) {
       //152, 152, 157
-      colorValue = Color.fromRGBO(255, 255, 255, 1);
+      colorObj = Color.fromRGBO(255, 255, 255, 1);
     }
-    return colorValue;
+    return colorObj;
   }
 
 // 灰一点文字
   Color get inactiveColor {
-    Color colorValue;
+    Color colorObj;
     if (themeMode == 1) {
       // 其他注释文字 110, 111, 115
       // bottom bar 143, 143, 143
       // 菜单栏列表 141, 141, 146
-      colorValue = Color.fromRGBO(153, 153, 153, 1);
+      colorObj = Color.fromRGBO(153, 153, 153, 1);
     } else if (themeMode == 2) {
       //152, 152, 157
-      colorValue = Color.fromRGBO(117, 117, 117, 1);
+      colorObj = Color.fromRGBO(117, 117, 117, 1);
     }
-    return colorValue;
+    return colorObj;
   }
 
   // 灰色线
   Color get borderColor {
-    Color colorValue;
+    Color colorObj;
     if (themeMode == 1) {
-      colorValue = Color.fromRGBO(200, 199, 204, 1);
+      colorObj = Color.fromRGBO(200, 199, 204, 1);
     } else if (themeMode == 2) {
       //152, 152, 157
-      colorValue = Color.fromRGBO(61, 61, 64, 1);
+      colorObj = Color.fromRGBO(61, 61, 64, 1);
     }
-    return colorValue;
+    return colorObj;
   }
 
   // self message color 白色
@@ -267,83 +406,91 @@ class ThemeModel extends ProfileChangeNotifier {
 // 聊天消息时间颜色
   // message 灰一点文字
   Color get inactiveColorMessage {
-    Color colorValue;
+    Color colorObj;
     if (themeMode == 1) {
-      colorValue = Color.fromRGBO(148, 148, 149, 1);
+      colorObj = Color.fromRGBO(148, 148, 149, 1);
     } else if (themeMode == 2) {
-      colorValue = Color.fromRGBO(152, 152, 153, 1);
+      colorObj = Color.fromRGBO(152, 152, 153, 1);
     }
-    return colorValue;
+    return colorObj;
   }
 
   Color get inactiveColorMessageSelf {
-    Color colorValue;
+    Color colorObj;
     if (themeMode == 1) {
-      // colorValue = Color.fromRGBO(153, 153, 153, 1);
-      colorValue = Color.fromRGBO(255, 255, 255, 4.6);
+      // colorObj = Color.fromRGBO(153, 153, 153, 1);
+      colorObj = Color.fromRGBO(255, 255, 255, 4.6);
     } else if (themeMode == 2) {
-      colorValue = Color.fromRGBO(255, 255, 255, 4.6);
-      // colorValue = Color.fromRGBO(152, 152, 153, 1);
+      colorObj = Color.fromRGBO(255, 255, 255, 4.6);
+      // colorObj = Color.fromRGBO(152, 152, 153, 1);
     }
-    return colorValue;
+    return colorObj;
   }
+
+  // message 圆角
+  double get radius {
+    return 16.0;
+  }
+
 
   /// 特殊颜色 主题页面
   // 自己消息背景 themesMessage
   Color get messagesColorAppearanceDay {
-    Color colorValue;
-    colorValue = Color(Global.profile.themesDayMessage[theme]);
-    return colorValue;
+    Color colorObj;
+    colorObj = Color(Global.profile.themesDayMessage[theme]);
+    return colorObj;
   }
 
   // 对方消息背景 固定
   Color get messagesColorSideAppearanceDay {
-    Color colorValue;
-    colorValue = Color.fromRGBO(214, 221, 229, 1);
-    return colorValue;
+    Color colorObj;
+    colorObj = Color.fromRGBO(214, 221, 229, 1);
+    return colorObj;
   }
 
   // 自己消息背景 themesMessage
   Color get messagesColorAppearanceDark {
-    Color colorValue;
+    Color colorObj;
     var newValue = Global.profile.themesDarkMessage[themeDark];
-    if (Color(newValue).red > 177 && Color(newValue).green > 177 && Color(newValue).blue > 177) {
-      colorValue = Color.fromRGBO(40, 40, 48, 1);
+    if (Color(newValue).red > 177 &&
+        Color(newValue).green > 177 &&
+        Color(newValue).blue > 177) {
+      colorObj = Color.fromRGBO(40, 40, 48, 1);
     } else {
-      colorValue = Color(newValue);
+      colorObj = Color(newValue);
     }
     // if (newValue > Color.fromRGBO(177, 177, 177, 1).value) {
-    //   colorValue = Color.fromRGBO(40, 40, 48, 1);
+    //   colorObj = Color.fromRGBO(40, 40, 48, 1);
     // } else {
-    //   colorValue = Color(newValue);
+    //   colorObj = Color(newValue);
     // }
-    // colorValue = Color(Global.profile.themesDarkMessage[themeDark]);
-    return colorValue;
+    // colorObj = Color(Global.profile.themesDarkMessage[themeDark]);
+    return colorObj;
   }
 
   // 对方消息背景 固定
   Color get messagesColorSideAppearanceDark {
-    Color colorValue;
-    colorValue = Color.fromRGBO(38, 38, 40, 1);
-    return colorValue;
+    Color colorObj;
+    colorObj = Color.fromRGBO(38, 38, 40, 1);
+    return colorObj;
   }
 
   // 聊天页面背景颜色 themesBg
   Color get messagesChatBgAppearanceDay {
-    Color colorValue;
+    Color colorObj;
     // logger.d(Global.profile.themesDayBg);
     // logger.d(theme);
-    colorValue = Color(Global.profile.themesDayBg[theme]);
-    // colorValue = CupertinoColors.
-    return colorValue;
+    colorObj = Color(Global.profile.themesDayBg[theme]);
+    // colorObj = CupertinoColors.
+    return colorObj;
   }
 
   // 聊天页面背景颜色 themesBg
   Color get messagesChatBgAppearanceDark {
-    Color colorValue;
-    colorValue = Color(Global.profile.themesDarkBg[themeDark]);
-    // colorValue = CupertinoColors.
-    return colorValue;
+    Color colorObj;
+    colorObj = Color(Global.profile.themesDarkBg[themeDark]);
+    // colorObj = CupertinoColors.
+    return colorObj;
   }
 }
 

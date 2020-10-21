@@ -178,17 +178,17 @@ class _ChatBubbleState extends State<ChatBubble> {
     themeObj = Provider.of<ThemeModel>(context);
     final align =
         widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
-    final radius = widget.isMe
-        ? BorderRadius.only(
-            topLeft: Radius.circular(5.0),
-            bottomLeft: Radius.circular(5.0),
-            bottomRight: Radius.circular(10.0),
-          )
-        : BorderRadius.only(
-            topRight: Radius.circular(5.0),
-            bottomLeft: Radius.circular(10.0),
-            bottomRight: Radius.circular(5.0),
-          );
+    // final radius = widget.isMe
+    //     ? BorderRadius.only(
+    //         topLeft: Radius.circular(5.0),
+    //         bottomLeft: Radius.circular(5.0),
+    //         bottomRight: Radius.circular(10.0),
+    //       )
+    //     : BorderRadius.only(
+    //         topRight: Radius.circular(5.0),
+    //         bottomLeft: Radius.circular(10.0),
+    //         bottomRight: Radius.circular(5.0),
+    //       );
 
 //    var avatarW = widget.isGroup
 //        ? widget.isMe
@@ -253,165 +253,78 @@ class _ChatBubbleState extends State<ChatBubble> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             avatarW,
-            Container(
-              margin: const EdgeInsets.all(3.0),
-              padding: const EdgeInsets.all(5.0),
-              decoration: BoxDecoration(
-                // color: chatBubbleColor(),
-                color: widget.isMe
-                    ? themeObj.messagesColor
-                    : themeObj.messagesColorSide,
-                borderRadius: radius,
-              ),
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width / 1.3 - 30,
-                minWidth: 20.0,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: align,
-                children: <Widget>[
-                  widget.isMe
-                      ? SizedBox()
-                      : widget.isGroup
-                          ? widget.showUsername
-                              ? Container(
-                                  child: Text(
-                                    widget.username,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: colors[rNum],
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.left,
-                                  ),
-                                  constraints: BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width /
-                                                1.3 -
-                                            30,
-                                    minWidth: 20.0,
-                                  ),
-                                )
-                              : SizedBox()
-                          : SizedBox(),
-//                  widget.isGroup
-//                      ? widget.isMe ? SizedBox() : SizedBox(height: 5)
-//                      : SizedBox(),
-                  widget.isReply
-                      ? Container(
-                          decoration: BoxDecoration(
-                            color: chatBubbleReplyColor(),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(5.0)),
-                          ),
-                          constraints: BoxConstraints(
-                            minHeight: 25,
-                            maxHeight: 100,
-                            minWidth: 80,
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(5),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Container(
-                                  child: Text(
-                                    widget.isMe ? "You" : widget.replyName,
-                                    style: TextStyle(
-                                      color: Theme.of(context).accentColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
-                                    maxLines: 1,
-                                    textAlign: TextAlign.left,
-                                  ),
-                                  alignment: Alignment.centerLeft,
-                                ),
-                                SizedBox(height: 2),
-                                Container(
-                                  child: Text(
-                                    widget.replyText,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .title
-                                          .color,
-                                      fontSize: 10,
-                                    ),
-                                    maxLines: 2,
-                                  ),
-                                  alignment: Alignment.centerLeft,
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      : SizedBox(width: 2),
-                  widget.isReply ? SizedBox(height: 5) : SizedBox(),
-                  Stack(
-                    children: [
-                      _buildMessage(context),
-                      Positioned(
-                        right: 0.0,
-                        bottom: -10.0,
-                        child: Padding(
-                          padding: widget.isMe
-                              ? EdgeInsets.only(
-                                  right: 10,
-                                  bottom: 10.0,
-                                )
-                              : EdgeInsets.only(
-                                  left: 10,
-                                  bottom: 10.0,
-                                ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                '${TimeUtil.formatTime(widget.time, 1, 'HH:mm')}',
-                                style: TextStyle(
-                                  color: widget.isMe
-                                      ? themeObj.inactiveColorMessageSelf
-                                      : themeObj.inactiveColorMessage,
-                                  fontSize: 10.0,
-                                ),
-                              ),
-                              if (widget.isMe)
-                                widget.sending
-                                    ? Container(
-                                        child: Icon(
-                                          Icons.access_time,
-                                          size: 10,
-                                          color: themeObj.messagesWordSelf,
-                                        ),
-                                        height: 10.0,
-                                        width: 10.0,
-                                      )
-                                    : widget.success
-                                        ? Icon(
-                                            Icons.check,
-                                            color: themeObj.messagesWordSelf,
-                                            size: 10.0,
-                                          )
-                                        : Icon(
-                                            Icons.sms_failed,
-                                            color: Colors.red,
-                                            size: 10.0,
-                                          )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            _buildPaint(),
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildPaint() {
+    final align =
+        widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    // final radius = widget.isMe
+    //     ? BorderRadius.only(
+    //   topLeft: Radius.circular(5.0),
+    //   bottomLeft: Radius.circular(5.0),
+    //   bottomRight: Radius.circular(10.0),
+    // )
+    //     : BorderRadius.only(
+    //   topRight: Radius.circular(5.0),
+    //   bottomLeft: Radius.circular(10.0),
+    //   bottomRight: Radius.circular(5.0),
+    // );
+    Color paintColor =
+        widget.isMe ? themeObj.messagesColor : themeObj.messagesColorSide;
+    var alignCorner = widget.isMe ? Alignment.topRight : Alignment.bottomLeft;
+    double _radius = themeObj.radius == null ? 16 : themeObj.radius;
+    return Container(
+      margin: EdgeInsets.only(top: 2,bottom: 2, left:2, right: 2),
+      child: CustomPaint(
+        painter: ChatCustomCorner(
+          color: paintColor,
+          alignment: alignCorner,
+          showCorner: widget.showAvatar,
+          radius: _radius,
+        ),
+        child: Container(
+          child: Stack(
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(top: 3, bottom: 3, right: 8, left: 8),
+                padding: EdgeInsets.only(top: 0, bottom: 0, right: 2, left: 5),
+                decoration: BoxDecoration(
+                  // color: chatBubbleColor(),
+                  // color: widget.isMe
+                  //     ? themeObj.messagesColor
+                  //     : themeObj.messagesColorSide,
+                  borderRadius: BorderRadius.circular(_radius),
+                ),
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width / 1.3 - 30,
+                  minWidth: 20.0,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: align,
+                  children: <Widget>[
+                    _buildName(),
+                    _buildReply(),
+                    widget.isReply ? SizedBox(height: 5) : SizedBox(),
+                    Stack(
+                      children: [
+                        _buildMessage(context),
+                        _buildMessageTime(),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -813,10 +726,139 @@ class _ChatBubbleState extends State<ChatBubble> {
       );
     }
     return Container(
-      color: widget.isMe ? themeObj.messagesColor : themeObj.messagesColorSide,
       padding: EdgeInsets.all(widget.type == 1 ? 1 : 0),
+      decoration: BoxDecoration(
+        color: widget.isMe ? themeObj.messagesColor : themeObj.messagesColorSide,
+        borderRadius: BorderRadius.circular(themeObj.radius),
+      ),
       child: contentWidget,
     );
+  }
+
+  Widget _buildMessageTime() {
+    return Positioned(
+      right: 0.0,
+      bottom: -10.0,
+      child: Padding(
+        padding: widget.isMe
+            ? EdgeInsets.only(
+                right: 10,
+                bottom: 10.0,
+              )
+            : EdgeInsets.only(
+                left: 10,
+                bottom: 10.0,
+              ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              '${TimeUtil.formatTime(widget.time, 1, 'HH:mm')}',
+              style: TextStyle(
+                color: widget.isMe
+                    ? themeObj.inactiveColorMessageSelf
+                    : themeObj.inactiveColorMessage,
+                fontSize: 10.0,
+              ),
+            ),
+            if (widget.isMe)
+              widget.sending
+                  ? Container(
+                      child: Icon(
+                        Icons.access_time,
+                        size: 10,
+                        color: themeObj.messagesWordSelf,
+                      ),
+                      height: 10.0,
+                      width: 10.0,
+                    )
+                  : widget.success
+                      ? Icon(
+                          Icons.check,
+                          color: themeObj.messagesWordSelf,
+                          size: 10.0,
+                        )
+                      : Icon(
+                          Icons.sms_failed,
+                          color: Colors.red,
+                          size: 10.0,
+                        )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReply() {
+    return widget.isReply
+        ? Container(
+            decoration: BoxDecoration(
+              color: chatBubbleReplyColor(),
+              borderRadius: BorderRadius.all(Radius.circular(5.0)),
+            ),
+            constraints: BoxConstraints(
+              minHeight: 25,
+              maxHeight: 100,
+              minWidth: 80,
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(5),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    child: Text(
+                      widget.isMe ? "You" : widget.replyName,
+                      style: TextStyle(
+                        color: Theme.of(context).accentColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                      maxLines: 1,
+                      textAlign: TextAlign.left,
+                    ),
+                    alignment: Alignment.centerLeft,
+                  ),
+                  SizedBox(height: 2),
+                  Container(
+                    child: Text(
+                      widget.replyText,
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.title.color,
+                        fontSize: 10,
+                      ),
+                      maxLines: 2,
+                    ),
+                    alignment: Alignment.centerLeft,
+                  ),
+                ],
+              ),
+            ),
+          )
+        : SizedBox(width: 2);
+  }
+
+  Widget _buildName() {
+    var nameWidget = Container(
+      child: Text(
+        widget.username,
+        style: TextStyle(
+          fontSize: 13,
+          color: colors[rNum],
+          fontWeight: FontWeight.bold,
+        ),
+        textAlign: TextAlign.left,
+      ),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width / 1.3 - 30,
+        minWidth: 20.0,
+      ),
+    );
+    return widget.isMe
+        ? SizedBox()
+        : widget.isGroup
+            ? widget.showUsername ? nameWidget : SizedBox()
+            : SizedBox();
   }
 
   void showVideoPlayer(parentContext, String videoUrl) async {

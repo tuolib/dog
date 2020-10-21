@@ -25,6 +25,9 @@ class FloatButtonModel extends FloatNotifier {
     if (noti) {
       notifyListeners();
     }
+  }
 
+  noti() {
+    notifyListeners();
   }
 }

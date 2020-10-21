@@ -16,7 +16,7 @@ class CircleWidget extends StatelessWidget {
     );
 
     return Material(
-      color: DataUtil.iosBarBgColor(),
+      color: themeObj.menuBackgroundColor,
       child: Center(
         child: Stack(
           children: <Widget>[

@@ -16,9 +16,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:keyboard_utils/keyboard_utils.dart';
-import 'package:keyboard_utils/keyboard_listener.dart';
-import 'package:keyboard_utils/widgets.dart';
+// import 'package:keyboard_utils/keyboard_utils.dart';
+// import 'package:keyboard_utils/keyboard_listener.dart';
+// import 'package:keyboard_utils/widgets.dart';
 
 int preOffset = 0;
 Timer getHistoryTime;
@@ -42,32 +42,6 @@ bool hasGetHistoryDownOver = false;
 // 是否还在渲染中
 bool afterBuilding = false;
 
-class KeyboardBloc {
-  KeyboardUtils _keyboardUtils = KeyboardUtils();
-  StreamController<double> _streamController = StreamController<double>();
-  Stream<double> get stream => _streamController.stream;
-
-  KeyboardUtils get keyboardUtils => _keyboardUtils;
-
-  int _idKeyboardListener;
-
-  void start() {
-    _idKeyboardListener = _keyboardUtils.add(
-        listener: KeyboardListener(willHideKeyboard: () {
-          _streamController.sink.add(_keyboardUtils.keyboardHeight);
-        }, willShowKeyboard: (double keyboardHeight) {
-          _streamController.sink.add(keyboardHeight);
-        }));
-  }
-
-  void dispose() {
-    _keyboardUtils.unsubscribeListener(subscribingId: _idKeyboardListener);
-    if (_keyboardUtils.canCallDispose()) {
-      _keyboardUtils.dispose();
-    }
-    _streamController.close();
-  }
-}
 
 class Conversation extends StatefulWidget {
   final int groupId;
@@ -143,6 +117,7 @@ class _ConversationState extends State<Conversation> {
   String groupName;
   bool isSendConversation = false;
   int lastReadId;
+  GlobalKey inputTextKey = GlobalKey();
 
 //  image_picker 选择插件 相关变量
   File _image;
@@ -184,8 +159,7 @@ class _ConversationState extends State<Conversation> {
   // 显示发送图标
   bool showSend = false;
 
-
-  KeyboardBloc _bloc = KeyboardBloc();
+  // KeyboardBloc _bloc = KeyboardBloc();
 
   ThemeModel themeObj;
 
@@ -211,7 +185,7 @@ class _ConversationState extends State<Conversation> {
     });
     //
     setTopLine();
-    _bloc.start();
+    // _bloc.start();
   }
 
   @override
@@ -224,7 +198,8 @@ class _ConversationState extends State<Conversation> {
 //    logger.d(converList.length);
     recodeTimeout?.cancel();
     _sliverController.dispose();
-    _bloc.dispose();
+    _unameController.dispose();
+    // _bloc.dispose();
 
 //    if (_isRecording) {
 //      AudioRecorder.stop();
@@ -256,7 +231,7 @@ class _ConversationState extends State<Conversation> {
             focusNode1.unfocus();
           },
           child: Scaffold(
-            backgroundColor: themeObj.scaffoldBackgroundColor,
+            backgroundColor: themeObj.messagesChatBg,
             appBar: _buildAppBar(),
             body: Container(
               height: MediaQuery.of(context).size.height,
@@ -294,23 +269,29 @@ class _ConversationState extends State<Conversation> {
   }
 
   _floatingActionButton() {
-    return Consumer<FloatButtonModel>(
-      builder: (BuildContext context, FloatButtonModel floatButtonModel,
-          Widget child) {
-        return Container(
-          margin: EdgeInsets.only(bottom: 150),
-          width: 36,
-          height: 36,
+    var floatButtonModel = Provider.of<FloatButtonModel>(context);
+    var keyContext = inputTextKey?.currentContext;
+    var box = keyContext?.findRenderObject() as RenderBox;
+    // var pos = box.localToGlobal(Offset.zero);
+    // logger.d(box.size.height);
+    double bottomLen = 150;
+    if (keyContext != null) {
+      bottomLen = box.size.height;
+    }
+    return Container(
+      margin: EdgeInsets.only(bottom: bottomLen),
+      width: 36,
+      height: 36,
 //      color: Colors.blue,
-          child: floatButtonModel.showFloatButton
-              ? FloatingActionButton(
-                  child: Icon(
-                    Icons.keyboard_arrow_down,
-                    color: DataUtil.iosLightTextColor(),
-                    size: 30,
-                  ),
-                  backgroundColor: CupertinoColors.lightBackgroundGray,
-                  onPressed: () {
+      child: floatButtonModel.showFloatButton
+          ? FloatingActionButton(
+        child: Icon(
+          Icons.keyboard_arrow_down,
+          color: DataUtil.iosLightTextColor(),
+          size: 30,
+        ),
+        backgroundColor: themeObj.barBackgroundColor,
+        onPressed: () {
 //          final double offset =
 //              DefaultStickyHeaderController.of(context).stickyHeaderScrollOffset;
 //          final double offset =
@@ -320,18 +301,16 @@ class _ConversationState extends State<Conversation> {
 //            duration: Duration(milliseconds: 300),
 //            curve: Curves.easeIn,
 //          );
-                    _getHistoryDown(type: 1);
+          _getHistoryDown(type: 1);
 //                logger.d(_sliverController.position.extentBefore);
 //                _sliverController.animateTo(
 //                  -_sliverController.position.extentBefore,
 //                  duration: Duration(milliseconds: 500),
 //                  curve: Curves.easeIn,
 //                );
-                  },
-                )
-              : SizedBox(),
-        );
-      },
+        },
+      )
+          : SizedBox(),
     );
   }
 
@@ -527,6 +506,7 @@ class _ConversationState extends State<Conversation> {
   }
 
   _buildBottomInput() {
+    var floatAction = Provider.of<FloatButtonModel>(context, listen: false);
     if (_isResetRecord) {
       bottomWidget = OrientationBuilder(
         builder: (context, orientation) {
@@ -534,7 +514,10 @@ class _ConversationState extends State<Conversation> {
           double mW = MediaQuery.of(context).size.width;
           // logger.d(mH);
           // logger.d(mW);
-          // _bloc.keyboardUtils.
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            floatAction.noti();
+            // Add Your Code here.
+          });
           return Container(
             // height: 48,
             constraints: BoxConstraints(
@@ -552,7 +535,7 @@ class _ConversationState extends State<Conversation> {
                     padding: EdgeInsets.only(left: 4, right: 4),
                     icon: Icon(
                       Icons.add,
-                      color: DataUtil.iosLightTextColor(),
+                      color: themeObj.inactiveColor,
 //                          color: Theme.of(context).accentColor,
                     ),
                     onPressed: () {
@@ -566,8 +549,8 @@ class _ConversationState extends State<Conversation> {
                   child: Container(
                     padding: EdgeInsets.only(top: 8, bottom: 8),
                     child: CupertinoTextField(
-                      padding:
-                      EdgeInsets.only(left: 10, right: 10, top: 6, bottom: 6),
+                      padding: EdgeInsets.only(
+                          left: 10, right: 10, top: 6, bottom: 6),
                       expands: true,
                       controller: _unameController,
                       focusNode: focusNode1,
@@ -577,6 +560,7 @@ class _ConversationState extends State<Conversation> {
                         color: themeObj.normalColor,
                       ),
                       decoration: BoxDecoration(
+                        color: themeObj.inputBackgroundColor,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           width: 1,
@@ -608,51 +592,46 @@ class _ConversationState extends State<Conversation> {
 //                            AudioCoders(),
                 !showSend
                     ? Container(
-                  // padding: EdgeInsets.only(top: 10, bottom: 10),
-                  width: 34,
-                  // height: 28,
-                  child: IconButton(
-                    padding: EdgeInsets.only(left: 4, right: 4),
-                    icon: Icon(
-                      Icons.mic,
-                      color: DataUtil.iosLightTextColor(),
-                    ),
-                    onPressed: () {
-                      _start();
-                    },
-                  ),
-                )
+                        // padding: EdgeInsets.only(top: 10, bottom: 10),
+                        width: 34,
+                        // height: 28,
+                        child: IconButton(
+                          padding: EdgeInsets.only(left: 4, right: 4),
+                          icon: Icon(
+                            Icons.mic,
+                            color: themeObj.inactiveColor,
+                          ),
+                          onPressed: () {
+                            _start();
+                          },
+                        ),
+                      )
                     : Container(
-                  // padding: EdgeInsets.only(top: 10, bottom: 10),
-                  width: 34,
-                  // height: 28,
-                  child: IconButton(
-                    padding: EdgeInsets.only(left: 4, right: 4),
-                    icon: Icon(
-                      Icons.send,
+                        // padding: EdgeInsets.only(top: 10, bottom: 10),
+                        width: 34,
+                        // height: 28,
+                        child: IconButton(
+                          padding: EdgeInsets.only(left: 4, right: 4),
+                          icon: Icon(
+                            Icons.send,
 //                          color: Theme.of(context).accentColor,
-                    ),
-                    onPressed: () {
-                      var textInput = _unameController.text.trim();
-                      if (textInput == null || textInput == '') {
-                        return;
-                      }
+                          ),
+                          onPressed: () {
+                            var textInput = _unameController.text.trim();
+                            if (textInput == null || textInput == '') {
+                              return;
+                            }
 //              focusNode1.unfocus();
-                      _unameController.clear();
-                      sendWordMessage(
-                          groupId: conversionInfo['groupId'],
-                          textInput: textInput);
-                    },
-                  ),
-                )
+                            _unameController.clear();
+                            sendWordMessage(
+                                groupId: conversionInfo['groupId'],
+                                textInput: textInput);
+                          },
+                        ),
+                      )
               ],
             ),
           );
-          // return GridView.count(
-          //   // Create a grid with 2 columns in portrait mode,
-          //   // or 3 columns in landscape mode.
-          //   crossAxisCount: orientation == Orientation.portrait ? 2 : 3,
-          // );
         },
       );
     } else {
@@ -729,10 +708,12 @@ class _ConversationState extends State<Conversation> {
         bool showInputTopLine = floatButtonModel.showInputTopLine;
 
         return Align(
+          key: inputTextKey,
           alignment: Alignment.bottomCenter,
           child: BottomAppBar(
             elevation: 0,
-            color: themeObj.scaffoldBackgroundColor,
+            // color: themeObj.scaffoldBackgroundColor,
+            color: themeObj.messagesChatBgBottom,
             child: Container(
               decoration: BoxDecoration(
                 border: Border(
@@ -741,7 +722,7 @@ class _ConversationState extends State<Conversation> {
                     color: themeObj.borderColor,
                     width: showInputTopLine ? 1.0 : 0,
                     style:
-                        showInputTopLine ? BorderStyle.solid : BorderStyle.none,
+                    showInputTopLine ? BorderStyle.solid : BorderStyle.none,
                   ),
                 ),
               ),
@@ -1029,10 +1010,10 @@ class _ConversationState extends State<Conversation> {
     var showAvatar = false;
 //    var showAvatarParent = false;
     var showDate = false;
-//    if (isFirstMessage(conversationList, msg, index)) {
-////      showAvatar = true;
+    if (isFirstMessage(conversationList, msg, index)) {
+      showAvatar = true;
 //      showAvatarParent = true;
-//    }
+    }
 
     if (isLastMessage(conversationList, msg, index)) {
       showUsername = true;
@@ -2071,7 +2052,46 @@ class _ConversationState extends State<Conversation> {
 
   setTopLine() {
     FloatButtonModel fbModel =
-    Provider.of<FloatButtonModel>(context, listen: false);
+        Provider.of<FloatButtonModel>(context, listen: false);
     fbModel.setTopLine(false, noti: false);
   }
 }
+
+
+// class KeyboardBloc {
+//   KeyboardUtils _keyboardUtils = KeyboardUtils();
+//   StreamController<double> _streamController = StreamController<double>();
+//
+//   Stream<double> get stream => _streamController.stream;
+//
+//   KeyboardUtils get keyboardUtils => _keyboardUtils;
+//
+//   bool _willShow = false;
+//
+//   bool get willShow => _willShow;
+//
+//   int _idKeyboardListener;
+//
+//   void start() {
+//     _idKeyboardListener = _keyboardUtils.add(
+//       listener: KeyboardListener(
+//         willHideKeyboard: () {
+//           _willShow = false;
+//           _streamController.sink.add(_keyboardUtils.keyboardHeight);
+//         },
+//         willShowKeyboard: (double keyboardHeight) {
+//           _willShow = true;
+//           _streamController.sink.add(keyboardHeight);
+//         },
+//       ),
+//     );
+//   }
+//
+//   void dispose() {
+//     _keyboardUtils.unsubscribeListener(subscribingId: _idKeyboardListener);
+//     if (_keyboardUtils.canCallDispose()) {
+//       _keyboardUtils.dispose();
+//     }
+//     _streamController.close();
+//   }
+// }

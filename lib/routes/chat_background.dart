@@ -1,31 +1,19 @@
 import '../index.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 // import 'modals/floating_modal.dart';
 
-int oldTheme;
-int oldThemeDark;
-
-class ThemeChangeRoute extends StatefulWidget {
+class ChatBackgroundRoute extends StatefulWidget {
   @override
-  _ThemeChangeRoute createState() => _ThemeChangeRoute();
+  _ChatBackgroundRoute createState() => _ChatBackgroundRoute();
 }
 
-class _ThemeChangeRoute extends State<ThemeChangeRoute> {
+class _ChatBackgroundRoute extends State<ChatBackgroundRoute> {
   ThemeModel themeObj;
 
   double con1 = 30;
   double border1 = 2;
   double border2 = 2;
-
-  int segmentedControlGroupValue = 0;
-
-  final Map<int, Widget> myTabs = const <int, Widget>{
-    0: Text("Accent"),
-    1: Text("Background"),
-    2: Text("Messages"),
-  };
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +52,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
         ),
         centerTitle: true,
         title: Text(
-          "${GmLocalizations.of(context).theme}",
+          "Chat Background",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: themeObj.normalColor,
@@ -72,47 +60,15 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
           ),
         ),
       ),
-      body: CupertinoPageScaffold(
-        child: SizedBox.expand(
-          child: SafeArea(
-            child: CustomScrollView(
-              primary: true,
-              slivers: <Widget>[
-                SliverToBoxAdapter(
-                  child: _buildChat(context),
-                ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      return Container(
-                        color: themeObj.messagesChatBg,
-                        padding: EdgeInsets.only(
-                          top: index == 0 ? 10 : 0,
-                          bottom: index == 1 ? 10 : 0,
-                        ),
-                        child: _buildChatList(context, index),
-                      );
-                    },
-                    childCount: 2,
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: _buildThemeMode(context),
-                ),
-                SliverToBoxAdapter(
-                  child: _buildThemeColor(context),
-                ),
-                _buildOther(),
-                SliverToBoxAdapter(
-                  child: Container(
-                    height: 30,
-                  ),
-                ),
-              ],
-            ),
+      body: CustomScrollView(
+        primary: true,
+        slivers: <Widget>[
+          SliverToBoxAdapter(
+            child: _buildChat(context),
           ),
-        ),
+        ],
       ),
+
     );
   }
 
@@ -463,28 +419,17 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
     // logger.d(themeObj.theme);
     int themeIndex;
 
-    bool showLitter = false;
-    Color litterCirBg;
-    int litterValue;
     if (Global.profile.themeMode == 1) {
       themeIndex = themeObj.theme;
-      litterValue = Global.profile.themesDayMessage[index];
-      litterCirBg = Color(litterValue);
     } else if (Global.profile.themeMode == 2) {
       themeIndex = themeObj.themeDark;
-      litterValue = Global.profile.themesDarkMessage[index];
-      litterCirBg = Color(litterValue);
     } else {
       themeIndex = 0;
-    }
-    if (litterValue != colorItem) {
-      showLitter = true;
     }
     bool selected = false;
     if (colorItem == Global.themes[themeIndex]) {
       selected = true;
     }
-    // if ()
     return Container(
       margin: EdgeInsets.only(left: 10, right: 10),
       decoration: BoxDecoration(
@@ -531,18 +476,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
                         Icons.more_horiz,
                         color: Colors.white,
                       )
-                    : showLitter
-                      ? Container(
-                          child: Container(
-                            width: 2,
-                            height: 2,
-                            decoration: BoxDecoration(
-                              color: litterCirBg,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        )
-                      : SizedBox()
+                    : SizedBox(),
               ),
             ],
           ),
@@ -584,6 +518,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
                   height: 1,
                   color: themeObj.borderColor,
                 ),
+
                 GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   child: Row(
@@ -615,7 +550,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
                       ),
                     ],
                   ),
-                  onTap: () => Navigator.pushNamed(context, "chatBackground"),
+                  onTap: () => Navigator.pushNamed(context, "themes"),
                 ),
                 Container(
                   padding: EdgeInsets.only(left: dividerLeft),
@@ -667,7 +602,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
                       ),
                     ],
                   ),
-                  onTap: () {},
+                  onTap: () => Navigator.pushNamed(context, "language"),
                 ),
                 Container(
                   padding: EdgeInsets.only(left: dividerLeft),
@@ -707,8 +642,9 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
                       ),
                     ],
                   ),
-                  onTap: () {},
+                  onTap: () => Navigator.pushNamed(context, "themes"),
                 ),
+
                 Divider(
                   height: 1,
                   color: themeObj.borderColor,
@@ -724,103 +660,15 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
   callback() {}
 
   _showColorPicker(context) {
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    // int accentColor = themeObj.primaryColor.value;
-    // int backgroundColor = themeObj.scaffoldBackgroundColor.value;
-    // int messagesColor = themeObj.messagesColor.value;
-    // themeObj.themeColorAdd(accentColor, 0);
-    // themeObj.themeColorAdd(backgroundColor, 1);
-    // themeObj.themeColorAdd(messagesColor, 2);
-    // if (themeObj.themeMode == 1) {
-    //   oldTheme = themeObj.theme;
-    //   themeObj.theme = 0;
-    // } else if (themeObj.themeMode == 2) {
-    //   oldThemeDark = themeObj.theme;
-    //   themeObj.themeDark = 0;
-    // }
     CupertinoScaffold.showCupertinoModalBottomSheet(
       expand: true,
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context, scrollController) => SegmentedControlExample(
-        type: 2,
-      ),
+      builder: (context, scrollController) => ModalFit(),
     );
   }
 
-  // accent background message
-  _setColor() {
-    // Map<int, Widget> myTabs = <int, Widget>{
-    //   0: GestureDetector(
-    //     child: Text("Accent"),
-    //     onTap: () {
-    //       setState(() {
-    //         segmentedControlGroupValue = 0;
-    //       });
-    //     },
-    //   ),
-    //   1: GestureDetector(
-    //     child: Text("Background"),
-    //     onTap: () {
-    //       setState(() {
-    //         segmentedControlGroupValue = 1;
-    //       });
-    //     },
-    //   ),
-    //   2: GestureDetector(
-    //     child: Text("Messages"),
-    //     onTap: () {
-    //       logger.d(segmentedControlGroupValue);
-    //       setState(() {
-    //         segmentedControlGroupValue = 2;
-    //       });
-    //     },
-    //   ),
-    // };
+  // _
 
-    return Material(
-      child: CupertinoPageScaffold(
-        backgroundColor: themeObj.barBackgroundColor,
-        child: SafeArea(
-          // top: false,
-          // left: false,
-          // right: false,
-          child: Container(
-            color: themeObj.barBackgroundColor,
-            // width: MediaQuery.of(context).size.width,
-            child: Column(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                  decoration: BoxDecoration(
-                    color: themeObj.barBackgroundColor,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: themeObj.borderColor,
-                        width: 1,
-                        style: BorderStyle.solid,
-                      ),
-                    ),
-                  ),
-                  // margin: EdgeInsets.only(top: 10, bottom: 10),
-                  child: CupertinoSlidingSegmentedControl<int>(
-                    // backgroundColor: themeObj.inputBackgroundColor,
-                    groupValue: segmentedControlGroupValue,
-                    children: myTabs,
-                    onValueChanged: (i) {
-                      logger.d(i);
-                      setState(() {
-                        segmentedControlGroupValue = i;
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+
 }

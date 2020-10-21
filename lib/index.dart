@@ -17,4 +17,5 @@ export 'package:assorted_layout_widgets/assorted_layout_widgets.dart';
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter_localizations/flutter_localizations.dart';
 export 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+export 'package:flutter_colorpicker/flutter_colorpicker.dart';
 

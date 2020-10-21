@@ -306,6 +306,8 @@ class MyApp extends StatelessWidget {
                         );
                       } else if (routeName == 'devices') {
                         goPage = DevicesPage();
+                      } else if (routeName == 'chatBackground') {
+                        goPage = ChatBackgroundRoute();
                       } else {
                         goPage = MainScreen();
 
