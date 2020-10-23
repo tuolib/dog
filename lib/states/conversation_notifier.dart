@@ -3,6 +3,7 @@ import 'dart:async';
 import '../index.dart';
 
 bool hasSendOne = false;
+
 class ConversationNotifier extends ChangeNotifier {
   @override
   void notifyListeners() {
@@ -698,9 +699,7 @@ class ConversationListModel extends ConversationNotifier {
 //    logger.d(extentBeforeId);
 //    logger.d(extentAfterId);
     if (!isUpdate) {
-      if (hasGetOldest == 1 &&
-          allMessage.length < limit &&
-          addOffset == 0) {
+      if (hasGetOldest == 1 && allMessage.length < limit && addOffset == 0) {
         hasGetHistoryUpOver = true;
       }
     }
@@ -744,8 +743,6 @@ class ConversationListModel extends ConversationNotifier {
 // 赋值群消息
   void insertFirst(Map<String, dynamic> item) {
     _conversationList.insert(0, item);
-//    print(_conversationList[_conversationList.length - 1]);
-    // 通知监听器（订阅者），重新构建InheritedProvider， 更新状态。
     notifyListeners();
   }
 
@@ -765,7 +762,7 @@ class ConversationListModel extends ConversationNotifier {
 
 //  群消息赋值所有
   void updateList(List conversations) {
-//    if (conversations == _conversationList) return;
+   if (conversations == _conversationList) return;
 //    print('conversations$conversations');
     _conversationList = conversations;
     // 通知监听器（订阅者），重新构建InheritedProvider， 更新状态。
@@ -777,6 +774,25 @@ class ConversationListModel extends ConversationNotifier {
     print(_conversationList[index]);
     _conversationList[index][property] = value;
     print(_conversationList[index]);
+    notifyListeners();
+  }
+
+  void updateMultipleItem(List listUpdate, Color value, Color value2) {
+    // for (var i = 0; i < _conversationList.length; i++) {
+    //   _conversationList[i]['topColor'] = Colors.blue;
+    //   _conversationList[i]['bottomColor'] = Colors.blue;
+    // }
+    for (var m = 0; m < listUpdate.length; m++) {
+      final tile = _conversationList.firstWhere(
+          (item) => item['timestamp'] == listUpdate[m]['timestamp']);
+      tile['topColor'] = value;
+      tile['bottomColor'] = value2;
+    }
+    // }
+    // notifyListeners();
+  }
+
+  void noti() {
     notifyListeners();
   }
 
@@ -805,3 +821,4 @@ class ConversationListModel extends ConversationNotifier {
     notifyListeners();
   }
 }
+

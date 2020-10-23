@@ -21,6 +21,8 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) {
     ..themesDarkMessage = json['themesDarkMessage'] as List
     ..themesDayBg = json['themesDayBg'] as List
     ..themesDarkBg = json['themesDarkBg'] as List
+    ..themesDayBg2 = json['themesDayBg2'] as List
+    ..themesDarkBg2 = json['themesDarkBg2'] as List
     ..cache = json['cache'] == null
         ? null
         : CacheConfig.fromJson(json['cache'] as Map<String, dynamic>)
@@ -40,6 +42,8 @@ Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
       'themesDarkMessage': instance.themesDarkMessage,
       'themesDayBg': instance.themesDayBg,
       'themesDarkBg': instance.themesDarkBg,
+      'themesDayBg2': instance.themesDayBg2,
+      'themesDarkBg2': instance.themesDarkBg2,
       'cache': instance.cache,
       'lastLogin': instance.lastLogin,
       'locale': instance.locale

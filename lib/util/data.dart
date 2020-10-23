@@ -197,4 +197,10 @@ class DataUtil {
 // dark 15, 15, 15
 // day 226, 227, 231
 
+
+  static int calcRanks(ranks) {
+    double multiplier = .5;
+    return (multiplier * ranks).round();
+  }
+
 }

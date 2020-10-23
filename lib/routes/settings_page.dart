@@ -298,7 +298,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ],
                 ),
-                onTap: () => Navigator.pushNamed(context, "themes"),
+                onTap: () {
+                  Navigator.pushNamed(context, "themes");
+                },
               ),
               Container(
                 padding: EdgeInsets.only(left: dividerLeft),

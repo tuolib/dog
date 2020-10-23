@@ -157,9 +157,9 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
         type: 1,
         isMe: false,
         isGroup: false,
-        replyText: '',
-        isReply: false,
-        replyName: '',
+        replyText: 'Do you have some apple xxxxxx slsdf sldfjs sdf lfsdf sdlf sdf sdfs sdf?',
+        isReply: true,
+        replyName: 'Bob Smith',
         isImage: false,
         index: 1,
         filePath: '',
@@ -414,7 +414,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
       child: GestureDetector(
         child: CircleWidget(),
         onTap: () {
-          _showColorPicker(context);
+          _showColorPicker(context, 2);
         },
       ),
     ));
@@ -487,11 +487,6 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
     if (litterValue != colorItem) {
       showLitter = true;
     }
-    // if (colorItem == Global.themes[themeIndex]) {
-    //   selected = true;
-    // }
-
-    // if ()
     return Container(
       margin: EdgeInsets.only(left: 10, right: 10),
       decoration: BoxDecoration(
@@ -562,9 +557,17 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
         ),
         onTap: () {
           if (Global.profile.themeMode == 1) {
-            Provider.of<ThemeModel>(context, listen: false).theme = index;
+            if (themeObj.theme == index) {
+              _showColorPicker(context, 1);
+            } else {
+              themeObj.theme = index;
+            }
           } else if (Global.profile.themeMode == 2) {
-            Provider.of<ThemeModel>(context, listen: false).themeDark = index;
+            if (themeObj.themeDark == index) {
+              _showColorPicker(context, 1);
+            } else {
+              themeObj.themeDark = index;
+            }
           }
         },
       ),
@@ -680,7 +683,9 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
                       ),
                     ],
                   ),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushNamed(context, "testGradient");
+                  },
                 ),
                 Container(
                   padding: EdgeInsets.only(left: dividerLeft),
@@ -720,7 +725,9 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
                       ),
                     ],
                   ),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushNamed(context, "blendMode");
+                  },
                 ),
                 Divider(
                   height: 1,
@@ -736,7 +743,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
 
   callback() {}
 
-  _showColorPicker(context) {
+  _showColorPicker(BuildContext context, int type) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     // int accentColor = themeObj.primaryColor.value;
     // int backgroundColor = themeObj.scaffoldBackgroundColor.value;
@@ -755,8 +762,8 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
       expand: true,
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context, scrollController) => SegmentedControlExample(
-        type: 2,
+      builder: (context, scrollController) => SetColorWidget(
+        type: type,
       ),
     );
   }

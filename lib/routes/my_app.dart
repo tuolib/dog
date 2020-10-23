@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dog/routes/test_gradient.dart';
 import 'package:dog/states/call_notifier.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
@@ -308,6 +309,10 @@ class MyApp extends StatelessWidget {
                         goPage = DevicesPage();
                       } else if (routeName == 'chatBackground') {
                         goPage = ChatBackgroundRoute();
+                      } else if (routeName == 'testGradient') {
+                        goPage = ScrollablePositionedListPage();
+                      } else if (routeName == 'blendMode') {
+                        goPage = ColorFiltersDemo();
                       } else {
                         goPage = MainScreen();
 

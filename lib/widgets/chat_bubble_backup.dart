@@ -16,14 +16,7 @@ import 'package:audioplayers/audio_cache.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
-// 滚动时，记录滚动过的widget位置 key
-List scrollWidgetList = [];
-
-typedef void OnError(Exception exception);
-
-Timer doStreamTime;
-// ignore: must_be_immutable
-class ChatBubble extends StatefulWidget {
+class ChatBubbleExample extends StatefulWidget {
   String message,
       username,
       avatarUrl,
@@ -57,7 +50,7 @@ class ChatBubble extends StatefulWidget {
   Color primaryColor;
   // StreamController streamController;
 
-  ChatBubble({
+  ChatBubbleExample({
     this.afterBuild,
     @required this.callback,
     @required this.message,
@@ -96,10 +89,10 @@ class ChatBubble extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  ChatBubbleState createState() => ChatBubbleState();
+  _ChatBubbleState createState() => _ChatBubbleState();
 }
 
-class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
+class _ChatBubbleState extends State<ChatBubbleExample> {
   ThemeModel themeObj;
   Color topColor;
   Color bottomColor;
@@ -176,7 +169,7 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     themeObj = Provider.of<ThemeModel>(context);
     final align =
-        widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
     if (widget.primaryColor == null) {
       primaryColor = themeObj.primaryColor;
     }
@@ -213,22 +206,22 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
     var avatarW = SizedBox();
     var dateW = widget.showDate
         ? Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Opacity(
-                opacity: 0.5,
-                child: Container(
-                  margin: widget.showAvatarParent && widget.isGroup
-                      ? EdgeInsets.only(right: 40, top: 4)
-                      : EdgeInsets.only(top: 4),
-                  child: Padding(
-                    padding: EdgeInsets.all(5.0),
-                    child: Text('${TimeUtil.chatDate(widget.time)}'),
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(8.0),
-                    //3像素圆角
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Opacity(
+          opacity: 0.5,
+          child: Container(
+            margin: widget.showAvatarParent && widget.isGroup
+                ? EdgeInsets.only(right: 40, top: 4)
+                : EdgeInsets.only(top: 4),
+            child: Padding(
+              padding: EdgeInsets.all(5.0),
+              child: Text('${TimeUtil.chatDate(widget.time)}'),
+            ),
+            decoration: BoxDecoration(
+              color: Colors.grey,
+              borderRadius: BorderRadius.circular(8.0),
+              //3像素圆角
 //            boxShadow: [
 //              //阴影
 //              BoxShadow(
@@ -236,11 +229,11 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
 //                  offset: Offset(2.0, 2.0),
 //                  blurRadius: 4.0)
 //            ],
-                  ),
-                ),
-              )
-            ],
-          )
+            ),
+          ),
+        )
+      ],
+    )
         : SizedBox();
     return Column(
       key: _keyRed,
@@ -250,7 +243,7 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
         Row(
 //          crossAxisAlignment: align,
           mainAxisAlignment:
-              widget.isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          widget.isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -265,7 +258,7 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
 
   Widget _buildPaint() {
     final align =
-        widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
     // final radius = widget.isMe
     //     ? BorderRadius.only(
     //   topLeft: Radius.circular(5.0),
@@ -278,7 +271,7 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
     //   bottomRight: Radius.circular(5.0),
     // );
     Color paintColor =
-        widget.isMe ? themeObj.messagesColor : themeObj.messagesColorSide;
+    widget.isMe ? themeObj.messagesColor : themeObj.messagesColorSide;
     var alignCorner = widget.isMe ? Alignment.topRight : Alignment.bottomLeft;
     double _radius = themeObj.radius == null ? 16 : themeObj.radius;
     return Container(
@@ -672,7 +665,7 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
                       print('widget.filePath: ${widget.filePath}');
                       print('widget.index: ${widget.index}');
                       var filePath =
-                          conversion.conversationList[widget.index]['filePath'];
+                      conversion.conversationList[widget.index]['filePath'];
                       print('filePath: $filePath');
                       var fileExist;
                       if (filePath != null && filePath != '') {
@@ -752,7 +745,7 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
           child: CircularProgressIndicator(
             strokeWidth: 3,
             valueColor:
-                AlwaysStoppedAnimation(Theme.of(context).textTheme.title.color),
+            AlwaysStoppedAnimation(Theme.of(context).textTheme.title.color),
           ),
         );
       } else {
@@ -795,13 +788,13 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
       child: Padding(
         padding: widget.isMe
             ? EdgeInsets.only(
-                right: 10,
-                bottom: 10.0,
-              )
+          right: 10,
+          bottom: 10.0,
+        )
             : EdgeInsets.only(
-                left: 10,
-                bottom: 10.0,
-              ),
+          left: 10,
+          bottom: 10.0,
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -817,25 +810,25 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
             if (widget.isMe)
               widget.sending
                   ? Container(
-                      child: Icon(
-                        Icons.access_time,
-                        size: 10,
-                        color: themeObj.messagesWordSelf,
-                      ),
-                      height: 10.0,
-                      width: 10.0,
-                    )
+                child: Icon(
+                  Icons.access_time,
+                  size: 10,
+                  color: themeObj.messagesWordSelf,
+                ),
+                height: 10.0,
+                width: 10.0,
+              )
                   : widget.success
-                      ? Icon(
-                          Icons.check,
-                          color: themeObj.messagesWordSelf,
-                          size: 10.0,
-                        )
-                      : Icon(
-                          Icons.sms_failed,
-                          color: Colors.red,
-                          size: 10.0,
-                        )
+                  ? Icon(
+                Icons.check,
+                color: themeObj.messagesWordSelf,
+                size: 10.0,
+              )
+                  : Icon(
+                Icons.sms_failed,
+                color: Colors.red,
+                size: 10.0,
+              )
           ],
         ),
       ),
@@ -845,76 +838,76 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
   Widget _buildReply() {
     return widget.isReply
         ? Container(
-            decoration: BoxDecoration(
-              // color: chatBubbleReplyColor(),
-              // borderRadius: BorderRadius.all(Radius.circular(5.0)),
-              border: Border(
-                left: BorderSide(
+      decoration: BoxDecoration(
+        // color: chatBubbleReplyColor(),
+        // borderRadius: BorderRadius.all(Radius.circular(5.0)),
+        border: Border(
+            left: BorderSide(
+              color: primaryColor,
+              width: 2.0,
+            )
+        ),
+      ),
+      // constraints: BoxConstraints(
+      //   minHeight: 25,
+      //   maxHeight: 100,
+      //   minWidth: 80,
+      // ),
+      child: Padding(
+        padding: EdgeInsets.only(left: 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
+              child: TextOneLine(
+                "${widget.isMe ? "You" : widget.replyName}",
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  // fontWeight: FontWeight.bold,
                   color: primaryColor,
-                  width: 2.0,
-                )
+                ),
               ),
+              // Text(
+              //   widget.isMe ? "You" : widget.replyName,
+              //   style: TextStyle(
+              //     color: Theme.of(context).accentColor,
+              //     fontWeight: FontWeight.bold,
+              //     fontSize: 12,
+              //   ),
+              //   maxLines: 1,
+              //   textAlign: TextAlign.left,
+              // ),
+              // alignment: Alignment.centerLeft,
             ),
-            // constraints: BoxConstraints(
-            //   minHeight: 25,
-            //   maxHeight: 100,
-            //   minWidth: 80,
-            // ),
-            child: Padding(
-              padding: EdgeInsets.only(left: 5),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Container(
-                    child: TextOneLine(
-                      "${widget.isMe ? "You" : widget.replyName}",
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        // fontWeight: FontWeight.bold,
-                        color: primaryColor,
-                      ),
-                    ),
-                    // Text(
-                    //   widget.isMe ? "You" : widget.replyName,
-                    //   style: TextStyle(
-                    //     color: Theme.of(context).accentColor,
-                    //     fontWeight: FontWeight.bold,
-                    //     fontSize: 12,
-                    //   ),
-                    //   maxLines: 1,
-                    //   textAlign: TextAlign.left,
-                    // ),
-                    // alignment: Alignment.centerLeft,
-                  ),
-                  SizedBox(height: 2),
-                  Container(
-                    child: TextOneLine(
-                      "${widget.replyText}",
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        // fontWeight: FontWeight.bold,
-                        color: widget.isMe
-                            ? themeObj.messagesWordSelf
-                            : themeObj.messagesWordSide,
-                      ),
-                    ),
-                    // Text(
-                    //   widget.replyText,
-                    //   style: TextStyle(
-                    //     color: widget.isMe
-                    //         ? themeObj.messagesWordSelf
-                    //         : themeObj.messagesWordSide,
-                    //     fontSize: 10,
-                    //   ),
-                    //   maxLines: 1,
-                    // ),
-                    // alignment: Alignment.centerLeft,
-                  ),
-                ],
+            SizedBox(height: 2),
+            Container(
+              child: TextOneLine(
+                "${widget.replyText}",
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  // fontWeight: FontWeight.bold,
+                  color: widget.isMe
+                      ? themeObj.messagesWordSelf
+                      : themeObj.messagesWordSide,
+                ),
               ),
+              // Text(
+              //   widget.replyText,
+              //   style: TextStyle(
+              //     color: widget.isMe
+              //         ? themeObj.messagesWordSelf
+              //         : themeObj.messagesWordSide,
+              //     fontSize: 10,
+              //   ),
+              //   maxLines: 1,
+              // ),
+              // alignment: Alignment.centerLeft,
             ),
-          )
+          ],
+        ),
+      ),
+    )
         : SizedBox(width: 2);
   }
 
@@ -937,8 +930,8 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
     return widget.isMe
         ? SizedBox()
         : widget.isGroup
-            ? widget.showUsername ? nameWidget : SizedBox()
-            : SizedBox();
+        ? widget.showUsername ? nameWidget : SizedBox()
+        : SizedBox();
   }
 
   void showVideoPlayer(parentContext, String videoUrl) async {
@@ -1040,8 +1033,8 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
 
 
 
-  // void _afterLayoutPersistent(Duration duration) {
-  //   logger.d('persistent: ${duration.inMilliseconds}');
-  //   logger.d(widget.content);
-  // }
+// void _afterLayoutPersistent(Duration duration) {
+//   logger.d('persistent: ${duration.inMilliseconds}');
+//   logger.d(widget.content);
+// }
 }

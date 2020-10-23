@@ -262,7 +262,15 @@ class ThemeModel extends ProfileChangeNotifier {
   Color get messagesColor {
     Color colorObj;
     if (themeMode == 1) {
-      colorObj = Color(Global.themesMessage[theme]);
+      // colorObj = Color(Global.themesMessage[theme]);
+      var newValue = Global.themesMessage[theme];
+      if (Color(newValue).red > 177 &&
+          Color(newValue).green > 177 &&
+          Color(newValue).blue > 177) {
+        colorObj = Color.fromRGBO(40, 40, 48, 1);
+      } else {
+        colorObj = Color(newValue);
+      }
     } else if (themeMode == 2) {
       var newValue = Global.themesMessage[themeDark];
       if (Color(newValue).red > 177 &&
@@ -301,6 +309,17 @@ class ThemeModel extends ProfileChangeNotifier {
       colorObj = Color(Global.themesBg[theme]);
     } else if (themeMode == 2) {
       colorObj = Color(Global.themesBg[themeDark]);
+    }
+    return colorObj;
+  }
+
+  // 聊天页面背景颜色 themesBg2 渐变色
+  Color get messagesChatBg2 {
+    Color colorObj;
+    if (themeMode == 1) {
+      colorObj = Color(Global.themesBg2[theme]);
+    } else if (themeMode == 2) {
+      colorObj = Color(Global.themesBg2[themeDark]);
     }
     return colorObj;
   }
@@ -437,7 +456,15 @@ class ThemeModel extends ProfileChangeNotifier {
   // 自己消息背景 themesMessage
   Color get messagesColorAppearanceDay {
     Color colorObj;
-    colorObj = Color(Global.profile.themesDayMessage[theme]);
+    // colorObj = Color(Global.profile.themesDayMessage[theme]);
+    var newValue = Global.profile.themesDayMessage[theme];
+    if (Color(newValue).red > 177 &&
+        Color(newValue).green > 177 &&
+        Color(newValue).blue > 177) {
+      colorObj = Color.fromRGBO(40, 40, 48, 1);
+    } else {
+      colorObj = Color(newValue);
+    }
     return colorObj;
   }
 
@@ -489,6 +516,23 @@ class ThemeModel extends ProfileChangeNotifier {
   Color get messagesChatBgAppearanceDark {
     Color colorObj;
     colorObj = Color(Global.profile.themesDarkBg[themeDark]);
+    // colorObj = CupertinoColors.
+    return colorObj;
+  }
+
+  // 聊天页面背景颜色 themesBg 渐变色
+  Color get messagesChatBgAppearanceDay2 {
+    Color colorObj;
+    // logger.d(Global.profile.themesDayBg);
+    // logger.d(theme);
+    colorObj = Color(Global.profile.themesDayBg2[theme]);
+    // colorObj = CupertinoColors.
+    return colorObj;
+  }
+  // 聊天页面背景颜色 themesBg 渐变色
+  Color get messagesChatBgAppearanceDark2 {
+    Color colorObj;
+    colorObj = Color(Global.profile.themesDarkBg2[themeDark]);
     // colorObj = CupertinoColors.
     return colorObj;
   }

@@ -29,4 +29,5 @@ export 'add_member_page.dart';
 export 'call_video_test.dart';
 export 'edit_devices.dart';
 export 'chat_background.dart';
-export 'set_color.dart';
+export 'test_scrollable_list.dart';
+export 'blend_mode.dart';

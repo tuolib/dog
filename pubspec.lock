@@ -944,6 +944,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.23.1"
+  scrollable_positioned_list:
+    dependency: "direct main"
+    description:
+      name: scrollable_positioned_list
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.8"
   secure_application:
     dependency: "direct main"
     description:
@@ -1019,6 +1026,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  smooth_page_indicator:
+    dependency: "direct main"
+    description:
+      name: smooth_page_indicator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0"
   socket_io_client:
     dependency: "direct main"
     description:
@@ -1229,6 +1243,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.7.3"
+  worm_indicator:
+    dependency: "direct main"
+    description:
+      name: worm_indicator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.4"
   xdg_directories:
     dependency: transitive
     description:

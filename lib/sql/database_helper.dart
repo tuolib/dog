@@ -230,17 +230,17 @@ class DatabaseHelper {
   }
 
   _onUpgrade(Database db, int oldVersion, int newVersion) async {
-   await db.execute("DROP TABLE IF EXISTS $chatListTable");
-    await db.execute("DROP TABLE IF EXISTS $groupRoom");
-    await db.execute("DROP TABLE IF EXISTS $groupUser");
-    await db.execute("DROP TABLE IF EXISTS $groupMessage");
-    await db.execute("DROP TABLE IF EXISTS $contactsTable");
-    await db.execute("DROP TABLE IF EXISTS $userTable");
-    await db.execute("DROP TABLE IF EXISTS $fileTable");
-    await db.execute("DROP TABLE IF EXISTS $table");
-    await db.execute("DROP TABLE IF EXISTS $callTable");
-    await db.execute("DROP TABLE IF EXISTS $deviceTable");
-    await _onCreate(db, newVersion);
+   // await db.execute("DROP TABLE IF EXISTS $chatListTable");
+   //  await db.execute("DROP TABLE IF EXISTS $groupRoom");
+   //  await db.execute("DROP TABLE IF EXISTS $groupUser");
+   //  await db.execute("DROP TABLE IF EXISTS $groupMessage");
+   //  await db.execute("DROP TABLE IF EXISTS $contactsTable");
+   //  await db.execute("DROP TABLE IF EXISTS $userTable");
+   //  await db.execute("DROP TABLE IF EXISTS $fileTable");
+   //  await db.execute("DROP TABLE IF EXISTS $table");
+   //  await db.execute("DROP TABLE IF EXISTS $callTable");
+   //  await db.execute("DROP TABLE IF EXISTS $deviceTable");
+   //  await _onCreate(db, newVersion);
     if (oldVersion < newVersion) {
       // await db.execute("ALTER TABLE $groupRoom ADD COLUMN pts INTEGER DEFAULT 0");
 //      await db.execute('CREATE INDEX test_createdDate ON $groupMessage(createdDate)');

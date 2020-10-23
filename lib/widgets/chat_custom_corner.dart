@@ -1,16 +1,21 @@
 import '../index.dart';
+import 'dart:math';
 
 class ChatCustomCorner extends CustomPainter {
   final Color color;
   final Alignment alignment;
   final bool showCorner;
   final double radius;
+  final Color topColor;
+  final Color bottomColor;
 
   ChatCustomCorner({
     @required this.color,
     this.alignment,
     this.showCorner = true,
     this.radius = 16.0,
+    this.topColor,
+    this.bottomColor,
   });
 
   // var _radius = 10.0;
@@ -20,6 +25,18 @@ class ChatCustomCorner extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     double _corner = 8.0;
     double _radius;
+    Color _topColor;
+    Color _bottomColor;
+    if (topColor == null) {
+      _topColor = color;
+    } else {
+      _topColor = topColor;
+    }
+    if (bottomColor == null) {
+      _bottomColor = color;
+    } else {
+      _bottomColor = bottomColor;
+    }
     if (radius > 28) {
       _radius = 28;
     } else {
@@ -29,6 +46,7 @@ class ChatCustomCorner extends CustomPainter {
       _corner = radius;
     }
     if (alignment == Alignment.topRight) {
+      var rect = Offset.zero & size;
       canvas.drawRRect(
           RRect.fromLTRBAndCorners(
             0,
@@ -41,7 +59,15 @@ class ChatCustomCorner extends CustomPainter {
             topLeft: Radius.circular(_radius),
           ),
           Paint()
-            ..color = this.color
+            ..shader = LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            colors: [
+              _topColor,
+              _bottomColor,
+            ],
+          ).createShader(rect)
+            // ..color = this.color
             ..style = PaintingStyle.fill);
       var path = new Path();
       path.moveTo(size.width - _x, size.height - 20);
@@ -102,3 +128,13 @@ class ChatCustomCorner extends CustomPainter {
     return true;
   }
 }
+
+class UniqueColorGenerator {
+  static Random random = new Random();
+  static Color getColor() {
+    return Color.fromARGB(
+        255, random.nextInt(255), random.nextInt(255), random.nextInt(255));
+  }
+}
+
+

@@ -98,7 +98,7 @@ List themesDarkMessage = [
   Color.fromRGBO(255, 255, 255, 1).value,
 ];
 
-// dark模式 主题颜色对应聊天页面背景颜色
+// day模式 主题颜色对应聊天页面背景颜色
 List themesDayBg = [
   // 52, 120, 246 蓝色
   Color.fromRGBO(255, 255, 255, 1).value,
@@ -122,7 +122,7 @@ List themesDayBg = [
   Color.fromRGBO(255, 255, 255, 1).value,
 ];
 
-// light模式 主题颜色对应聊天页面背景颜色
+// dark模式 主题颜色对应聊天页面背景颜色
 List themesDarkBg = [
   Color.fromRGBO(0, 0, 0, 1).value,
   //87, 190, 232
@@ -144,6 +144,97 @@ List themesDarkBg = [
   //0, 0, 0
   Color.fromRGBO(0, 0, 0, 1).value,
 ];
+
+
+// day模式 主题颜色对应聊天页面背景颜色 渐变色
+List themesDayBg2 = [
+  // 52, 120, 246 蓝色
+  Color.fromRGBO(255, 255, 255, 1).value,
+  //87, 190, 232
+  Color.fromRGBO(255, 255, 255, 1).value,
+  // 89, 176, 64
+  Color.fromRGBO(255, 255, 255, 1).value,
+  //220, 115, 162
+  Color.fromRGBO(255, 255, 255, 1).value,
+  //225, 136, 50
+  Color.fromRGBO(255, 255, 255, 1).value,
+  // 143, 114, 231
+  Color.fromRGBO(255, 255, 255, 1).value,
+  //194, 65, 38
+  Color.fromRGBO(255, 255, 255, 1).value,
+  //228, 182, 62
+  Color.fromRGBO(255, 255, 255, 1).value,
+  //113, 130, 156
+  Color.fromRGBO(255, 255, 255, 1).value,
+  //255, 255, 255
+  Color.fromRGBO(255, 255, 255, 1).value,
+];
+
+// dark模式 主题颜色对应聊天页面背景颜色 渐变色
+List themesDarkBg2 = [
+  Color.fromRGBO(0, 0, 0, 1).value,
+  //87, 190, 232
+  Color.fromRGBO(0, 0, 0, 1).value,
+  // 89, 176, 64
+  Color.fromRGBO(0, 0, 0, 1).value,
+  //220, 115, 162
+  Color.fromRGBO(0, 0, 0, 1).value,
+  //225, 136, 50
+  Color.fromRGBO(0, 0, 0, 1).value,
+  // 143, 114, 231
+  Color.fromRGBO(0, 0, 0, 1).value,
+  //194, 65, 38
+  Color.fromRGBO(0, 0, 0, 1).value,
+  //228, 182, 62
+  Color.fromRGBO(0, 0, 0, 1).value,
+  //113, 130, 156
+  Color.fromRGBO(0, 0, 0, 1).value,
+  //0, 0, 0
+  Color.fromRGBO(0, 0, 0, 1).value,
+];
+
+// Map<int, Map> dayTheme = <int, Map>{
+//   0: {
+//     'primary': Color.fromRGBO(52, 120, 246, 1).value,
+//     'message': Color.fromRGBO(52, 120, 246, 1).value,
+//     'background': Color.fromRGBO(255, 255, 255, 1).value,
+//   },
+//   1: {
+//
+//   },
+//   2: {
+//
+//   },
+// };
+//
+// Map<int, Map> darkTheme = <int, Map>{
+//   0: {
+//     'primary': Color.fromRGBO(52, 120, 246, 1).value,
+//     'message': Color.fromRGBO(52, 120, 246, 1).value,
+//     'background': Color.fromRGBO(0, 0, 0, 1).value,
+//   },
+//   1: {
+//
+//   },
+//   2: {
+//
+//   },
+// };
+//
+// Map<int, Map> backgroundGradient = <int, Map>{
+//   0: {
+//     'primary': Color.fromRGBO(52, 120, 246, 1).value,
+//     'message': Color.fromRGBO(52, 120, 246, 1).value,
+//     'background': Color.fromRGBO(0, 0, 0, 1).value,
+//   },
+//   1: {
+//
+//   },
+//   2: {
+//
+//   },
+// };
+
 
 class Global {
   static SharedPreferences _prefs;
@@ -196,6 +287,17 @@ class Global {
       return profile.themesDarkBg == null ? themesDarkBg : profile.themesDarkBg;
     } else {
       return profile.themesDayBg == null ? themesDayBg : profile.themesDayBg;
+    }
+  }
+
+  // 可选的聊天页面背景主题列表 渐变色
+  static List get themesBg2 {
+    if (profile.themeMode == 1) {
+      return profile.themesDayBg2 == null ? themesDayBg : profile.themesDayBg2;
+    } else if (profile.themeMode == 2) {
+      return profile.themesDarkBg2 == null ? themesDarkBg : profile.themesDarkBg2;
+    } else {
+      return profile.themesDayBg2 == null ? themesDayBg : profile.themesDayBg2;
     }
   }
 
@@ -252,6 +354,12 @@ class Global {
           profile.themesDarkBg = themesDarkBg;
         }
         // logger.d(profile.themesDayBg);
+        if (profile.themesDayBg2 == null) {
+          profile.themesDayBg2 = themesDayBg2;
+        }
+        if (profile.themesDarkBg2 == null) {
+          profile.themesDarkBg2 = themesDarkBg2;
+        }
         saveProfile();
       } catch (e) {
         print(e);
@@ -263,6 +371,8 @@ class Global {
       profile.themesDarkMessage = themesDarkMessage;
       profile.themesDayBg = themesDayBg;
       profile.themesDarkBg = themesDarkBg;
+      profile.themesDayBg2 = themesDayBg2;
+      profile.themesDarkBg2 = themesDarkBg2;
     }
     voipToken = _prefs.getString("voipToken");
     firebaseToken = _prefs.getString("firebaseToken");

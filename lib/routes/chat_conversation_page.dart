@@ -16,9 +16,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-// import 'package:keyboard_utils/keyboard_utils.dart';
-// import 'package:keyboard_utils/keyboard_listener.dart';
-// import 'package:keyboard_utils/widgets.dart';
 
 int preOffset = 0;
 Timer getHistoryTime;
@@ -43,6 +40,7 @@ bool hasGetHistoryDownOver = false;
 bool afterBuilding = false;
 
 
+Timer shouldSetTimer;
 class Conversation extends StatefulWidget {
   final int groupId;
   final int contactId;
@@ -73,9 +71,6 @@ class Conversation extends StatefulWidget {
     this.newChatNumber,
   }) : super(key: key);
 
-//  AudioCoders({localFileSystem})
-//      : this.localFileSystem = localFileSystem ?? LocalFileSystem();
-
   @override
   _ConversationState createState() => _ConversationState();
 }
@@ -91,10 +86,6 @@ class _ConversationState extends State<Conversation> {
   bool theFirstTouchBeforeIsBig = false;
   bool showFloatButton = false;
 
-//  群详情 页面过渡动画
-  ContainerTransitionType _transitionType = ContainerTransitionType.fade;
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-
 // 是否发送过获取群消息
   bool isSendGroup = false;
 
@@ -104,7 +95,6 @@ class _ConversationState extends State<Conversation> {
 
 //  重置或删除录音
   bool _isResetRecord = true;
-  TextEditingController _controllerRecord = new TextEditingController();
   int secondsPassed = 0;
   String recodeTime = '00:00:00';
   Timer recodeTimeout;
@@ -163,11 +153,14 @@ class _ConversationState extends State<Conversation> {
 
   ThemeModel themeObj;
 
+  double scrollGradientTopHeight = 0;
+  double scrollGradientBottomHeight = 0;
+
   @override
   void initState() {
     super.initState();
     scrollWidgetList = [];
-    logger.d(1);
+    logger.d('init conver');
     //监听滚动事件，打印滚动位置
     _sliverController.addListener(() {
       FloatButtonModel fbModel =
@@ -185,7 +178,6 @@ class _ConversationState extends State<Conversation> {
     });
     //
     setTopLine();
-    // _bloc.start();
   }
 
   @override
@@ -199,18 +191,13 @@ class _ConversationState extends State<Conversation> {
     recodeTimeout?.cancel();
     _sliverController.dispose();
     _unameController.dispose();
-    // _bloc.dispose();
-
-//    if (_isRecording) {
-//      AudioRecorder.stop();
-//    }
   }
 
   @override
   Widget build(BuildContext context) {
     themeObj = Provider.of<ThemeModel>(context);
     pageContext = context;
-    addPeople = Provider.of<AddPeopleModel>(context, listen: false);
+    addPeople = Provider.of<AddPeopleModel>(context);
     socketProviderAddPeopleModel = addPeople;
     socketConnect = Provider.of<ConnectSocketModel>(context);
 
@@ -221,11 +208,13 @@ class _ConversationState extends State<Conversation> {
     chatInfo = Provider.of<ChatInfoModel>(context);
     conversionInfo = chatInfo.conversationInfo;
     socketProviderConversationListModelGroupId = conversionInfo['groupId'];
+
+    List conversationList = conversion.conversationList;
+    converList = conversationList;
+
     return Consumer<ConversationListModel>(
       builder: (BuildContext context,
           ConversationListModel conversationListModel, Widget child) {
-        List conversationList = conversationListModel.conversationList;
-        converList = conversationList;
         return GestureDetector(
           onTap: () {
             focusNode1.unfocus();
@@ -234,11 +223,39 @@ class _ConversationState extends State<Conversation> {
             backgroundColor: themeObj.messagesChatBg,
             appBar: _buildAppBar(),
             body: Container(
-              height: MediaQuery.of(context).size.height,
+              // height: MediaQuery.of(context).size.height,
               child: Column(
                 children: <Widget>[
                   Expanded(
-                    child: _buildListBox(conversationList),
+                    child: Stack(
+                      children: [
+                        // Positioned(
+                        //   // top: scrollGradientTopHeight,
+                        //   top: 0,
+                        //   left: -2,
+                        //   right: 0,
+                        //   // bottom: scrollGradientBottomHeight,
+                        //   bottom: 0,
+                        //   child: Container(
+                        //     // width: MediaQuery.of(context).size.width,
+                        //     // height: MediaQuery.of(context).size.height,
+                        //     decoration: BoxDecoration(
+                        //       gradient: LinearGradient(
+                        //         begin: Alignment.topCenter,
+                        //         end: Alignment.bottomCenter,
+                        //         colors: [
+                        //           Colors.pinkAccent,
+                        //           Colors.deepPurpleAccent,
+                        //           Colors.lightBlue,
+                        //         ],
+                        //       ),
+                        //     ),
+                        //     child: _buildListBox(conversationList),
+                        //   ),
+                        // ),
+                        _buildListBox(conversationList),
+                      ],
+                    ),
                   ),
                   _buildBottomInput(),
                 ],
@@ -285,13 +302,13 @@ class _ConversationState extends State<Conversation> {
 //      color: Colors.blue,
       child: floatButtonModel.showFloatButton
           ? FloatingActionButton(
-        child: Icon(
-          Icons.keyboard_arrow_down,
-          color: DataUtil.iosLightTextColor(),
-          size: 30,
-        ),
-        backgroundColor: themeObj.barBackgroundColor,
-        onPressed: () {
+              child: Icon(
+                Icons.keyboard_arrow_down,
+                color: DataUtil.iosLightTextColor(),
+                size: 30,
+              ),
+              backgroundColor: themeObj.barBackgroundColor,
+              onPressed: () {
 //          final double offset =
 //              DefaultStickyHeaderController.of(context).stickyHeaderScrollOffset;
 //          final double offset =
@@ -301,15 +318,15 @@ class _ConversationState extends State<Conversation> {
 //            duration: Duration(milliseconds: 300),
 //            curve: Curves.easeIn,
 //          );
-          _getHistoryDown(type: 1);
+                _getHistoryDown(type: 1);
 //                logger.d(_sliverController.position.extentBefore);
 //                _sliverController.animateTo(
 //                  -_sliverController.position.extentBefore,
 //                  duration: Duration(milliseconds: 500),
 //                  curve: Curves.easeIn,
 //                );
-        },
-      )
+              },
+            )
           : SizedBox(),
     );
   }
@@ -514,10 +531,10 @@ class _ConversationState extends State<Conversation> {
           double mW = MediaQuery.of(context).size.width;
           // logger.d(mH);
           // logger.d(mW);
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            floatAction.noti();
-            // Add Your Code here.
-          });
+          // WidgetsBinding.instance.addPostFrameCallback((_) {
+          //   floatAction.noti();
+          //   // Add Your Code here.
+          // });
           return Container(
             // height: 48,
             constraints: BoxConstraints(
@@ -719,10 +736,11 @@ class _ConversationState extends State<Conversation> {
                 border: Border(
                   top: BorderSide(
                     //                    <--- top side
-                    color: themeObj.borderColor,
+                    color: showInputTopLine
+                        ? themeObj.borderColor
+                        : themeObj.messagesChatBgBottom,
                     width: showInputTopLine ? 1.0 : 0,
-                    style:
-                    showInputTopLine ? BorderStyle.solid : BorderStyle.none,
+                    style: BorderStyle.solid,
                   ),
                 ),
               ),
@@ -737,15 +755,10 @@ class _ConversationState extends State<Conversation> {
     );
   }
 
-  List keyList = [];
-
   _buildListBox(List conversationList) {
     if (conversationList.length == 0) {
       return SizedBox();
     }
-    keyList = [];
-//    ArrayUtil.sortArray(conversationList,
-//        sortOrder: 0, property: 'createdDate');
     const Key centerKey = ValueKey('second-sliver-list');
     List slivers = <Widget>[];
     List sliversNew = <Widget>[];
@@ -799,27 +812,15 @@ class _ConversationState extends State<Conversation> {
     for (var m = 0; m < typeArrayNew.length; m++) {
       if (typeArrayNew[m].length > 0) {
         sliversNew.insert(
-            0,
-            _buildStickyList(typeArrayNew[m],
-                conversationList: conversationList));
+          0,
+          _buildStickyList(
+            typeArrayNew[m],
+            conversationList: conversationList,
+          ),
+        );
       }
     }
 
-//    for (var i = 0; i < conversationList.length; i++) {
-//      Map msg = conversationList[i];
-//      if (isFirstMessage(conversationList, msg, i)) {
-//        typeArray.add([]);
-//        count = count + 1;
-//      }
-//      typeArray[count - 1].add(conversationList[i]);
-//    }
-//    for (var m = 0; m < typeArray.length; m++) {
-//      if (typeArray[m].length > 0) {
-//
-//        slivers.add(_buildStickyList(typeArray[m],
-//            conversationList: conversationList));
-//      }
-//    }
     return Listener(
       onPointerUp: (PointerEvent details) => _onPointerUp(details),
       onPointerDown: (PointerEvent details) {
@@ -832,9 +833,11 @@ class _ConversationState extends State<Conversation> {
         onNotification: _onNotify,
         child: Scrollbar(
           child: CustomScrollView(
+            // primary: true,
             controller: _sliverController,
-//            physics: AlwaysScrollableScrollPhysics(),
+            //            physics: AlwaysScrollableScrollPhysics(),
             physics: BouncingScrollPhysics(),
+            // physics: ClampingScrollPhysics(),
             scrollDirection: Axis.vertical,
             reverse: true,
             center: centerKey,
@@ -853,8 +856,9 @@ class _ConversationState extends State<Conversation> {
                                   height: 30.0,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor:
-                                        AlwaysStoppedAnimation(Colors.blue),
+                                    valueColor: AlwaysStoppedAnimation(
+                                      themeObj.primaryColor,
+                                    ),
                                   ),
                                 )
                               : SizedBox(),
@@ -867,12 +871,12 @@ class _ConversationState extends State<Conversation> {
                 key: centerKey,
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-//                  return Container(
-//                    alignment: Alignment.center,
-//                    color: Colors.green[200 + bottom[index] % 4 * 100],
-//                    height: 100 + bottom[index] % 4 * 20.0,
-//                    child: Text('Item: ${bottom[index]}'),
-//                  );
+                    //                  return Container(
+                    //                    alignment: Alignment.center,
+                    //                    color: Colors.green[200 + bottom[index] % 4 * 100],
+                    //                    height: 100 + bottom[index] % 4 * 20.0,
+                    //                    child: Text('Item: ${bottom[index]}'),
+                    //                  );
                     return SizedBox();
                   },
                   childCount: 1,
@@ -892,7 +896,9 @@ class _ConversationState extends State<Conversation> {
                             height: 30.0,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation(Colors.blue),
+                              valueColor: AlwaysStoppedAnimation(
+                                themeObj.primaryColor,
+                              ),
                             ),
                           )
                         : SizedBox(),
@@ -916,32 +922,13 @@ class _ConversationState extends State<Conversation> {
         showAvatar = true;
       }
     }
-//    return SliverList(
-//      delegate: SliverChildBuilderDelegate(
-//            (BuildContext context, int index) {
-//          var item = list[index];
-////                  logger.d(item);
-//          int countIndex;
-//          for (var m = 0; m < conversationList.length; m++) {
-//            if (item['createdDate'] == conversationList[m]['createdDate'] &&
-//                item['timestamp'] == conversationList[m]['timestamp']) {
-//              countIndex = m;
-//            }
-//          }
-////              logger.d(countIndex);
-//          return _buildItem(conversationList, countIndex,
-//              showAvatarParent: showAvatar);
-//        },
-//        childCount: list.length,
-//      ),
-//    );
     return SliverStickyHeader(
       controller: _stickyHeaderController,
       sticky: true,
       overlapsContent: true,
       header: _buildStickyHeader(senderId, showAvatar: showAvatar),
       sliver: SliverPadding(
-        padding: EdgeInsets.only(left: showAvatar ? 40 : 2),
+        padding: EdgeInsets.only(left: showAvatar ? 40 : 0),
         sliver: SliverList(
           delegate: SliverChildBuilderDelegate(
             (BuildContext context, int index) {
@@ -954,7 +941,6 @@ class _ConversationState extends State<Conversation> {
                   countIndex = m;
                 }
               }
-//              logger.d(countIndex);
               return _buildItem(conversationList, countIndex,
                   showAvatarParent: showAvatar);
             },
@@ -966,24 +952,6 @@ class _ConversationState extends State<Conversation> {
   }
 
   _buildStickyHeader(senderId, {int index, bool showAvatar}) {
-    //    var avatarW = widget.isGroup
-//        ? widget.isMe
-//            ? SizedBox()
-//            : widget.showAvatar
-//                ? AvatarWidget(
-//                    avatarUrl: '',
-//                    avatarLocal: '',
-//                    firstName: 'firstName',
-//                    lastName: 'lastName',
-//                    colorId: 0,
-//                    width: 36,
-//                    height: 36,
-//                    fontSize: 16,
-//                  )
-//                : SizedBox(
-//                    width: 36.0,
-//                  )
-//        : SizedBox();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
       child: Align(
@@ -1023,6 +991,9 @@ class _ConversationState extends State<Conversation> {
     }
     afterBuild();
     return ChatBubble(
+      // stream: streamEvent,
+      // key: chatBubbleKey,
+      // streamController: streamController,
       callback: callback,
       message: msg['contentType'] == 1 ? msg['content'] : msg['contentUrl'],
       content: msg['content'],
@@ -1052,14 +1023,9 @@ class _ConversationState extends State<Conversation> {
       contentId: msg['contentId'],
       id: msg['id'],
       timestamp: msg['timestamp'],
+      topColor: msg['topColor'],
+      bottomColor: msg['bottomColor'],
     );
-  }
-
-  void _showMarkedAsDoneSnackbar(bool isMarkedAsDone) {
-    if (isMarkedAsDone ?? false)
-      scaffoldKey.currentState.showSnackBar(const SnackBar(
-        content: Text('Marked as done!'),
-      ));
   }
 
   bool isFirstMessage(List list, Map item, int index) {
@@ -1174,6 +1140,7 @@ class _ConversationState extends State<Conversation> {
   }
 
   callback(index, property, filePath) {
+    logger.d('callback');
     conversion.updateListItem(index, property, filePath);
   }
 
@@ -1230,7 +1197,6 @@ class _ConversationState extends State<Conversation> {
       if (!isPermissionStatusGranted2) return;
       file = await getCamera(other);
     } else {
-//      print('fileType: $fileType');
 //    if (fileType == 'custom')
 
       final isPermissionStatusGranted = await Git(context).requestPermissions();
@@ -1239,7 +1205,6 @@ class _ConversationState extends State<Conversation> {
       await _openFileExplorer();
       file = _path;
     }
-    print('file$file');
 
     if (file == null) return;
 
@@ -1278,7 +1243,6 @@ class _ConversationState extends State<Conversation> {
   Future _openFileExplorer() async {
     setState(() => _loadingPath = true);
     try {
-      print('_multiPick: $_multiPick');
       if (_multiPick) {
         _path = null;
         _paths = await FilePicker.getMultiFilePath(
@@ -1299,9 +1263,7 @@ class _ConversationState extends State<Conversation> {
         groupId: socketProviderConversationListModelGroupId,
         filePath: _path,
       );
-    } on PlatformException catch (e) {
-      print("Unsupported operation" + e.toString());
-    }
+    } on PlatformException catch (e) {}
     if (!mounted) return;
     setState(() {
       _loadingPath = false;
@@ -1321,13 +1283,10 @@ class _ConversationState extends State<Conversation> {
     } else if (type == 'video') {
       pickedFile = await picker.getVideo(source: ImageSource.camera);
     }
-    print('pickedFile: $pickedFile');
     if (pickedFile != null) {
       setState(() {
         _filePath = pickedFile.path;
         _image = File(pickedFile.path);
-        print('_filePath: $_filePath');
-        print('_image: $_image');
 //        var isImage = false;
 //        var isVideo = false;
 //        if (type == 'camera') {
@@ -1351,8 +1310,8 @@ class _ConversationState extends State<Conversation> {
     final f = File(filePath);
     int sizeInBytes = f.lengthSync();
     double sizeInMb = sizeInBytes / (1024 * 1024);
-    print('file path: $filePath');
-    print('file size: $sizeInMb MB');
+    logger.d('file path: $filePath');
+    logger.d('file size: $sizeInMb MB');
     if (sizeInMb > 1024) {
       // This file is Longer the
       showToast('Please send files up to 1G');
@@ -1367,22 +1326,22 @@ class _ConversationState extends State<Conversation> {
     var isVideo = false;
     var isAudio = false;
     String mimeStr = lookupMimeType(filePath);
-    print('mimeStr: $mimeStr');
+    logger.d('mimeStr: $mimeStr');
     if (mimeStr != null) {
       var fileTypeStr = mimeStr.split('/');
-      print('file type $fileTypeStr');
-      print('file type0 ${fileTypeStr[0]}');
+      logger.d('file type $fileTypeStr');
+      logger.d('file type0 ${fileTypeStr[0]}');
       if (fileTypeStr[0] == 'image') {
         isImage = true;
-        print('file isImage ${fileTypeStr[0]}');
+        logger.d('file isImage ${fileTypeStr[0]}');
       }
       if (fileTypeStr[0] == 'video') {
         isVideo = true;
-        print('file isVideo ${fileTypeStr[0]}');
+        logger.d('file isVideo ${fileTypeStr[0]}');
       }
       if (fileTypeStr[0] == 'audio') {
         isAudio = true;
-        print('file isAudio ${fileTypeStr[0]}');
+        logger.d('file isAudio ${fileTypeStr[0]}');
       }
     }
     if (fileDeter == 'audio') {
@@ -1422,7 +1381,7 @@ class _ConversationState extends State<Conversation> {
     };
     conversionBox.insertFirst(chatObj);
     var res = Git(context).uploadFile(filePath, chatObj: chatObj).then((value) {
-      print('Git back: $value');
+      logger.d('Git back: $value');
     });
   }
 
@@ -1561,20 +1520,7 @@ class _ConversationState extends State<Conversation> {
         downloading: 0,
       );
       await dbHelper.groupMessageAdd(groupMessageInsert);
-//      var updateObj = {
-//        'senderId': Global.profile.user.userId,
-//        'sendName': Global.profile.user.firstName,
-//        'createdDate': chatObj['createdDate'],
-//        'content': chatObj['content'],
-//        'contentName': chatObj['contentName'],
-//        'contentType': chatObj['contentType'],
-//        'timestamp': chatObj['timestamp'],
-//        'sending': true,
-//        'messageId': chatObj['id'],
-//      };
       socketProviderChatListModel.updateItemPropertyMultiple(groupId, chatObj);
-//      _sliverController.jumpTo(-140);
-//      logger.d(keyList[keyList.length - 1]['id']);
       SocketIoEmit.messageSend(
         groupId: chatObj['groupId'],
         contactId: chatObj['contactId'],
@@ -1617,7 +1563,7 @@ class _ConversationState extends State<Conversation> {
     try {
       var filePath;
       String path;
-//      print('isPermissionStatusGranted: $isPermissionStatusGranted');
+//      logger.d('isPermissionStatusGranted: $isPermissionStatusGranted');
       bool isPermissionStatusGranted = await AudioRecorder.hasPermissions;
       if (isPermissionStatusGranted) {
         logger.d(_recording.path);
@@ -1632,7 +1578,7 @@ class _ConversationState extends State<Conversation> {
 //            '.aac';
 ////          path = appDocDirectory.path +
 ////              '/' + _recording.path;
-//          print("Start recording: $path");
+//          logger.d("Start recording: $path");
 //          await AudioRecorder.start(
 //            path: path,
 ////          audioOutputFormat: AudioOutputFormat.AAC,
@@ -1672,7 +1618,7 @@ class _ConversationState extends State<Conversation> {
             '.aac';
 //          path = appDocDirectory.path +
 //              '/' + _recording.path;
-        print("Start recording: $path");
+        logger.d("Start recording: $path");
         await AudioRecorder.start(
           path: path,
           audioOutputFormat: AudioOutputFormat.AAC,
@@ -1698,6 +1644,7 @@ class _ConversationState extends State<Conversation> {
           setState(() {
             recodeTime = h + ':' + m + ':' + s;
           });
+          logger.d('recodeTimeout');
         });
       } else {
 //        showToast('You must accept audio permissions');
@@ -1706,16 +1653,16 @@ class _ConversationState extends State<Conversation> {
             await Git(context).requestAudioPermissions();
       }
     } catch (e) {
-      print(e);
+      logger.d(e);
     }
   }
 
   _stop() async {
     var recording = await AudioRecorder.stop();
-    print("Stop recording: ${recording.path}");
+    logger.d("Stop recording: ${recording.path}");
     bool isRecording = await AudioRecorder.isRecording;
     File file = File(recording.path);
-    print("  File length: ${await file.length()}");
+    logger.d("  File length: ${await file.length()}");
     setState(() {
       _recording = recording;
       _isRecording = isRecording;
@@ -1730,9 +1677,9 @@ class _ConversationState extends State<Conversation> {
     if (isRecording) {
       AudioRecorder?.stop();
     }
-    print('isRecording: $isRecording');
+    logger.d('isRecording: $isRecording');
     var recodePath = _recording.path;
-    print('recodePath: $recodePath');
+    logger.d('recodePath: $recodePath');
     setState(() {
       _isResetRecord = true;
       _isRecording = false;
@@ -1756,18 +1703,16 @@ class _ConversationState extends State<Conversation> {
         } else {
           _scrollPosition();
         }
-//        _getHistoryUp();
-//        _getHistoryDown();
       }
     });
   }
 
-//  保存滚动位置
+
   _scrollPosition() async {
+    // _setColor();
     const timeout = Duration(milliseconds: 30);
     saveHistoryTime?.cancel();
     saveHistoryTime = Timer(timeout, () {
-//      logger.d('key len ${scrollWidgetList.length}');
       var scrollArr = [];
       double positionMax = 0;
       double maxHeight = 850;
@@ -1791,10 +1736,6 @@ class _ConversationState extends State<Conversation> {
           }
         }
       }
-//      logger.d(scrollArr.join(','));
-//      logger.d(scrollArr.length);
-//      logger.d(positionMax);
-//      logger.d(positionMaxItem['id']);
       if (positionMaxItem == null) {
         _resetSavePosition();
         return;
@@ -1803,6 +1744,7 @@ class _ConversationState extends State<Conversation> {
     });
   }
 
+//  保存滚动位置
   _savePosition(Map<String, dynamic> positionMaxItem) async {
     int extentAfterId = 0;
     double extentAfter = 0;
@@ -1826,6 +1768,8 @@ class _ConversationState extends State<Conversation> {
     if (extentBefore < 30) {
       extentBefore = 0;
       extentBeforeId = 0;
+    } else {
+      extentBefore += 1;
     }
     chatInfoModelSocket.saveChatPosition(
       groupId: conversionInfo['groupId'],
@@ -1879,10 +1823,11 @@ class _ConversationState extends State<Conversation> {
       "extentAfterId": extentAfterId,
       "extentBeforeId": extentBeforeId,
     });
-    logger.d(saveInfo);
+    // logger.d(saveInfo);
   }
 
   bool _onNotify(ScrollNotification notification) {
+    // _setScrollGradient(notification);
     double left =
         notification.metrics.maxScrollExtent - notification.metrics.pixels;
     if (hasJumpLastPosition) {
@@ -1899,15 +1844,6 @@ class _ConversationState extends State<Conversation> {
     if (!hasGetHistoryUp && !hasGetHistoryUpOver) {
       hasGetHistoryUp = true;
       int offsetDate = converList[converList.length - 1]['createdDate'];
-//      for (var i = 0; i < converList.length; i++) {
-//        if (i == 0) {
-//          offsetDate = converList[i]['createdDate'];
-//        } else {
-//          if (converList[i]['createdDate'] < offsetDate) {
-//            offsetDate = converList[i]['createdDate'];
-//          }
-//        }
-//      }
       if (offsetDate != preOffset) {
         preOffset = offsetDate;
         socketProviderConversationListModel.getConversationList(
@@ -1919,14 +1855,6 @@ class _ConversationState extends State<Conversation> {
           contactId: conversionInfo['contactId'],
           groupType: conversionInfo['groupType'],
         );
-//        const timeout = Duration(milliseconds: 2000);
-//        Timer(timeout, () {
-//          preOffset = 0;
-//        });
-//        getHistoryTime?.cancel();
-//        getHistoryTime = Timer(timeout, () {
-//          logger.d('11111111111111111111111111111111111111');
-//        });
       }
     }
   }
@@ -1963,18 +1891,21 @@ class _ConversationState extends State<Conversation> {
 //      _sliverController.position
 //          .jumpTo(-_sliverController.position.extentBefore);
 
-//      final double offset =
+//      double offset =
 //          _stickyHeaderController.stickyHeaderScrollOffset;
 //      logger.d(offset);
-      _sliverController.position
-          .jumpTo(-_sliverController.position.extentBefore);
-//      _sliverController.animateTo(
-//        -offset,
-//        duration: Duration(milliseconds: 1000),
-//        curve: Curves.ease,
-//      );
+      double offset = _sliverController.position.extentBefore;
+//       double offset = _sliverController.position.maxScrollExtent;
+      logger.d(_sliverController.position.maxScrollExtent);
+      logger.d('offset: $offset');
+      _sliverController.position.jumpTo(-offset);
+      // _sliverController.animateTo(
+      //   -offset,
+      //   duration: Duration(milliseconds: 1000),
+      //   curve: Curves.ease,
+      // );
       if (!sameLast) {
-        await Future.delayed(Duration(milliseconds: 1000));
+        await Future.delayed(Duration(milliseconds: 2000));
         socketProviderConversationListModel.removeRangeList(
             40, converList.length);
       }
@@ -2055,43 +1986,84 @@ class _ConversationState extends State<Conversation> {
         Provider.of<FloatButtonModel>(context, listen: false);
     fbModel.setTopLine(false, noti: false);
   }
+
+
+
+
+  bool shouldSet = true;
+
+  int addNum = 0;
+  _setColor() {
+    // logger.d('set color');
+    if (shouldSet) {
+      shouldSet = false;
+
+      const timeout = Duration(milliseconds: 30);
+
+      shouldSetTimer = Timer(timeout, () {
+        addNum += 1;
+        logger.d(addNum);
+        saveHistoryTime?.cancel();
+        shouldSet = true;
+        // List colors = [Colors.red, Colors.green, Colors.yellow];
+        // Random random = new Random();
+
+        // int index = 0;
+        double totalHeight = 0;
+        // 自己发消息颜色背景设置
+        for (var s = 0; s < scrollWidgetList.length; s++) {
+          totalHeight += scrollWidgetList[s]['height'];
+          // index = random.nextInt(3);
+          // if (scrollWidgetList[s]['key']?.currentContext != null) {
+          //   // scrollArr.add(scrollWidgetList[s]['id']);
+          //   RenderBox renderBoxRed =
+          //   scrollWidgetList[s]['key']?.currentContext?.findRenderObject();
+          //   var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
+          //   logger.d(positionsRed.dy);
+          //   logger.d('${scrollWidgetList[s]['height']}');
+          //   // if (positionMax < positionsRed.dy && maxHeight >= positionsRed.dy) {
+          //   //   positionMax = positionsRed.dy;
+          //   //   positionMaxItem = {
+          //   //     "key": scrollWidgetList[s]['key'],
+          //   //     "id": scrollWidgetList[s]['id'],
+          //   //     "dy": positionsRed.dy,
+          //   //     "height": scrollWidgetList[s]['height'],
+          //   //     "createdDate": scrollWidgetList[s]['createdDate'],
+          //   //     "timestamp": scrollWidgetList[s]['timestamp'],
+          //   //   };
+          //   // }
+          // }
+        }
+
+        double preHeight = 0;
+        Color startColor = Colors.blue;
+        Color endColor = Colors.red;
+        for (var s = 0; s < scrollWidgetList.length; s++) {
+
+          double currentHeight = scrollWidgetList[s]['height'];
+          // 此widget 开始的高度
+          final double startH = preHeight / totalHeight;
+          preHeight += scrollWidgetList[s]['height'];
+          // 此widget 结束高度
+          final double endH = preHeight / totalHeight;
+          // 使用开始颜色
+          Color lastStartValue;
+          // 使用结束颜色
+          Color lastEndValue;
+
+          lastStartValue = Color.lerp(startColor, endColor, startH);
+          lastEndValue = Color.lerp(startColor, endColor, endH);
+          conversion.updateMultipleItem(
+            [scrollWidgetList[s]],
+            lastStartValue,
+            lastEndValue,
+          );
+        }
+        conversion.noti();
+
+      });
+    }
+
+
+  }
 }
-
-
-// class KeyboardBloc {
-//   KeyboardUtils _keyboardUtils = KeyboardUtils();
-//   StreamController<double> _streamController = StreamController<double>();
-//
-//   Stream<double> get stream => _streamController.stream;
-//
-//   KeyboardUtils get keyboardUtils => _keyboardUtils;
-//
-//   bool _willShow = false;
-//
-//   bool get willShow => _willShow;
-//
-//   int _idKeyboardListener;
-//
-//   void start() {
-//     _idKeyboardListener = _keyboardUtils.add(
-//       listener: KeyboardListener(
-//         willHideKeyboard: () {
-//           _willShow = false;
-//           _streamController.sink.add(_keyboardUtils.keyboardHeight);
-//         },
-//         willShowKeyboard: (double keyboardHeight) {
-//           _willShow = true;
-//           _streamController.sink.add(keyboardHeight);
-//         },
-//       ),
-//     );
-//   }
-//
-//   void dispose() {
-//     _keyboardUtils.unsubscribeListener(subscribingId: _idKeyboardListener);
-//     if (_keyboardUtils.canCallDispose()) {
-//       _keyboardUtils.dispose();
-//     }
-//     _streamController.close();
-//   }
-// }
