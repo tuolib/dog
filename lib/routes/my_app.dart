@@ -84,6 +84,10 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => DeviceModel(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => ConversationScrollModel(),
+        ),
+
       ],
       child: Consumer2<ThemeModel, LocaleModel>(
         builder: (BuildContext context, themeModel, localeModel, Widget child) {

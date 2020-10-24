@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'dart:math';
 import '../index.dart';
 
 class DataUtil {
@@ -79,7 +80,7 @@ class DataUtil {
   // 自己消息背景 themesMessage
   static Color messagesColor() {
     Color colorValue;
-    colorValue = Color(Global.themesMessage[Global.profile.theme]);
+    colorValue = Color(Global.themes[Global.profile.theme]['message']);
     return colorValue;
   }
 
@@ -102,7 +103,7 @@ class DataUtil {
   // 聊天页面背景颜色 themesBg
   static Color messagesChatBg() {
     Color colorValue;
-    colorValue = Color(Global.themesBg[Global.profile.theme]);
+    colorValue = Color(Global.themes[Global.profile.theme]['background']);
     // colorValue = CupertinoColors.
     return colorValue;
   }
@@ -201,6 +202,13 @@ class DataUtil {
   static int calcRanks(ranks) {
     double multiplier = .5;
     return (multiplier * ranks).round();
+  }
+
+  static Color randomColor() {
+
+    List colors = [Colors.red, Colors.green, Colors.yellow];
+    Random random = new Random();
+    return colors[random.nextInt(3)];
   }
 
 }

@@ -146,7 +146,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
 
   _buildChatList(context, index) {
     if (index == 0) {
-      return ChatBubble(
+      return ChatBubbleWidget(
         callback: callback,
         message: 'Do you know what time it is?',
         content: 'Do you know what time it is?',
@@ -178,7 +178,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
         timestamp: 1601108277901,
       );
     } else {
-      return ChatBubble(
+      return ChatBubbleWidget(
         callback: callback,
         message: "It's morning in Tokyo",
         content: "It's morning in Tokyo",
@@ -422,7 +422,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
     for (var i = 0; i < myList.length; i++) {
       var item = Container(
         // height: 200,
-        child: _colorItem(myList[i], i),
+        child: _colorItem(myList[i]['primary'], i),
       );
       allMember.add(item);
     }
@@ -469,14 +469,14 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
     int litterValue;
     if (Global.profile.themeMode == 1) {
       themeIndex = themeObj.theme;
-      litterValue = Global.profile.themesDayMessage[index];
+      litterValue = Global.profile.dayList[index]['message'];
       litterCirBg = Color(litterValue);
       if (index == themeObj.theme) {
         selected = true;
       }
     } else if (Global.profile.themeMode == 2) {
       themeIndex = themeObj.themeDark;
-      litterValue = Global.profile.themesDarkMessage[index];
+      litterValue = Global.profile.darkList[index]['message'];
       litterCirBg = Color(litterValue);
       if (index == themeObj.themeDark) {
         selected = true;

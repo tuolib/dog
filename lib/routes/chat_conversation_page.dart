@@ -156,6 +156,8 @@ class _ConversationState extends State<Conversation> {
   double scrollGradientTopHeight = 0;
   double scrollGradientBottomHeight = 0;
 
+  bool hasInitColor = false;
+
   @override
   void initState() {
     super.initState();
@@ -177,7 +179,16 @@ class _ConversationState extends State<Conversation> {
       _scrollPosition();
     });
     //
-    setTopLine();
+
+    // WidgetsBinding.instance.addPostFrameCallback(_initColor());
+    // _setColor();
+  }
+  _initColor() {
+    if (!hasInitColor) {
+      hasInitColor = true;
+      _setColor();
+      setTopLine();
+    }
   }
 
   @override
@@ -191,10 +202,18 @@ class _ConversationState extends State<Conversation> {
     recodeTimeout?.cancel();
     _sliverController.dispose();
     _unameController.dispose();
+    hasInitColor = false;
+    // scrollWidgetList = [];
+    // var scrollModel = Provider.of<ConversationScrollModel>(context, listen: false);
+    // scrollModel.updateScrollList([], noti: false);
   }
 
   @override
   Widget build(BuildContext context) {
+    // if (mounted) {
+    //   _initColor();
+    // }
+    _initColor();
     themeObj = Provider.of<ThemeModel>(context);
     pageContext = context;
     addPeople = Provider.of<AddPeopleModel>(context);
@@ -229,31 +248,31 @@ class _ConversationState extends State<Conversation> {
                   Expanded(
                     child: Stack(
                       children: [
-                        // Positioned(
-                        //   // top: scrollGradientTopHeight,
-                        //   top: 0,
-                        //   left: -2,
-                        //   right: 0,
-                        //   // bottom: scrollGradientBottomHeight,
-                        //   bottom: 0,
-                        //   child: Container(
-                        //     // width: MediaQuery.of(context).size.width,
-                        //     // height: MediaQuery.of(context).size.height,
-                        //     decoration: BoxDecoration(
-                        //       gradient: LinearGradient(
-                        //         begin: Alignment.topCenter,
-                        //         end: Alignment.bottomCenter,
-                        //         colors: [
-                        //           Colors.pinkAccent,
-                        //           Colors.deepPurpleAccent,
-                        //           Colors.lightBlue,
-                        //         ],
-                        //       ),
+                        // Container(
+                        //   decoration: BoxDecoration(
+                        //     gradient: LinearGradient(
+                        //       begin: Alignment.topCenter,
+                        //       end: Alignment.bottomCenter,
+                        //       colors: [
+                        //         Colors.lightBlue,
+                        //         Colors.deepPurpleAccent,
+                        //         Colors.pinkAccent,
+                        //       ],
                         //     ),
-                        //     child: _buildListBox(conversationList),
+                        //   ),
+                        // ),
+                        // Container(
+                        //   // width: MediaQuery.of(context).size.width,
+                        //   // height: MediaQuery.of(context).size.height,
+                        //   decoration: BoxDecoration(
+                        //     image: DecorationImage(
+                        //       image: AssetImage('assets/cm4.jpeg'),
+                        //       fit: BoxFit.fill,
+                        //     ),
                         //   ),
                         // ),
                         _buildListBox(conversationList),
+
                       ],
                     ),
                   ),
@@ -845,32 +864,32 @@ class _ConversationState extends State<Conversation> {
               SliverToBoxAdapter(
                 child: !hasGetHistoryDownOver
                     ? Align(
-                        alignment: Alignment.center,
-                        child: Container(
-                          padding: EdgeInsets.all(4),
-                          height: 40.0,
-                          width: 40.0,
-                          child: !hasGetHistoryDownOver
-                              ? SizedBox(
-                                  width: 30,
-                                  height: 30.0,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation(
-                                      themeObj.primaryColor,
-                                    ),
-                                  ),
-                                )
-                              : SizedBox(),
+                  alignment: Alignment.center,
+                  child: Container(
+                    padding: EdgeInsets.all(4),
+                    height: 40.0,
+                    width: 40.0,
+                    child: !hasGetHistoryDownOver
+                        ? SizedBox(
+                      width: 30,
+                      height: 30.0,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation(
+                          themeObj.primaryColor,
                         ),
-                      )
+                      ),
+                    )
+                        : SizedBox(),
+                  ),
+                )
                     : SizedBox(),
               ),
               ...sliversNew,
               SliverList(
                 key: centerKey,
                 delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
+                      (BuildContext context, int index) {
                     //                  return Container(
                     //                    alignment: Alignment.center,
                     //                    color: Colors.green[200 + bottom[index] % 4 * 100],
@@ -892,21 +911,22 @@ class _ConversationState extends State<Conversation> {
                     width: 40.0,
                     child: !hasGetHistoryUpOver
                         ? SizedBox(
-                            width: 30,
-                            height: 30.0,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation(
-                                themeObj.primaryColor,
-                              ),
-                            ),
-                          )
+                      width: 30,
+                      height: 30.0,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation(
+                          themeObj.primaryColor,
+                        ),
+                      ),
+                    )
                         : SizedBox(),
                   ),
                 ),
               ),
             ],
           ),
+
         ),
       ),
     );
@@ -990,7 +1010,21 @@ class _ConversationState extends State<Conversation> {
       showDate = true;
     }
     afterBuild();
-    return ChatBubble(
+    Color topColor;
+    Color bottomColor;
+    var scrollModel = Provider.of<ConversationScrollModel>(context, listen: false);
+    List scrollList = scrollModel.scrollList;
+    if (scrollList.length != 0 && msg['isMe']) {
+      // ArrayUtil.sortArray(scrollWidgetList, sortOrder: 1, property: 'timestamp');
+      // logger.d(' time da xiao ${scrollList[scrollList.length - 1]['timestamp'] - msg['timestamp']}');
+      // logger.d('msg time : ${msg['timestamp']}');
+      if (msg['timestamp'] <= scrollList[scrollList.length - 1]['timestamp']) {
+        topColor = Colors.blue;
+      } else {
+        topColor = Colors.red;
+      }
+    }
+    return ChatBubbleWidget(
       // stream: streamEvent,
       // key: chatBubbleKey,
       // streamController: streamController,
@@ -1023,8 +1057,10 @@ class _ConversationState extends State<Conversation> {
       contentId: msg['contentId'],
       id: msg['id'],
       timestamp: msg['timestamp'],
-      topColor: msg['topColor'],
-      bottomColor: msg['bottomColor'],
+      // topColor: msg['topColor'],
+      // bottomColor: msg['bottomColor'],
+      topColor: topColor,
+      bottomColor: topColor,
     );
   }
 
@@ -1141,6 +1177,7 @@ class _ConversationState extends State<Conversation> {
 
   callback(index, property, filePath) {
     logger.d('callback');
+
     conversion.updateListItem(index, property, filePath);
   }
 
@@ -1709,7 +1746,7 @@ class _ConversationState extends State<Conversation> {
 
 
   _scrollPosition() async {
-    // _setColor();
+    _setColor();
     const timeout = Duration(milliseconds: 30);
     saveHistoryTime?.cancel();
     saveHistoryTime = Timer(timeout, () {
@@ -1988,78 +2025,115 @@ class _ConversationState extends State<Conversation> {
   }
 
 
-
-
   bool shouldSet = true;
 
   int addNum = 0;
   _setColor() {
     // logger.d('set color');
+    // return;
+    double mediaHeight = MediaQuery.of(context).size.height - 48;
+    var scrollModel = Provider.of<ConversationScrollModel>(context, listen: false);
+    // List scrollList = scrollModel.scrollList;
+
     if (shouldSet) {
       shouldSet = false;
 
-      const timeout = Duration(milliseconds: 30);
+      var timeout = Duration(milliseconds: 100);
 
       shouldSetTimer = Timer(timeout, () {
+        bool hasSelf = false;
+        for (var s = 0; s < scrollWidgetList.length; s++) {
+          if (scrollWidgetList[s]['isMe'] == true) {
+            hasSelf = true;
+            // print(scrollWidgetList[s]['content']);
+            break;
+          }
+        }
+        if (hasSelf) {
+          List sList = [];
+          for (var s = 0; s < scrollWidgetList.length; s++) {
+            var scrollW = scrollWidgetList[s];
+            if (scrollW['key']?.currentContext != null) {
+              // scrollArr.add(scrollList[s]['id']);
+              RenderBox renderBoxRed =
+              scrollW['key']?.currentContext?.findRenderObject();
+              var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
+              if (positionsRed.dy >= 0 && positionsRed.dy <= mediaHeight) {
+                sList.add(scrollW);
+              }
+              // logger.d('${scrollW['content']}');
+              // logger.d('dy: ${positionsRed.dy}');
+              // logger.d('height: ${scrollW['height']}');
+            }
+          }
+          // logger.d('sList.length: ${sList.length}');
+          scrollModel.updateScrollList(sList);
+          // print('update');
+        }
+
         addNum += 1;
-        logger.d(addNum);
-        saveHistoryTime?.cancel();
+        // logger.d('addNum: $addNum');
+        // print('scrollWidgetList: ${scrollWidgetList.length}');
+        shouldSetTimer?.cancel();
         shouldSet = true;
         // List colors = [Colors.red, Colors.green, Colors.yellow];
         // Random random = new Random();
 
         // int index = 0;
-        double totalHeight = 0;
-        // 自己发消息颜色背景设置
-        for (var s = 0; s < scrollWidgetList.length; s++) {
-          totalHeight += scrollWidgetList[s]['height'];
-          // index = random.nextInt(3);
-          // if (scrollWidgetList[s]['key']?.currentContext != null) {
-          //   // scrollArr.add(scrollWidgetList[s]['id']);
-          //   RenderBox renderBoxRed =
-          //   scrollWidgetList[s]['key']?.currentContext?.findRenderObject();
-          //   var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
-          //   logger.d(positionsRed.dy);
-          //   logger.d('${scrollWidgetList[s]['height']}');
-          //   // if (positionMax < positionsRed.dy && maxHeight >= positionsRed.dy) {
-          //   //   positionMax = positionsRed.dy;
-          //   //   positionMaxItem = {
-          //   //     "key": scrollWidgetList[s]['key'],
-          //   //     "id": scrollWidgetList[s]['id'],
-          //   //     "dy": positionsRed.dy,
-          //   //     "height": scrollWidgetList[s]['height'],
-          //   //     "createdDate": scrollWidgetList[s]['createdDate'],
-          //   //     "timestamp": scrollWidgetList[s]['timestamp'],
-          //   //   };
-          //   // }
-          // }
-        }
-
-        double preHeight = 0;
-        Color startColor = Colors.blue;
-        Color endColor = Colors.red;
-        for (var s = 0; s < scrollWidgetList.length; s++) {
-
-          double currentHeight = scrollWidgetList[s]['height'];
-          // 此widget 开始的高度
-          final double startH = preHeight / totalHeight;
-          preHeight += scrollWidgetList[s]['height'];
-          // 此widget 结束高度
-          final double endH = preHeight / totalHeight;
-          // 使用开始颜色
-          Color lastStartValue;
-          // 使用结束颜色
-          Color lastEndValue;
-
-          lastStartValue = Color.lerp(startColor, endColor, startH);
-          lastEndValue = Color.lerp(startColor, endColor, endH);
-          conversion.updateMultipleItem(
-            [scrollWidgetList[s]],
-            lastStartValue,
-            lastEndValue,
-          );
-        }
-        conversion.noti();
+        // double totalHeight = 0;
+        // // 自己发消息颜色背景设置
+        // for (var s = 0; s < scrollWidgetList.length; s++) {
+        //   totalHeight += scrollWidgetList[s]['height'];
+        //   // index = random.nextInt(3);
+        //   // if (scrollWidgetList[s]['key']?.currentContext != null) {
+        //   //   // scrollArr.add(scrollWidgetList[s]['id']);
+        //   //   RenderBox renderBoxRed =
+        //   //   scrollWidgetList[s]['key']?.currentContext?.findRenderObject();
+        //   //   var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
+        //   //   logger.d(positionsRed.dy);
+        //   //   logger.d('${scrollWidgetList[s]['height']}');
+        //   //   // if (positionMax < positionsRed.dy && maxHeight >= positionsRed.dy) {
+        //   //   //   positionMax = positionsRed.dy;
+        //   //   //   positionMaxItem = {
+        //   //   //     "key": scrollWidgetList[s]['key'],
+        //   //   //     "id": scrollWidgetList[s]['id'],
+        //   //   //     "dy": positionsRed.dy,
+        //   //   //     "height": scrollWidgetList[s]['height'],
+        //   //   //     "createdDate": scrollWidgetList[s]['createdDate'],
+        //   //   //     "timestamp": scrollWidgetList[s]['timestamp'],
+        //   //   //   };
+        //   //   // }
+        //   // }
+        // }
+        //
+        // double preHeight = 0;
+        // Color startColor = Colors.blue;
+        // Color endColor = Colors.red;
+        // for (var s = 0; s < scrollWidgetList.length; s++) {
+        //
+        //   double currentHeight = scrollWidgetList[s]['height'];
+        //   // 此widget 开始的高度
+        //   final double startH = preHeight / totalHeight;
+        //   preHeight += scrollWidgetList[s]['height'];
+        //   // 此widget 结束高度
+        //   final double endH = preHeight / totalHeight;
+        //   // 使用开始颜色
+        //   Color lastStartValue;
+        //   // 使用结束颜色
+        //   Color lastEndValue;
+        //
+        //   logger.d(startH);
+        //   logger.d(endH);
+        //
+        //   lastStartValue = Color.lerp(startColor, endColor, startH);
+        //   lastEndValue = Color.lerp(startColor, endColor, endH);
+        //   conversion.updateMultipleItem(
+        //     scrollWidgetList[s]['timestamp'],
+        //     lastStartValue,
+        //     lastEndValue,
+        //   );
+        // }
+        // conversion.noti();
 
       });
     }

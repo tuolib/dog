@@ -45,6 +45,8 @@ class ChatCustomCorner extends CustomPainter {
     if (radius < _corner) {
       _corner = radius;
     }
+
+    double nipSize = _x;
     if (alignment == Alignment.topRight) {
       var rect = Offset.zero & size;
       canvas.drawRRect(
@@ -53,7 +55,7 @@ class ChatCustomCorner extends CustomPainter {
             0,
             size.width - 5,
             size.height,
-            bottomRight: Radius.circular(_corner),
+            bottomRight: Radius.circular(_radius),
             bottomLeft: Radius.circular(_radius),
             topRight: Radius.circular(_radius),
             topLeft: Radius.circular(_radius),
@@ -70,9 +72,41 @@ class ChatCustomCorner extends CustomPainter {
             // ..color = this.color
             ..style = PaintingStyle.fill);
       var path = new Path();
-      path.moveTo(size.width - _x, size.height - 20);
-      path.lineTo(size.width - _x, size.height);
-      path.lineTo(size.width, size.height);
+      // path.moveTo(size.width - _x, size.height - 20);
+      // path.lineTo(size.width - _x, size.height);
+      // path.lineTo(size.width, size.height);
+
+      path.moveTo(radius, 0);
+      path.lineTo(size.width - radius - nipSize, 0);
+      path.arcToPoint(Offset(size.width - nipSize, radius),
+          radius: Radius.circular(radius));
+
+      path.lineTo(size.width - nipSize, size.height - nipSize);
+
+      // path.arcToPoint(Offset(size.width, size.height),
+      //     radius: Radius.circular(nipSize), clockwise: false);
+      path.arcToPoint(Offset(size.width, size.height),
+          radius: Radius.circular(nipSize - 2), clockwise: false);
+
+      // path.arcToPoint(Offset(size.width - 2 * nipSize, size.height - nipSize),
+      //     radius: Radius.circular(2 * nipSize));
+      path.arcToPoint(Offset(size.width - nipSize / 2, size.height - nipSize - 3),
+          radius: Radius.circular(2 * nipSize));
+
+
+      // path.arcToPoint(Offset(size.width - 4 * nipSize, size.height),
+      //     radius: Radius.circular(2 * nipSize));
+      path.arcToPoint(Offset(size.width - 3 * nipSize, size.height),
+          radius: Radius.circular(2 * nipSize));
+
+      path.lineTo(radius, size.height);
+      path.arcToPoint(Offset(0, size.height - radius),
+          radius: Radius.circular(radius));
+      path.lineTo(0, radius);
+      path.arcToPoint(Offset(radius, 0), radius: Radius.circular(radius));
+
+
+
       canvas.clipPath(path);
       if (showCorner) {
         canvas.drawRRect(
@@ -84,7 +118,7 @@ class ChatCustomCorner extends CustomPainter {
               topRight: Radius.circular(_radius),
             ),
             Paint()
-              ..color = this.color
+              ..color = _bottomColor
               ..style = PaintingStyle.fill);
       }
     } else {
@@ -95,7 +129,7 @@ class ChatCustomCorner extends CustomPainter {
             size.width,
             size.height,
             bottomRight: Radius.circular(_radius),
-            bottomLeft: Radius.circular(_corner),
+            bottomLeft: Radius.circular(_radius),
             topRight: Radius.circular(_radius),
             topLeft: Radius.circular(_radius),
           ),
@@ -103,9 +137,48 @@ class ChatCustomCorner extends CustomPainter {
             ..color = this.color
             ..style = PaintingStyle.fill);
       var path = new Path();
-      path.moveTo(0, size.height);
-      path.lineTo(_x, size.height);
-      path.lineTo(_x, size.height - 20);
+      // path.moveTo(0, size.height);
+      // path.lineTo(_x, size.height);
+      // path.lineTo(_x, size.height - 20);
+
+
+      path.moveTo(radius, 0);
+      path.lineTo(size.width - radius, 0);
+      path.arcToPoint(Offset(size.width, radius),
+          radius: Radius.circular(radius));
+
+      path.lineTo(size.width, size.height - radius);
+
+      path.arcToPoint(Offset(size.width - radius, size.height),
+          radius: Radius.circular(radius));
+
+      /// change
+      // path.lineTo(4 * nipSize, size.height);
+      path.lineTo(3 * nipSize, size.height);
+
+      /// change
+      // path.arcToPoint(Offset(2 * nipSize, size.height - nipSize),
+      //     radius: Radius.circular(2 * nipSize));
+      path.arcToPoint(Offset(nipSize / 2, size.height - nipSize - 3),
+          radius: Radius.circular(2 * nipSize));
+
+      path.arcToPoint(Offset(0, size.height),
+          radius: Radius.circular(2 * nipSize));
+
+      /// change
+      // path.arcToPoint(Offset(nipSize, size.height - nipSize),
+      //     radius: Radius.circular(nipSize), clockwise: false);
+      path.arcToPoint(Offset(nipSize, size.height - nipSize),
+          radius: Radius.circular(nipSize - 2), clockwise: false);
+
+      path.lineTo(nipSize, radius);
+      path.arcToPoint(Offset(radius + nipSize, 0),
+          radius: Radius.circular(radius));
+
+
+
+
+
       canvas.clipPath(path);
       if (showCorner) {
         canvas.drawRRect(

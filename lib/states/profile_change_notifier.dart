@@ -101,26 +101,32 @@ class ThemeModel extends ProfileChangeNotifier {
     }
   }
   //修改value
-  themeColorValue(int color, int type) {
+  themeColorValue(Map color, int type) {
     // type 0 accent themesDay
     // 1 background themesDayBg
     // 2 messages themesDayMessage
     if (themeMode == 1) {
-      if (type == 0) {
-        Global.profile.themesDay[theme] = color;
-      } else if (type == 1) {
-        Global.profile.themesDayBg[theme] = color;
-      } else if (type == 2) {
-        Global.profile.themesDayMessage[theme] = color;
-      }
+      Global.profile.dayList[theme] = color;
+      // if (type == 0) {
+      //   Global.profile.dayList[theme]['primary'] = color;
+      // } else if (type == 1) {
+      //   Global.profile.dayList[theme]['background'] = color;
+      //   Global.profile.dayList[theme]['background2'] = color2;
+      // } else if (type == 2) {
+      //   Global.profile.dayList[theme]['message'] = color;
+      //   Global.profile.dayList[theme]['message2'] = color2;
+      // }
     } else if (themeMode == 2) {
-      if (type == 0) {
-        Global.profile.themesDark[themeDark] = color;
-      } else if (type == 1) {
-        Global.profile.themesDarkBg[themeDark] = color;
-      } else if (type == 2) {
-        Global.profile.themesDarkMessage[themeDark] = color;
-      }
+      Global.profile.darkList[themeDark] = color;
+      // if (type == 0) {
+      //   Global.profile.darkList[themeDark]['primary'] = color;
+      // } else if (type == 1) {
+      //   Global.profile.darkList[themeDark]['background'] = color;
+      //   Global.profile.darkList[theme]['background2'] = color2;
+      // } else if (type == 2) {
+      //   Global.profile.darkList[themeDark]['message'] = color;
+      //   Global.profile.darkList[theme]['message2'] = color2;
+      // }
     }
     // _profile.themeMode = mode;
     Global.saveProfile();
@@ -128,34 +134,36 @@ class ThemeModel extends ProfileChangeNotifier {
   }
 
   // 新增
-  themeColorAdd(int color, int type) {
+  themeColorAdd(Map color, int type) {
     logger.d('$color/$type');
     // type 0 accent themesDay
     // 1 background themesDayBg
     // 2 messages themesDayMessage
     if (themeMode == 1) {
+      Global.profile.dayList.insert(0, color);
       // Global.profile.themesDay.insert(0, color);
       // Global.profile.themesDayBg.insert(0, color);
       // Global.profile.themesDayMessage.insert(0, color);
-      if (type == 0) {
-        Global.profile.themesDay.insert(0, color);
-      } else if (type == 1) {
-        Global.profile.themesDayBg.insert(0, color);
-      } else if (type == 2) {
-        Global.profile.themesDayMessage.insert(0, color);
-      }
+      // if (type == 0) {
+      //   Global.profile.themesDay.insert(0, color);
+      // } else if (type == 1) {
+      //   Global.profile.themesDayBg.insert(0, color);
+      // } else if (type == 2) {
+      //   Global.profile.themesDayMessage.insert(0, color);
+      // }
       theme = 0;
     } else if (themeMode == 2) {
+      Global.profile.darkList.insert(0, color);
       // Global.profile.themesDark.insert(0, color);
       // Global.profile.themesDarkBg.insert(0, color);
       // Global.profile.themesDarkMessage.insert(0, color);
-      if (type == 0) {
-        Global.profile.themesDark.insert(0, color);
-      } else if (type == 1) {
-        Global.profile.themesDarkBg.insert(0, color);
-      } else if (type == 2) {
-        Global.profile.themesDarkMessage.insert(0, color);
-      }
+      // if (type == 0) {
+      //   Global.profile.themesDark.insert(0, color);
+      // } else if (type == 1) {
+      //   Global.profile.themesDarkBg.insert(0, color);
+      // } else if (type == 2) {
+      //   Global.profile.themesDarkMessage.insert(0, color);
+      // }
       themeDark = 0;
     }
     // _profile.themeMode = mode;
@@ -168,29 +176,29 @@ class ThemeModel extends ProfileChangeNotifier {
     // type 0 accent themesDay
     // 1 background themesDayBg
     // 2 messages themesDayMessage
-    if (themeMode == 1) {
-      Global.profile.themesDay.removeAt(theme);
-      Global.profile.themesDayBg.removeAt(theme);
-      Global.profile.themesDayMessage.removeAt(theme);
-      // if (type == 0) {
-      //   Global.profile.themesDay.removeAt(theme);
-      // } else if (type == 1) {
-      //   Global.profile.themesDayBg.removeAt(theme);
-      // } else if (type == 2) {
-      //   Global.profile.themesDayMessage.removeAt(theme);
-      // }
-    } else if (themeMode == 2) {
-      Global.profile.themesDark.removeAt(themeDark);
-      Global.profile.themesDarkBg.removeAt(themeDark);
-      Global.profile.themesDarkMessage.removeAt(themeDark);
-      // if (type == 0) {
-      //   Global.profile.themesDark.removeAt(themeDark);
-      // } else if (type == 1) {
-      //   Global.profile.themesDarkBg.removeAt(themeDark);
-      // } else if (type == 2) {
-      //   Global.profile.themesDarkMessage.removeAt(themeDark);
-      // }
-    }
+    // if (themeMode == 1) {
+    //   Global.profile.themesDay.removeAt(theme);
+    //   Global.profile.themesDayBg.removeAt(theme);
+    //   Global.profile.themesDayMessage.removeAt(theme);
+    //   // if (type == 0) {
+    //   //   Global.profile.themesDay.removeAt(theme);
+    //   // } else if (type == 1) {
+    //   //   Global.profile.themesDayBg.removeAt(theme);
+    //   // } else if (type == 2) {
+    //   //   Global.profile.themesDayMessage.removeAt(theme);
+    //   // }
+    // } else if (themeMode == 2) {
+    //   Global.profile.themesDark.removeAt(themeDark);
+    //   Global.profile.themesDarkBg.removeAt(themeDark);
+    //   Global.profile.themesDarkMessage.removeAt(themeDark);
+    //   // if (type == 0) {
+    //   //   Global.profile.themesDark.removeAt(themeDark);
+    //   // } else if (type == 1) {
+    //   //   Global.profile.themesDarkBg.removeAt(themeDark);
+    //   // } else if (type == 2) {
+    //   //   Global.profile.themesDarkMessage.removeAt(themeDark);
+    //   // }
+    // }
     // _profile.themeMode = mode;
     Global.saveProfile();
     notifyListeners();
@@ -205,7 +213,7 @@ class ThemeModel extends ProfileChangeNotifier {
   // 主颜色 themes
   Color get primaryColor {
     Color colorObj;
-    colorObj = Color(Global.themes[themeMode == 1 ? theme : themeDark]);
+    colorObj = Color(Global.themes[themeMode == 1 ? theme : themeDark]['primary']);
     return colorObj;
   }
 
@@ -263,7 +271,7 @@ class ThemeModel extends ProfileChangeNotifier {
     Color colorObj;
     if (themeMode == 1) {
       // colorObj = Color(Global.themesMessage[theme]);
-      var newValue = Global.themesMessage[theme];
+      var newValue = Global.themes[theme]['message'];
       if (Color(newValue).red > 177 &&
           Color(newValue).green > 177 &&
           Color(newValue).blue > 177) {
@@ -272,7 +280,7 @@ class ThemeModel extends ProfileChangeNotifier {
         colorObj = Color(newValue);
       }
     } else if (themeMode == 2) {
-      var newValue = Global.themesMessage[themeDark];
+      var newValue = Global.themes[themeDark]['message'];
       if (Color(newValue).red > 177 &&
           Color(newValue).green > 177 &&
           Color(newValue).blue > 177) {
@@ -306,9 +314,9 @@ class ThemeModel extends ProfileChangeNotifier {
   Color get messagesChatBg {
     Color colorObj;
     if (themeMode == 1) {
-      colorObj = Color(Global.themesBg[theme]);
+      colorObj = Color(Global.themes[theme]['background']);
     } else if (themeMode == 2) {
-      colorObj = Color(Global.themesBg[themeDark]);
+      colorObj = Color(Global.themes[themeDark]['background']);
     }
     return colorObj;
   }
@@ -317,9 +325,9 @@ class ThemeModel extends ProfileChangeNotifier {
   Color get messagesChatBg2 {
     Color colorObj;
     if (themeMode == 1) {
-      colorObj = Color(Global.themesBg2[theme]);
+      colorObj = Color(Global.themes[theme]['background2']);
     } else if (themeMode == 2) {
-      colorObj = Color(Global.themesBg2[themeDark]);
+      colorObj = Color(Global.themes[themeDark]['background2']);
     }
     return colorObj;
   }
@@ -457,7 +465,7 @@ class ThemeModel extends ProfileChangeNotifier {
   Color get messagesColorAppearanceDay {
     Color colorObj;
     // colorObj = Color(Global.profile.themesDayMessage[theme]);
-    var newValue = Global.profile.themesDayMessage[theme];
+    var newValue = Global.profile.dayList[theme]['message'];
     if (Color(newValue).red > 177 &&
         Color(newValue).green > 177 &&
         Color(newValue).blue > 177) {
@@ -478,7 +486,7 @@ class ThemeModel extends ProfileChangeNotifier {
   // 自己消息背景 themesMessage
   Color get messagesColorAppearanceDark {
     Color colorObj;
-    var newValue = Global.profile.themesDarkMessage[themeDark];
+    var newValue = Global.profile.darkList[themeDark]['message'];
     if (Color(newValue).red > 177 &&
         Color(newValue).green > 177 &&
         Color(newValue).blue > 177) {
@@ -507,7 +515,7 @@ class ThemeModel extends ProfileChangeNotifier {
     Color colorObj;
     // logger.d(Global.profile.themesDayBg);
     // logger.d(theme);
-    colorObj = Color(Global.profile.themesDayBg[theme]);
+    colorObj = Color(Global.profile.dayList[theme]['background']);
     // colorObj = CupertinoColors.
     return colorObj;
   }
@@ -515,7 +523,7 @@ class ThemeModel extends ProfileChangeNotifier {
   // 聊天页面背景颜色 themesBg
   Color get messagesChatBgAppearanceDark {
     Color colorObj;
-    colorObj = Color(Global.profile.themesDarkBg[themeDark]);
+    colorObj = Color(Global.profile.darkList[themeDark]['background']);
     // colorObj = CupertinoColors.
     return colorObj;
   }
@@ -525,14 +533,14 @@ class ThemeModel extends ProfileChangeNotifier {
     Color colorObj;
     // logger.d(Global.profile.themesDayBg);
     // logger.d(theme);
-    colorObj = Color(Global.profile.themesDayBg2[theme]);
+    colorObj = Color(Global.profile.dayList[theme]['background2']);
     // colorObj = CupertinoColors.
     return colorObj;
   }
   // 聊天页面背景颜色 themesBg 渐变色
   Color get messagesChatBgAppearanceDark2 {
     Color colorObj;
-    colorObj = Color(Global.profile.themesDarkBg2[themeDark]);
+    colorObj = Color(Global.profile.darkList[themeDark]['background2']);
     // colorObj = CupertinoColors.
     return colorObj;
   }

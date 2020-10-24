@@ -15,6 +15,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_chat_bubble/bubble_type.dart';
+import 'package:flutter_chat_bubble/chat_bubble.dart';
+import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_3.dart';
 
 // 滚动时，记录滚动过的widget位置 key
 List scrollWidgetList = [];
@@ -23,7 +26,7 @@ typedef void OnError(Exception exception);
 
 Timer doStreamTime;
 // ignore: must_be_immutable
-class ChatBubble extends StatefulWidget {
+class ChatBubbleWidget extends StatefulWidget {
   String message,
       username,
       avatarUrl,
@@ -57,7 +60,7 @@ class ChatBubble extends StatefulWidget {
   Color primaryColor;
   // StreamController streamController;
 
-  ChatBubble({
+  ChatBubbleWidget({
     this.afterBuild,
     @required this.callback,
     @required this.message,
@@ -99,7 +102,7 @@ class ChatBubble extends StatefulWidget {
   ChatBubbleState createState() => ChatBubbleState();
 }
 
-class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
+class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserver {
   ThemeModel themeObj;
   Color topColor;
   Color bottomColor;
@@ -281,58 +284,68 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
         widget.isMe ? themeObj.messagesColor : themeObj.messagesColorSide;
     var alignCorner = widget.isMe ? Alignment.topRight : Alignment.bottomLeft;
     double _radius = themeObj.radius == null ? 16 : themeObj.radius;
-    return Container(
-      margin: EdgeInsets.only(top: 2,bottom: 2, left:2, right: 2),
-      child: CustomPaint(
-        painter: ChatCustomCorner(
-          color: paintColor,
-          alignment: alignCorner,
-          showCorner: widget.showAvatar,
-          radius: _radius,
-          topColor: topColor == null ? paintColor : topColor,
-          bottomColor: bottomColor == null ? paintColor : bottomColor,
-        ),
-        child: Container(
-          child: Stack(
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(top: 3, bottom: 3, right: 8, left: 8),
-                padding: EdgeInsets.only(top: 0, bottom: 0, right: 2, left: 5),
-                decoration: BoxDecoration(
-                  // color: chatBubbleColor(),
-                  // color: widget.isMe
-                  //     ? themeObj.messagesColor
-                  //     : themeObj.messagesColorSide,
-                  borderRadius: BorderRadius.circular(_radius),
-                ),
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width / 1.3 - 30,
-                  minWidth: 20.0,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: align,
-                  children: <Widget>[
-                    _buildName(),
-                    _buildReply(),
-                    widget.isReply ? SizedBox(height: 5) : SizedBox(),
-                    Stack(
-                      children: [
-                        _buildMessage(context),
-                        _buildMessageTime(),
-                      ],
-                    ),
-                  ],
-                ),
-              )
+    return Consumer<ConversationScrollModel>(
+        builder: (BuildContext context,
+            ConversationScrollModel conversationScrollModel, Widget child) {
 
+          // print('widget.content: ${widget.content}');
+          if (widget.isMe) {
+            // print(mounted);
+            _setColor();
+          }
 
-            ],
+      return Container(
+        margin: EdgeInsets.only(top: 2, bottom: 2, left: 2, right: 2),
+        child: CustomPaint(
+          painter: ChatCustomCorner(
+            color: paintColor,
+            alignment: alignCorner,
+            showCorner: widget.showAvatar,
+            radius: _radius,
+            topColor: topColor == null ? paintColor : topColor,
+            bottomColor: bottomColor == null ? paintColor : bottomColor,
+          ),
+          child: Container(
+            child: Stack(
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(top: 3, bottom: 3, right: 8, left: 8),
+                  padding:
+                      EdgeInsets.only(top: 0, bottom: 0, right: 2, left: 5),
+                  decoration: BoxDecoration(
+                    // color: chatBubbleColor(),
+                    // color: widget.isMe
+                    //     ? themeObj.messagesColor
+                    //     : themeObj.messagesColorSide,
+                    borderRadius: BorderRadius.circular(_radius),
+                  ),
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width / 1.3 - 30,
+                    minWidth: 20.0,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: align,
+                    children: <Widget>[
+                      _buildName(),
+                      _buildReply(),
+                      widget.isReply ? SizedBox(height: 5) : SizedBox(),
+                      Stack(
+                        children: [
+                          _buildMessage(context),
+                          _buildMessageTime(),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   ColorFiltered _chatBubbleFilter({Widget child, bool ismine}) {
@@ -364,27 +377,59 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
 
     var conversion = Provider.of<ConversationListModel>(context);
     if (widget.type == 1) {
-      contentWidget = Text.rich(
-        TextSpan(
-          children: [
-            TextSpan(
-              text: '${widget.message}',
-              style: TextStyle(
-                color: widget.isMe
-                    ? themeObj.messagesWordSelf
-                    : themeObj.messagesWordSide,
+      contentWidget = Stack(
+        children: [
+          Opacity(
+            opacity: 0,
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '${widget.message}',
+                    style: TextStyle(
+                      color: widget.isMe
+                          ? themeObj.messagesWordSelf
+                          : themeObj.messagesWordSide,
+                    ),
+                  ),
+                  TextSpan(
+                    // text: '             ',
+                    text: '_________',
+                    style: TextStyle(
+                      color: widget.isMe
+                          ? bottomColor != null ? bottomColor : themeObj.messagesColor
+                          : themeObj.messagesColorSide,
+                    ),
+                  ),
+                ],
               ),
             ),
+          ),
+
+          Text.rich(
             TextSpan(
-              text: '_________',
-              style: TextStyle(
-                color: widget.isMe
-                    ? themeObj.messagesColor
-                    : themeObj.messagesColorSide,
-              ),
+              children: [
+                TextSpan(
+                  text: '${widget.message}',
+                  style: TextStyle(
+                    color: widget.isMe
+                        ? themeObj.messagesWordSelf
+                        : themeObj.messagesWordSide,
+                  ),
+                ),
+                TextSpan(
+                  text: '          ',
+                  // text: '_________',
+                  style: TextStyle(
+                    color: widget.isMe
+                        ? bottomColor != null ? bottomColor : themeObj.messagesColor
+                        : themeObj.messagesColorSide,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       );
 //       if (!widget.isReply) {
 // //        contentWidget = Padding(
@@ -965,12 +1010,24 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
         "dy": positionsRed.dy,
         "id": widget.id,
         "height": sizeRed.height,
-        "timestamp": widget.timestamp
+        "timestamp": widget.timestamp,
+        "isMe": widget.isMe,
+        "content": widget.content,
       };
       // logger.d(widget.content);
       // logger.d(positionsRed.dy);
       // logger.d(sizeRed.height);
-      scrollWidgetList.add(scrollItem);
+      if (scrollWidgetList.length > 0) {
+        if (widget.timestamp < scrollWidgetList[0]['timestamp']) {
+          scrollWidgetList.insert(0, scrollItem);
+        } else {
+          scrollWidgetList.add(scrollItem);
+        }
+      } else {
+        scrollWidgetList.add(scrollItem);
+      }
+      ArrayUtil.sortArray(scrollWidgetList, sortOrder: 1, property: 'timestamp');
+
       // _setColor();
     }
   }
@@ -981,10 +1038,17 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
     // Random random = new Random();
 
     // int index = 0;
+
+
+    var scrollModel = Provider.of<ConversationScrollModel>(context, listen: false);
+    List scrollList = scrollModel.scrollList;
+
+    // ArrayUtil.sortArray(scrollWidgetList, sortOrder: 1, property: 'timestamp');
     double totalHeight = 0;
+    bool hasSelf;
     // 自己发消息颜色背景设置
-    for (var s = 0; s < scrollWidgetList.length; s++) {
-      totalHeight += scrollWidgetList[s]['height'];
+    for (var s = 0; s < scrollList.length; s++) {
+      totalHeight += scrollList[s]['height'];
       // index = random.nextInt(3);
       // if (scrollWidgetList[s]['key']?.currentContext != null) {
       //   // scrollArr.add(scrollWidgetList[s]['id']);
@@ -1010,33 +1074,48 @@ class ChatBubbleState extends State<ChatBubble> with WidgetsBindingObserver {
     double preHeight = 0;
     Color startColor = Colors.blue;
     Color endColor = Colors.red;
-    for (var s = 0; s < scrollWidgetList.length; s++) {
-
-      double currentHeight = scrollWidgetList[s]['height'];
+    for (var s = 0; s < scrollList.length; s++) {
+      var scrollW = scrollList[s];
+      // double currentHeight = scrollW['height'];
       // 此widget 开始的高度
       final double startH = preHeight / totalHeight;
-      preHeight += scrollWidgetList[s]['height'];
+      preHeight += scrollW['height'];
       // 此widget 结束高度
       final double endH = preHeight / totalHeight;
-
 
       // 使用开始颜色
       Color lastStartValue;
       // 使用结束颜色
       Color lastEndValue;
-      if (scrollWidgetList[s]['timestamp'] == widget.timestamp) {
+      if (scrollW['timestamp'] == widget.timestamp) {
         lastStartValue = Color.lerp(startColor, endColor, startH);
         lastEndValue = Color.lerp(startColor, endColor, endH);
-        setState(() {
-          topColor = lastStartValue;
-          bottomColor = lastEndValue;
-        });
+        // setState(() {
+        //   topColor = lastStartValue;
+        //   bottomColor = lastEndValue;
+        // });
+        topColor = lastStartValue;
+        bottomColor = lastEndValue;
       }
-
-
     }
 
   }
+
+  _deleteColor() {
+    var scrollModel = Provider.of<ConversationScrollModel>(context, listen: false);
+    List scrollList = scrollModel.scrollList;
+    for (var s = 0; s < scrollList.length; s++) {
+      if (scrollList[s]['key']?.currentContext != null) {
+        // scrollArr.add(scrollList[s]['id']);
+        RenderBox renderBoxRed =
+        scrollList[s]['key']?.currentContext?.findRenderObject();
+        var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
+        // logger.d(positionsRed.dy);
+        // logger.d('${scrollList[s]['height']}');
+      }
+    }
+  }
+
 
 
 

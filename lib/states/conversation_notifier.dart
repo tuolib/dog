@@ -777,18 +777,22 @@ class ConversationListModel extends ConversationNotifier {
     notifyListeners();
   }
 
-  void updateMultipleItem(List listUpdate, Color value, Color value2) {
+  void updateMultipleItem(int timestamp, Color value, Color value2) {
     // for (var i = 0; i < _conversationList.length; i++) {
     //   _conversationList[i]['topColor'] = Colors.blue;
     //   _conversationList[i]['bottomColor'] = Colors.blue;
     // }
-    for (var m = 0; m < listUpdate.length; m++) {
-      final tile = _conversationList.firstWhere(
-          (item) => item['timestamp'] == listUpdate[m]['timestamp']);
-      tile['topColor'] = value;
-      tile['bottomColor'] = value2;
-    }
+    // for (var m = 0; m < listUpdate.length; m++) {
+    //   final tile = _conversationList.firstWhere(
+    //       (item) => item['timestamp'] == listUpdate[m]['timestamp']);
+    //   tile['topColor'] = value;
+    //   tile['bottomColor'] = value2;
     // }
+    // }
+    var tile = _conversationList.firstWhere(
+            (item) => item['timestamp'] == timestamp);
+    tile['topColor'] = value;
+    tile['bottomColor'] = value2;
     // notifyListeners();
   }
 
@@ -819,6 +823,28 @@ class ConversationListModel extends ConversationNotifier {
   removeRangeList(int start, int end) {
     _conversationList.removeRange(start, end);
     notifyListeners();
+  }
+}
+
+
+
+class ConversationScrollModel extends ChangeNotifier {
+  @override
+  void notifyListeners() {
+    super.notifyListeners(); //通知依赖的Widget更新
+  }
+
+
+  // 监听聊天列表变化
+  List<dynamic> _scrollList = [];
+  List get scrollList => _scrollList;
+
+  updateScrollList(List list, {bool noti = true}) {
+    // if (_scrollList == list) return;
+    _scrollList = list;
+    if (noti) {
+      notifyListeners();
+    }
   }
 }
 

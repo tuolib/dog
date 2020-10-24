@@ -1,3 +1,14 @@
+### build
+
+```shell
+
+flutter build apk --release
+
+```
+
+
+
+
 
 ###多语言生成:
 ```shell

@@ -15,14 +15,16 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) {
     ..theme = json['theme'] as int
     ..themeMode = json['themeMode'] as int
     ..themeDark = json['themeMode'] as int
-    ..themesDay = json['themesDay'] as List
-    ..themesDark = json['themesDark'] as List
-    ..themesDayMessage = json['themesDayMessage'] as List
-    ..themesDarkMessage = json['themesDarkMessage'] as List
-    ..themesDayBg = json['themesDayBg'] as List
-    ..themesDarkBg = json['themesDarkBg'] as List
-    ..themesDayBg2 = json['themesDayBg2'] as List
-    ..themesDarkBg2 = json['themesDarkBg2'] as List
+    // ..themesDay = json['themesDay'] as List
+    // ..themesDark = json['themesDark'] as List
+    // ..themesDayMessage = json['themesDayMessage'] as List
+    // ..themesDarkMessage = json['themesDarkMessage'] as List
+    // ..themesDayBg = json['themesDayBg'] as List
+    // ..themesDarkBg = json['themesDarkBg'] as List
+    // ..themesDayBg2 = json['themesDayBg2'] as List
+    // ..themesDarkBg2 = json['themesDarkBg2'] as List
+    ..dayList = json['dayList'] as List
+    ..darkList = json['darkList'] as List
     ..cache = json['cache'] == null
         ? null
         : CacheConfig.fromJson(json['cache'] as Map<String, dynamic>)
@@ -36,14 +38,16 @@ Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
       'theme': instance.theme,
       'themeDark': instance.themeDark,
       'themeMode': instance.themeMode,
-      'themesDay': instance.themesDay,
-      'themesDark': instance.themesDark,
-      'themesDayMessage': instance.themesDayMessage,
-      'themesDarkMessage': instance.themesDarkMessage,
-      'themesDayBg': instance.themesDayBg,
-      'themesDarkBg': instance.themesDarkBg,
-      'themesDayBg2': instance.themesDayBg2,
-      'themesDarkBg2': instance.themesDarkBg2,
+      // 'themesDay': instance.themesDay,
+      // 'themesDark': instance.themesDark,
+      // 'themesDayMessage': instance.themesDayMessage,
+      // 'themesDarkMessage': instance.themesDarkMessage,
+      // 'themesDayBg': instance.themesDayBg,
+      // 'themesDarkBg': instance.themesDarkBg,
+      // 'themesDayBg2': instance.themesDayBg2,
+      // 'themesDarkBg2': instance.themesDarkBg2,
+      'dayList': instance.dayList,
+      'darkList': instance.darkList,
       'cache': instance.cache,
       'lastLogin': instance.lastLogin,
       'locale': instance.locale

@@ -19,19 +19,25 @@ class Profile {
     // 1 day 2 dark
     int themeMode;
     // primary 颜色
-    List themesDay;
-    List themesDark;
-    // 自己发的消息背景
-    List themesDayMessage;
-    List themesDarkMessage;
-    // 聊天对话页面背景
-    List themesDayBg;
-    List themesDarkBg;
+    // List themesDay;
+    // List themesDark;
+    // // 自己发的消息背景
+    // List themesDayMessage;
+    // List themesDarkMessage;
+    // // 聊天对话页面背景
+    // List themesDayBg;
+    // List themesDarkBg;
+
+    // day 主题
+    List dayList;
+
+    // dark
+    List darkList;
 
 
     // 聊天对话页面背景 渐变色
-    List themesDayBg2;
-    List themesDarkBg2;
+    // List themesDayBg2;
+    // List themesDarkBg2;
     
     factory Profile.fromJson(Map<String,dynamic> json) => _$ProfileFromJson(json);
     Map<String, dynamic> toJson() => _$ProfileToJson(this);

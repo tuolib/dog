@@ -97,6 +97,8 @@ PODS:
     - Flutter
   - flutter_call_kit (0.0.1):
     - Flutter
+  - flutter_chat_bubble (0.0.1):
+    - Flutter
   - flutter_incall_manager (0.0.1):
     - Flutter
   - flutter_local_notifications (0.0.1):
@@ -207,6 +209,7 @@ DEPENDENCIES:
   - flutter_apns (from `.symlinks/plugins/flutter_apns/ios`)
   - flutter_app_badger (from `.symlinks/plugins/flutter_app_badger/ios`)
   - flutter_call_kit (from `.symlinks/plugins/flutter_call_kit/ios`)
+  - flutter_chat_bubble (from `.symlinks/plugins/flutter_chat_bubble/ios`)
   - flutter_incall_manager (from `.symlinks/plugins/flutter_incall_manager/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_statusbarcolor (from `.symlinks/plugins/flutter_statusbarcolor/ios`)
@@ -282,6 +285,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_app_badger/ios"
   flutter_call_kit:
     :path: ".symlinks/plugins/flutter_call_kit/ios"
+  flutter_chat_bubble:
+    :path: ".symlinks/plugins/flutter_chat_bubble/ios"
   flutter_incall_manager:
     :path: ".symlinks/plugins/flutter_incall_manager/ios"
   flutter_local_notifications:
@@ -354,6 +359,7 @@ SPEC CHECKSUMS:
   flutter_apns: f516b118e423fe7c0a38771180549c4d6cb67c2f
   flutter_app_badger: 65de4d6f0c34a891df49e6cfb8a1c0496426fa68
   flutter_call_kit: 0598f2eec54579aa00b53fb68a622ccdb08fe4fe
+  flutter_chat_bubble: cad6265ec611ba0f7bede70eabc26fdfce9bf2b0
   flutter_incall_manager: 1a6aea8d37fb46d63aaa30ac7ea225e121704eab
   flutter_local_notifications: 9e4738ce2471c5af910d961a6b7eadcf57c50186
   flutter_statusbarcolor: 8afb1071ed8c58be929f1e32b36c629771fd2259

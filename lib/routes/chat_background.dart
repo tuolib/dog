@@ -102,7 +102,7 @@ class _ChatBackgroundRoute extends State<ChatBackgroundRoute> {
 
   _buildChatList(context, index) {
     if (index == 0) {
-      return ChatBubble(
+      return ChatBubbleWidget(
         callback: callback,
         message: 'Do you know what time it is?',
         content: 'Do you know what time it is?',
@@ -134,7 +134,7 @@ class _ChatBackgroundRoute extends State<ChatBackgroundRoute> {
         timestamp: 1601108277901,
       );
     } else {
-      return ChatBubble(
+      return ChatBubbleWidget(
         callback: callback,
         message: "It's morning in Tokyo",
         content: "It's morning in Tokyo",

@@ -120,6 +120,7 @@ dependencies:
   scrollable_positioned_list: ^0.1.8
   smooth_page_indicator: ^0.2.0
   worm_indicator: ^0.2.4
+  flutter_chat_bubble: ^1.0.2
 
 dev_dependencies:
   flutter_test:

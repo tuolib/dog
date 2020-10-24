@@ -47,13 +47,18 @@ class _SetColorWidgetState extends State<SetColorWidget> {
   };
   TextEditingController _textController = TextEditingController();
   FocusNode focusNode1 = FocusNode();
+  TextEditingController _textController2 = TextEditingController();
+  FocusNode focusNode2 = FocusNode();
 
   Color pickerColor = Color(0xff443a49);
+  Color pickerColor2;
+  int selectPicker = 1;
 
   Color accentColor;
   Color backgroundColor;
   Color backgroundColor2;
   Color messagesColor;
+  Color messagesColor2;
 
   int backgroundColorTab = 0;
 
@@ -102,7 +107,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
       backgroundColor = themeObj.messagesChatBg;
     }
     if (backgroundColor2 == null) {
-      backgroundColor2 = themeObj.messagesChatBg2;
+      // backgroundColor2 = themeObj.messagesChatBg2;
     }
     if (messagesColor == null) {
       messagesColor = themeObj.messagesColor;
@@ -208,90 +213,12 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                     left: 8,
                     right: 8,
                   ),
-                  child: Stack(
-                    children: [
-                      Container(
-                        height: 30,
-                        child: CupertinoTextField(
-                          inputFormatters: [
-                            // WhitelistingTextInputFormatter.digitsOnly,
-                            //RegExp("[a-zA-Z0-9]")
-                            FilteringTextInputFormatter.allow(
-                              RegExp("[a-zA-Z0-9]"),
-                            ),
-                            LengthLimitingTextInputFormatter(6),
-                            // WhitelistingTextInputFormatter.,
-                          ],
-                          onSubmitted: (str) {
-                            logger.d(str.length);
-                            if (str.length != 6) {
-                              _resetColor();
-                            } else {
-                              changeColor(HexColor.fromHex("#ff$str"));
-                            }
-                            // logger.d(123);
-                          },
-                          textInputAction: TextInputAction.done,
-                          padding: EdgeInsets.only(
-                              left: 40, right: 10, top: 6, bottom: 6),
-                          // expands: true,
-                          controller: _textController,
-                          focusNode: focusNode1,
-                          placeholder: '',
-                          style: TextStyle(
-                            fontSize: 15.0,
-                            color: themeObj.normalColor,
-                          ),
-                          decoration: BoxDecoration(
-                            color: themeObj.inputBackgroundColor,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              width: 1,
-                              color: themeObj.borderColor,
-                            ),
-                          ),
-                          maxLines: 1,
-                          onChanged: _inputTextChange,
-                        ),
-                      ),
-                      Positioned(
-                        left: 30,
-                        top: 0,
-                        child: Container(
-                          height: 30,
-                          alignment: Alignment.center,
-                          child: Text(
-                            '#',
-                            style: TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 6,
-                        top: 0,
-                        child: Container(
-                          height: 30,
-                          width: 20,
-                          alignment: Alignment.center,
-                          child: Container(
-                            width: 20.0,
-                            height: 20.0,
-                            decoration: BoxDecoration(
-                              color: pickerColor,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: _inputBox(),
                 ),
                 Container(
                   child: Material(
                     child: ColorPicker(
-                      pickerColor: pickerColor,
+                      pickerColor: _pickerSelectColor(),
                       onColorChanged: changeColor,
                       showLabel: false,
                       colorPickerWidth: MediaQuery.of(context).size.width,
@@ -384,14 +311,302 @@ class _SetColorWidgetState extends State<SetColorWidget> {
     );
   }
 
-  _example() {
-    // if (_segmented == 0) {
-    //   pageNum = 2;
-    // }
-    return _exampleContent();
+  Widget _inputBox() {
+    return Stack(
+      children: [
+        Container(
+          height: 30,
+          child: Flex(
+            direction: Axis.horizontal,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              _colorInput(1),
+              if (_segmented != 0) _colorInput(2),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
-  _exampleContent() {
+  Widget _colorInput(int type) {
+    if (type == 1) {
+      return Expanded(
+        flex: 1,
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(
+                  color:
+                      selectPicker == 1 ? Colors.green : themeObj.borderColor,
+                  width: selectPicker == 1 ? 2 : 1,
+                ),
+              ),
+              child: Focus(
+                child: CupertinoTextField(
+                  inputFormatters: [
+                    // WhitelistingTextInputFormatter.digitsOnly,
+                    //RegExp("[a-zA-Z0-9]")
+                    FilteringTextInputFormatter.allow(
+                      RegExp("[a-zA-Z0-9]"),
+                    ),
+                    LengthLimitingTextInputFormatter(6),
+                    // WhitelistingTextInputFormatter.,
+                  ],
+                  onSubmitted: (str) {
+                    logger.d(str.length);
+                    if (str.length != 6) {
+                      _resetColor();
+                    } else {
+                      changeColor(HexColor.fromHex("#ff$str"));
+                    }
+                    // logger.d(123);
+                  },
+                  textInputAction: TextInputAction.done,
+                  padding:
+                  EdgeInsets.only(left: 40, right: 10, top: 3.5, bottom: 3.5),
+                  // expands: true,
+                  controller: _textController,
+                  focusNode: focusNode1,
+                  placeholder: '',
+                  style: TextStyle(
+                    fontSize: 15.0,
+                    color: themeObj.normalColor,
+                    // fontSize: selectPicker == 1 ? 18 : 14.0,
+                    // color: selectPicker == 1 ? Colors.red : themeObj.normalColor,
+                  ),
+                  decoration: BoxDecoration(
+                    color: themeObj.inputBackgroundColor,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      width: 1,
+                      color: themeObj.borderColor,
+                    ),
+                  ),
+                  maxLines: 1,
+                  onChanged: _inputTextChange,
+                ),
+                onFocusChange: (hasFocus) {
+                  if (hasFocus) {
+                    setState(() {
+                      selectPicker = 1;
+                      changeColor(pickerColor, type: 1);
+                      // isTextFiledFocus = hasFocus;
+                    });
+                  }
+                },
+              ),
+
+
+            ),
+            Positioned(
+              right: 6,
+              top: 0,
+              child: pickerColor2 != null ? _closeIcon(1) : SizedBox(),
+            ),
+            Positioned(
+              left: 30,
+              top: 0,
+              child: _colorPre(),
+            ),
+            Positioned(
+              left: 6,
+              top: 0,
+              child: _colorCircle(1),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Expanded(
+        flex: pickerColor2 != null ? 1 : null,
+        child: pickerColor2 != null
+            ? Container(
+                margin: EdgeInsets.only(left: 10),
+                child: Stack(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: selectPicker == 2
+                              ? Colors.green
+                              : themeObj.borderColor,
+                          width: selectPicker == 2 ? 2 : 1,
+                        ),
+                      ),
+                      child: Focus(
+                        child: CupertinoTextField(
+                          inputFormatters: [
+                            // WhitelistingTextInputFormatter.digitsOnly,
+                            //RegExp("[a-zA-Z0-9]")
+                            FilteringTextInputFormatter.allow(
+                              RegExp("[a-zA-Z0-9]"),
+                            ),
+                            LengthLimitingTextInputFormatter(6),
+                            // WhitelistingTextInputFormatter.,
+                          ],
+                          onSubmitted: (str) {
+                            logger.d(str.length);
+                            if (str.length != 6) {
+                              _resetColor();
+                            } else {
+                              changeColor(HexColor.fromHex("#ff$str"));
+                            }
+                            // logger.d(123);
+                          },
+                          textInputAction: TextInputAction.done,
+                          padding: EdgeInsets.only(
+                              left: 40, right: 10, top: 3.5, bottom: 3.5),
+                          // expands: true,
+                          controller: _textController2,
+                          focusNode: focusNode2,
+                          placeholder: '',
+                          style: TextStyle(
+                            fontSize: 15.0,
+                            color: themeObj.normalColor,
+                            // fontSize: selectPicker == 2 ? 18 : 14.0,
+                            // color: selectPicker == 2 ? Colors.red : themeObj.normalColor,
+                          ),
+                          decoration: BoxDecoration(
+                            color: themeObj.inputBackgroundColor,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              width: 1,
+                              color: themeObj.borderColor,
+                            ),
+                          ),
+                          maxLines: 1,
+                          onChanged: _inputTextChange,
+                        ),
+                        onFocusChange: (hasFocus) {
+                          if (hasFocus) {
+                            setState(() {
+                              selectPicker = 2;
+                              changeColor(pickerColor2, type: 2);
+                              // isTextFiledFocus = hasFocus;
+                            });
+                          }
+                        },
+                      ),
+
+                    ),
+                    _closeIcon(2),
+                    Positioned(
+                      left: 30,
+                      top: 0,
+                      child: _colorPre(),
+                    ),
+                    Positioned(
+                      left: 6,
+                      top: 0,
+                      child: _colorCircle(2),
+                    ),
+                  ],
+                ),
+              )
+            : _addIcon(),
+      );
+    }
+  }
+
+  Widget _colorPre() {
+    return Container(
+      height: 30,
+      alignment: Alignment.center,
+      child: Text(
+        '#',
+        style: TextStyle(
+          fontSize: 16,
+        ),
+      ),
+    );
+  }
+
+  Widget _colorCircle(int type) {
+    return Container(
+      height: 30,
+      width: 20,
+      alignment: Alignment.center,
+      child: Container(
+        width: 20.0,
+        height: 20.0,
+        decoration: BoxDecoration(
+          // border: Border.all(),
+          color: type == 1 ? pickerColor : pickerColor2,
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+
+  Widget _closeIcon(int type) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      child: Container(
+        height: 30,
+        width: 30,
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.clear,
+          color: themeObj.inactiveColor,
+        ),
+      ),
+      onTap: () {
+        setState(() {
+          // if (selectPicker == )
+
+          selectPicker = 1;
+          if (type == 1) {
+            // pickerColor = pickerColor2;
+            changeColor(pickerColor2, type: 1);
+            if (_segmented == 1) {
+              backgroundColor2 = null;
+            } else if (_segmented == 2) {
+              messagesColor2 = null;
+            }
+          } else {
+            changeColor(pickerColor, type: 1);
+            if (_segmented == 1) {
+              backgroundColor2 = null;
+            } else if (_segmented == 2) {
+              messagesColor2 = null;
+            }
+          }
+          pickerColor2 = null;
+          _textController2.text = '';
+        });
+      },
+    );
+  }
+
+  Widget _addIcon() {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      child: Container(
+        // color: Colors.red,
+        // padding: EdgeInsets.only(left: 10, right: 10),
+        width: 40,
+        height: 30,
+        child: Icon(
+          Icons.add,
+          color: themeObj.inactiveColor,
+        ),
+      ),
+      onTap: () {
+        logger.d('click');
+        setState(() {
+          pickerColor2 = DataUtil.randomColor();
+          selectPicker = 2;
+          changeColor(pickerColor2, type: 2);
+        });
+      },
+    );
+  }
+
+  Widget _exampleContent() {
     Widget back;
     // if (_segmented == 0) {
     //   pageNum = 2;
@@ -430,97 +645,96 @@ class _SetColorWidgetState extends State<SetColorWidget> {
     return back;
   }
 
-  _messagesWidget() {
+  Widget _messagesWidget() {
     return SingleChildScrollView(
-      physics: NeverScrollableScrollPhysics(),
-      // mainAxisAlignment: MainAxisAlignment.center,
-      reverse: true,
-      scrollDirection: Axis.vertical,
-      child: Container(
-        color: backgroundColor,
-        child: Column(
-          children: <Widget>[
-            Container(
-              width: MediaQuery.of(context).size.width,
-              child: _chatBubble(
-                message: 'Yes, turn to camera.',
-                time: 1601108277901,
-                isMe: false,
-                replyText:
-                'Do you have some apple xxxxxx slsdf sldfjs sdf lfsdf sdlf sdf sdfs sdf?',
-                isReply: false,
-                replyName: 'Bob Smith',
+        physics: NeverScrollableScrollPhysics(),
+        // mainAxisAlignment: MainAxisAlignment.center,
+        reverse: true,
+        scrollDirection: Axis.vertical,
+        child: Container(
+          color: backgroundColor,
+          child: Column(
+            children: <Widget>[
+              Container(
+                width: MediaQuery.of(context).size.width,
+                child: _chatBubble(
+                  message: 'Yes, turn to camera.',
+                  time: 1601108277901,
+                  isMe: false,
+                  replyText:
+                      'Do you have some apple xxxxxx slsdf sldfjs sdf lfsdf sdlf sdf sdfs sdf?',
+                  isReply: false,
+                  replyName: 'Bob Smith',
+                ),
               ),
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              child: _chatBubble(
-                message:
-                'Does he want me to turn from the right or turn form the left?',
-                time: 1601108277901,
-                isMe: true,
-                isReply: false,
+              Container(
+                width: MediaQuery.of(context).size.width,
+                child: _chatBubble(
+                  message:
+                      'Does he want me to turn from the right or turn form the left?',
+                  time: 1601108277901,
+                  isMe: true,
+                  isReply: false,
+                ),
               ),
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              child: _chatBubble(
-                message: 'Right side. And, uh, with intensity.',
-                time: 1601108277901,
-                isMe: false,
-                replyText: 'Does he want me to turn from the',
-                isReply: true,
-                replyName: 'Bob Smith',
+              Container(
+                width: MediaQuery.of(context).size.width,
+                child: _chatBubble(
+                  message: 'Right side. And, uh, with intensity.',
+                  time: 1601108277901,
+                  isMe: false,
+                  replyText: 'Does he want me to turn from the',
+                  isReply: true,
+                  replyName: 'Bob Smith',
+                ),
               ),
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              child: _chatBubble(
-                message:
-                'Is that everything? It seemed like he said quite a bit more than that.',
-                time: 1601108277901,
-                isMe: true,
-                replyText:
-                'Do you have some apple xxxxxx slsdf sldfjs sdf lfsdf sdlf sdf sdfs sdf?',
-                isReply: false,
-                replyName: 'Bob Smith',
+              Container(
+                width: MediaQuery.of(context).size.width,
+                child: _chatBubble(
+                  message:
+                      'Is that everything? It seemed like he said quite a bit more than that.',
+                  time: 1601108277901,
+                  isMe: true,
+                  replyText:
+                      'Do you have some apple xxxxxx slsdf sldfjs sdf lfsdf sdlf sdf sdfs sdf?',
+                  isReply: false,
+                  replyName: 'Bob Smith',
+                ),
               ),
-            ),
-            Container(
-              // height: 30,
-              width: MediaQuery.of(context).size.width,
-              child: _chatBubble(
-                message: 'Do you know what time it is?',
-                time: 1601108277901,
-                isMe: false,
-                replyText:
-                'Do you have some apple xxxxxx slsdf sldfjs sdf lfsdf sdlf sdf sdfs sdf?',
-                isReply: true,
-                replyName: 'Bob Smith',
+              Container(
+                // height: 30,
+                width: MediaQuery.of(context).size.width,
+                child: _chatBubble(
+                  message: 'Do you know what time it is?',
+                  time: 1601108277901,
+                  isMe: false,
+                  replyText:
+                      'Do you have some apple xxxxxx slsdf sldfjs sdf lfsdf sdlf sdf sdfs sdf?',
+                  isReply: true,
+                  replyName: 'Bob Smith',
+                ),
               ),
-            ),
-            Container(
-              // height: 30,
-              width: MediaQuery.of(context).size.width,
-              child: _chatBubble(
-                message: "It's morning in Tokyo....",
-                time: 1601108277901,
-                isMe: true,
-                replyText: '',
-                isReply: false,
-                replyName: '',
+              Container(
+                // height: 30,
+                width: MediaQuery.of(context).size.width,
+                child: _chatBubble(
+                  message: "It's morning in Tokyo....",
+                  time: 1601108277901,
+                  isMe: true,
+                  replyText: '',
+                  isReply: false,
+                  replyName: '',
+                ),
               ),
-            ),
-            Container(
-              height: 5,
-            ),
-          ],
-        ),
-      )
-    );
+              Container(
+                height: 5,
+              ),
+            ],
+          ),
+        ));
   }
 
-  _chatBubble({
+  Widget _chatBubble({
     bool isMe,
     bool isReply,
     String replyName,
@@ -683,7 +897,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
     );
   }
 
-  _buildMessage({
+  Widget _buildMessage({
     BuildContext context,
     String message,
     bool isMe,
@@ -797,42 +1011,78 @@ class _SetColorWidgetState extends State<SetColorWidget> {
   }
 
   // ValueChanged<Color> callback
-  void changeColor(Color color) {
+  // type 1 pickerColor, 2 pickerColor2
+  void changeColor(Color color, {int type = 1}) {
     var conver = Provider.of<ConversationListModel>(context, listen: false);
     // logger.d()
-    logger.d(color.toHex());
+    // logger.d(color.toHex());
     // themeObj.themeColorValue(color.value, _segmented);
     // logger.d(Global.profile.getProperty(''));
     setState(() {
-      if (_segmented == 0) {
-        // themeObj.theme = 1;
-        accentColor = color;
-        pickerColor = accentColor;
-        // _textController.text = "${accentColor.toHex().substring(3)}";
-      } else if (_segmented == 1) {
-        backgroundColor = color;
-        pickerColor = backgroundColor;
-        // _textController.text = "${backgroundColor.toHex().substring(3)}";
-      } else if (_segmented == 2) {
-        messagesColor = color;
-        pickerColor = messagesColor;
-        // _textController.text = "${messagesColor.toHex().substring(3)}";
+      if (selectPicker == 1) {
+        if (_segmented == 0) {
+          accentColor = color;
+        } else if (_segmented == 1) {
+          backgroundColor = color;
+        } else if (_segmented == 2) {
+          messagesColor = color;
+        }
+        pickerColor = color;
+        _textController.text = '${color.toHex().substring(3)}';
+      } else {
+        if (_segmented == 0) {
+          accentColor = color;
+        } else if (_segmented == 1) {
+          backgroundColor2 = color;
+        } else if (_segmented == 2) {
+          messagesColor2 = color;
+        }
+        pickerColor2 = color;
+        _textController2.text = '${color.toHex().substring(3)}';
       }
-      pickerColor = color;
-      _textController.text = '${color.toHex().substring(3)}';
     });
+    Map allColor = {
+      'primary': accentColor.value,
+      'background': backgroundColor.value,
+      'message': messagesColor.value,
+      'background2': backgroundColor2 == null ? null : backgroundColor2.value,
+      'message2': messagesColor2 == null ? null : messagesColor2.value,
+    };
+    logger.d(allColor);
     conver.noti();
+  }
+
+  _pickerSelectColor() {
+    if (selectPicker == 1) {
+      return pickerColor;
+    } else {
+      return pickerColor2;
+    }
   }
 
   _saveColor() {
     if (widget.type == 1) {
-      themeObj.themeColorValue(accentColor.value, 0);
-      themeObj.themeColorValue(backgroundColor.value, 1);
-      themeObj.themeColorValue(messagesColor.value, 2);
+      themeObj.themeColorValue({
+        'primary': accentColor.value,
+        'background': backgroundColor.value,
+        'message': messagesColor.value,
+        'background2': backgroundColor2 == null ? null : backgroundColor2.value,
+        'message2': messagesColor == null ? null : messagesColor.value,
+      }, 1);
+      // themeObj.themeColorValue(accentColor.value, 0);
+      // themeObj.themeColorValue(backgroundColor.value, 1);
+      // themeObj.themeColorValue(messagesColor.value, 2);
     } else if (widget.type == 2) {
-      themeObj.themeColorAdd(accentColor.value, 0);
-      themeObj.themeColorAdd(backgroundColor.value, 1);
-      themeObj.themeColorAdd(messagesColor.value, 2);
+      themeObj.themeColorAdd({
+        'primary': accentColor.value,
+        'background': backgroundColor.value,
+        'message': messagesColor.value,
+        'background2': backgroundColor2 == null ? null : backgroundColor2.value,
+        'message2': messagesColor == null ? null : messagesColor.value,
+      }, 2);
+      // themeObj.themeColorAdd(accentColor.value, 0);
+      // themeObj.themeColorAdd(backgroundColor.value, 1);
+      // themeObj.themeColorAdd(messagesColor.value, 2);
     }
     Navigator.of(context).pop();
   }

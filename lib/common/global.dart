@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// 提供可选主题色
-List themesDay = [
+// // 提供可选主题色
+List exampleColor = [
   // 52, 120, 246 蓝色
   Color.fromRGBO(52, 120, 246, 1).value,
   //87, 190, 232
@@ -27,172 +27,318 @@ List themesDay = [
   //0, 0, 0 light模式主文字包含黑色，去掉白色
   Color.fromRGBO(0, 0, 0, 1).value,
 ];
+//
+// List themesDark = [
+//   //52, 120, 246 蓝色
+//   Color.fromRGBO(52, 120, 246, 1).value,
+//   //87, 190, 232
+//   Color.fromRGBO(225, 136, 50, 1).value,
+//   // 89, 176, 64
+//   Color.fromRGBO(89, 176, 64, 1).value,
+//   //220, 115, 162
+//   Color.fromRGBO(220, 115, 162, 1).value,
+//   //225, 136, 50
+//   Color.fromRGBO(225, 136, 50, 1).value,
+//   // 143, 114, 231
+//   Color.fromRGBO(143, 114, 231, 1).value,
+//   //194, 65, 38
+//   Color.fromRGBO(194, 65, 38, 1).value,
+//   //228, 182, 62
+//   Color.fromRGBO(228, 182, 62, 1).value,
+//   //113, 130, 156
+//   Color.fromRGBO(113, 130, 156, 1).value,
+//   //255, 255, 255 dark模式主颜色包含白色，去掉黑色
+//   Color.fromRGBO(255, 255, 255, 1).value,
+// ];
+//
+// // 提供可选消息背景色
+// List themesDayMessage = [
+//   // 52, 120, 246 蓝色
+//   Color.fromRGBO(52, 120, 246, 1).value,
+//   //87, 190, 232
+//   Color.fromRGBO(87, 190, 232, 1).value,
+//   // 89, 176, 64
+//   Color.fromRGBO(89, 176, 64, 1).value,
+//   //220, 115, 162
+//   Color.fromRGBO(220, 115, 162, 1).value,
+//   //225, 136, 50
+//   Color.fromRGBO(225, 136, 50, 1).value,
+//   // 143, 114, 231
+//   Color.fromRGBO(143, 114, 231, 1).value,
+//   //194, 65, 38
+//   Color.fromRGBO(194, 65, 38, 1).value,
+//   //228, 182, 62
+//   Color.fromRGBO(228, 182, 62, 1).value,
+//   //113, 130, 156
+//   Color.fromRGBO(113, 130, 156, 1).value,
+//   //0, 0, 0 light模式主文字包含黑色，去掉白色
+//   Color.fromRGBO(0, 0, 0, 1).value,
+// ];
+//
+// List themesDarkMessage = [
+//   //52, 120, 246 蓝色
+//   Color.fromRGBO(52, 120, 246, 1).value,
+//   //87, 190, 232
+//   Color.fromRGBO(87, 190, 232, 1).value,
+//   // 89, 176, 64
+//   Color.fromRGBO(89, 176, 64, 1).value,
+//   //220, 115, 162
+//   Color.fromRGBO(220, 115, 162, 1).value,
+//   //225, 136, 50
+//   Color.fromRGBO(225, 136, 50, 1).value,
+//   // 143, 114, 231
+//   Color.fromRGBO(143, 114, 231, 1).value,
+//   //194, 65, 38
+//   Color.fromRGBO(194, 65, 38, 1).value,
+//   //228, 182, 62
+//   Color.fromRGBO(228, 182, 62, 1).value,
+//   //113, 130, 156
+//   Color.fromRGBO(113, 130, 156, 1).value,
+//   //255, 255, 255 dark模式主颜色包含白色，去掉黑色
+//   Color.fromRGBO(255, 255, 255, 1).value,
+// ];
+//
+// // day模式 主题颜色对应聊天页面背景颜色
+// List themesDayBg = [
+//   // 52, 120, 246 蓝色
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //87, 190, 232
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   // 89, 176, 64
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //220, 115, 162
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //225, 136, 50
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   // 143, 114, 231
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //194, 65, 38
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //228, 182, 62
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //113, 130, 156
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //255, 255, 255
+//   Color.fromRGBO(255, 255, 255, 1).value,
+// ];
+//
+// // dark模式 主题颜色对应聊天页面背景颜色
+// List themesDarkBg = [
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //87, 190, 232
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   // 89, 176, 64
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //220, 115, 162
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //225, 136, 50
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   // 143, 114, 231
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //194, 65, 38
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //228, 182, 62
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //113, 130, 156
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //0, 0, 0
+//   Color.fromRGBO(0, 0, 0, 1).value,
+// ];
+//
+//
+// // day模式 主题颜色对应聊天页面背景颜色 渐变色
+// List themesDayBg2 = [
+//   // 52, 120, 246 蓝色
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //87, 190, 232
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   // 89, 176, 64
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //220, 115, 162
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //225, 136, 50
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   // 143, 114, 231
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //194, 65, 38
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //228, 182, 62
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //113, 130, 156
+//   Color.fromRGBO(255, 255, 255, 1).value,
+//   //255, 255, 255
+//   Color.fromRGBO(255, 255, 255, 1).value,
+// ];
+//
+// // dark模式 主题颜色对应聊天页面背景颜色 渐变色
+// List themesDarkBg2 = [
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //87, 190, 232
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   // 89, 176, 64
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //220, 115, 162
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //225, 136, 50
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   // 143, 114, 231
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //194, 65, 38
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //228, 182, 62
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //113, 130, 156
+//   Color.fromRGBO(0, 0, 0, 1).value,
+//   //0, 0, 0
+//   Color.fromRGBO(0, 0, 0, 1).value,
+// ];
 
-List themesDark = [
-  //52, 120, 246 蓝色
-  Color.fromRGBO(52, 120, 246, 1).value,
-  //87, 190, 232
-  Color.fromRGBO(87, 190, 232, 1).value,
-  // 89, 176, 64
-  Color.fromRGBO(89, 176, 64, 1).value,
-  //220, 115, 162
-  Color.fromRGBO(220, 115, 162, 1).value,
-  //225, 136, 50
-  Color.fromRGBO(225, 136, 50, 1).value,
-  // 143, 114, 231
-  Color.fromRGBO(143, 114, 231, 1).value,
-  //194, 65, 38
-  Color.fromRGBO(194, 65, 38, 1).value,
-  //228, 182, 62
-  Color.fromRGBO(228, 182, 62, 1).value,
-  //113, 130, 156
-  Color.fromRGBO(113, 130, 156, 1).value,
-  //255, 255, 255 dark模式主颜色包含白色，去掉黑色
-  Color.fromRGBO(255, 255, 255, 1).value,
+List dayList = [
+  {
+    'primary': Color.fromRGBO(52, 120, 246, 1).value,
+    'message': Color.fromRGBO(52, 120, 246, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(87, 190, 232, 1).value,
+    'message': Color.fromRGBO(87, 190, 232, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(89, 176, 64, 1).value,
+    'message': Color.fromRGBO(89, 176, 64, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(220, 115, 162, 1).value,
+    'message': Color.fromRGBO(220, 115, 162, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(225, 136, 50, 1).value,
+    'message': Color.fromRGBO(225, 136, 50, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(143, 114, 231, 1).value,
+    'message': Color.fromRGBO(143, 114, 231, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(194, 65, 38, 1).value,
+    'message': Color.fromRGBO(194, 65, 38, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(228, 182, 62, 1).value,
+    'message': Color.fromRGBO(228, 182, 62, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(113, 130, 156, 1).value,
+    'message': Color.fromRGBO(113, 130, 156, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(0, 0, 0, 1).value,
+    'message': Color.fromRGBO(0, 0, 0, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'message2': null,
+    'background2': null,
+  },
 ];
 
-// 提供可选消息背景色
-List themesDayMessage = [
-  // 52, 120, 246 蓝色
-  Color.fromRGBO(52, 120, 246, 1).value,
-  //87, 190, 232
-  Color.fromRGBO(87, 190, 232, 1).value,
-  // 89, 176, 64
-  Color.fromRGBO(89, 176, 64, 1).value,
-  //220, 115, 162
-  Color.fromRGBO(220, 115, 162, 1).value,
-  //225, 136, 50
-  Color.fromRGBO(225, 136, 50, 1).value,
-  // 143, 114, 231
-  Color.fromRGBO(143, 114, 231, 1).value,
-  //194, 65, 38
-  Color.fromRGBO(194, 65, 38, 1).value,
-  //228, 182, 62
-  Color.fromRGBO(228, 182, 62, 1).value,
-  //113, 130, 156
-  Color.fromRGBO(113, 130, 156, 1).value,
-  //0, 0, 0 light模式主文字包含黑色，去掉白色
-  Color.fromRGBO(0, 0, 0, 1).value,
+
+List darkList = [
+  {
+    'primary': Color.fromRGBO(52, 120, 246, 1).value,
+    'message': Color.fromRGBO(52, 120, 246, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(87, 190, 232, 1).value,
+    'message': Color.fromRGBO(87, 190, 232, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(89, 176, 64, 1).value,
+    'message': Color.fromRGBO(89, 176, 64, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(220, 115, 162, 1).value,
+    'message': Color.fromRGBO(220, 115, 162, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(225, 136, 50, 1).value,
+    'message': Color.fromRGBO(225, 136, 50, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(143, 114, 231, 1).value,
+    'message': Color.fromRGBO(143, 114, 231, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(194, 65, 38, 1).value,
+    'message': Color.fromRGBO(194, 65, 38, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(228, 182, 62, 1).value,
+    'message': Color.fromRGBO(228, 182, 62, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(113, 130, 156, 1).value,
+    'message': Color.fromRGBO(113, 130, 156, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'message2': null,
+    'background2': null,
+  },
+  {
+    'primary': Color.fromRGBO(255, 255, 255, 1).value,
+    'message': Color.fromRGBO(255, 255, 255, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'message2': null,
+    'background2': null,
+  },
 ];
-
-List themesDarkMessage = [
-  //52, 120, 246 蓝色
-  Color.fromRGBO(52, 120, 246, 1).value,
-  //87, 190, 232
-  Color.fromRGBO(87, 190, 232, 1).value,
-  // 89, 176, 64
-  Color.fromRGBO(89, 176, 64, 1).value,
-  //220, 115, 162
-  Color.fromRGBO(220, 115, 162, 1).value,
-  //225, 136, 50
-  Color.fromRGBO(225, 136, 50, 1).value,
-  // 143, 114, 231
-  Color.fromRGBO(143, 114, 231, 1).value,
-  //194, 65, 38
-  Color.fromRGBO(194, 65, 38, 1).value,
-  //228, 182, 62
-  Color.fromRGBO(228, 182, 62, 1).value,
-  //113, 130, 156
-  Color.fromRGBO(113, 130, 156, 1).value,
-  //255, 255, 255 dark模式主颜色包含白色，去掉黑色
-  Color.fromRGBO(255, 255, 255, 1).value,
-];
-
-// day模式 主题颜色对应聊天页面背景颜色
-List themesDayBg = [
-  // 52, 120, 246 蓝色
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //87, 190, 232
-  Color.fromRGBO(255, 255, 255, 1).value,
-  // 89, 176, 64
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //220, 115, 162
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //225, 136, 50
-  Color.fromRGBO(255, 255, 255, 1).value,
-  // 143, 114, 231
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //194, 65, 38
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //228, 182, 62
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //113, 130, 156
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //255, 255, 255
-  Color.fromRGBO(255, 255, 255, 1).value,
-];
-
-// dark模式 主题颜色对应聊天页面背景颜色
-List themesDarkBg = [
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //87, 190, 232
-  Color.fromRGBO(0, 0, 0, 1).value,
-  // 89, 176, 64
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //220, 115, 162
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //225, 136, 50
-  Color.fromRGBO(0, 0, 0, 1).value,
-  // 143, 114, 231
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //194, 65, 38
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //228, 182, 62
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //113, 130, 156
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //0, 0, 0
-  Color.fromRGBO(0, 0, 0, 1).value,
-];
-
-
-// day模式 主题颜色对应聊天页面背景颜色 渐变色
-List themesDayBg2 = [
-  // 52, 120, 246 蓝色
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //87, 190, 232
-  Color.fromRGBO(255, 255, 255, 1).value,
-  // 89, 176, 64
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //220, 115, 162
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //225, 136, 50
-  Color.fromRGBO(255, 255, 255, 1).value,
-  // 143, 114, 231
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //194, 65, 38
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //228, 182, 62
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //113, 130, 156
-  Color.fromRGBO(255, 255, 255, 1).value,
-  //255, 255, 255
-  Color.fromRGBO(255, 255, 255, 1).value,
-];
-
-// dark模式 主题颜色对应聊天页面背景颜色 渐变色
-List themesDarkBg2 = [
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //87, 190, 232
-  Color.fromRGBO(0, 0, 0, 1).value,
-  // 89, 176, 64
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //220, 115, 162
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //225, 136, 50
-  Color.fromRGBO(0, 0, 0, 1).value,
-  // 143, 114, 231
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //194, 65, 38
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //228, 182, 62
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //113, 130, 156
-  Color.fromRGBO(0, 0, 0, 1).value,
-  //0, 0, 0
-  Color.fromRGBO(0, 0, 0, 1).value,
-];
-
 // Map<int, Map> dayTheme = <int, Map>{
 //   0: {
 //     'primary': Color.fromRGBO(52, 120, 246, 1).value,
@@ -246,60 +392,62 @@ class Global {
   // 可选的主题列表
   static List get themes {
     if (profile.themeMode == 1) {
-      return profile.themesDay == null || profile.themesDay.length == 0
-          ? themesDay
-          : profile.themesDay;
+      return profile.dayList == null || profile.dayList.length == 0
+          ? dayList
+          : profile.dayList;
     } else if (profile.themeMode == 2) {
-      return profile.themesDark == null || profile.themesDark.length == 0
-          ? themesDark
-          : profile.themesDark;
+      return profile.darkList == null || profile.darkList.length == 0
+          ? darkList
+          : profile.darkList;
     } else {
-      return profile.themesDay == null || profile.themesDay.length == 0
-          ? themesDay
-          : profile.themesDay;
+      return profile.dayList == null || profile.dayList.length == 0
+          ? dayList
+          : profile.dayList;
     }
   }
 
   // profile.themeMode == 2 ? themesDark : themesDay;
 
   // 可选的 消息背景色
-  static List get themesMessage {
-    if (profile.themeMode == 1) {
-      return profile.themesDayMessage == null
-          ? themesDayMessage
-          : profile.themesDayMessage;
-    } else if (profile.themeMode == 2) {
-      return profile.themesDarkMessage == null
-          ? themesDarkMessage
-          : profile.themesDarkMessage;
-    } else {
-      return profile.themesDayMessage == null
-          ? themesDayMessage
-          : profile.themesDayMessage;
-    }
-  }
+  // static List get themesMessage {
+  //   if (profile.themeMode == 1) {
+  //     return profile.themesDayMessage == null
+  //         ? themesDayMessage
+  //         : profile.themesDayMessage;
+  //   } else if (profile.themeMode == 2) {
+  //     return profile.themesDarkMessage == null
+  //         ? themesDarkMessage
+  //         : profile.themesDarkMessage;
+  //   } else {
+  //     return profile.themesDayMessage == null
+  //         ? themesDayMessage
+  //         : profile.themesDayMessage;
+  //   }
+  // }
+  //
+  // // 可选的聊天页面背景主题列表
+  // static List get themesBg {
+  //   if (profile.themeMode == 1) {
+  //     return profile.themesDayBg == null ? themesDayBg : profile.themesDayBg;
+  //   } else if (profile.themeMode == 2) {
+  //     return profile.themesDarkBg == null ? themesDarkBg : profile.themesDarkBg;
+  //   } else {
+  //     return profile.themesDayBg == null ? themesDayBg : profile.themesDayBg;
+  //   }
+  // }
+  //
+  // // 可选的聊天页面背景主题列表 渐变色
+  // static List get themesBg2 {
+  //   if (profile.themeMode == 1) {
+  //     return profile.themesDayBg2 == null ? themesDayBg : profile.themesDayBg2;
+  //   } else if (profile.themeMode == 2) {
+  //     return profile.themesDarkBg2 == null ? themesDarkBg : profile.themesDarkBg2;
+  //   } else {
+  //     return profile.themesDayBg2 == null ? themesDayBg : profile.themesDayBg2;
+  //   }
+  // }
 
-  // 可选的聊天页面背景主题列表
-  static List get themesBg {
-    if (profile.themeMode == 1) {
-      return profile.themesDayBg == null ? themesDayBg : profile.themesDayBg;
-    } else if (profile.themeMode == 2) {
-      return profile.themesDarkBg == null ? themesDarkBg : profile.themesDarkBg;
-    } else {
-      return profile.themesDayBg == null ? themesDayBg : profile.themesDayBg;
-    }
-  }
 
-  // 可选的聊天页面背景主题列表 渐变色
-  static List get themesBg2 {
-    if (profile.themeMode == 1) {
-      return profile.themesDayBg2 == null ? themesDayBg : profile.themesDayBg2;
-    } else if (profile.themeMode == 2) {
-      return profile.themesDarkBg2 == null ? themesDarkBg : profile.themesDarkBg2;
-    } else {
-      return profile.themesDayBg2 == null ? themesDayBg : profile.themesDayBg2;
-    }
-  }
 
   // 是否为release版
   static bool get isRelease => bool.fromEnvironment("dart.vm.product");
@@ -332,47 +480,61 @@ class Global {
     if (_profile != null) {
       try {
         profile = Profile.fromJson(jsonDecode(_profile));
+        // day 主题 list
+        if (profile.dayList == null) {
+          profile.dayList = dayList;
+        }
+        // dark 主题 list
+        if (profile.darkList == null) {
+          profile.darkList = darkList;
+        }
+
+
         // logger.d(profile.themesDay);
-        if (profile.themesDay == null) {
-          profile.themesDay = themesDay;
-        }
-        // logger.d(profile.themesDay);
-        if (profile.themesDark == null) {
-          profile.themesDark = themesDark;
-        }
-        if (profile.themesDayMessage == null) {
-          profile.themesDayMessage = themesDayMessage;
-        }
-        if (profile.themesDarkMessage == null) {
-          profile.themesDarkMessage = themesDarkMessage;
-        }
-        // logger.d(profile.themesDayBg);
-        if (profile.themesDayBg == null) {
-          profile.themesDayBg = themesDayBg;
-        }
-        if (profile.themesDarkBg == null) {
-          profile.themesDarkBg = themesDarkBg;
-        }
-        // logger.d(profile.themesDayBg);
-        if (profile.themesDayBg2 == null) {
-          profile.themesDayBg2 = themesDayBg2;
-        }
-        if (profile.themesDarkBg2 == null) {
-          profile.themesDarkBg2 = themesDarkBg2;
-        }
+        // if (profile.themesDay == null) {
+        //   profile.themesDay = themesDay;
+        // }
+        // // logger.d(profile.themesDay);
+        // if (profile.themesDark == null) {
+        //   profile.themesDark = themesDark;
+        // }
+        // if (profile.themesDayMessage == null) {
+        //   profile.themesDayMessage = themesDayMessage;
+        // }
+        // if (profile.themesDarkMessage == null) {
+        //   profile.themesDarkMessage = themesDarkMessage;
+        // }
+        // // logger.d(profile.themesDayBg);
+        // if (profile.themesDayBg == null) {
+        //   profile.themesDayBg = themesDayBg;
+        // }
+        // if (profile.themesDarkBg == null) {
+        //   profile.themesDarkBg = themesDarkBg;
+        // }
+        // // logger.d(profile.themesDayBg);
+        // if (profile.themesDayBg2 == null) {
+        //   profile.themesDayBg2 = themesDayBg2;
+        // }
+        // if (profile.themesDarkBg2 == null) {
+        //   profile.themesDarkBg2 = themesDarkBg2;
+        // }
         saveProfile();
       } catch (e) {
         print(e);
       }
     } else {
-      profile.themesDay = themesDay;
-      profile.themesDark = themesDark;
-      profile.themesDayMessage = themesDayMessage;
-      profile.themesDarkMessage = themesDarkMessage;
-      profile.themesDayBg = themesDayBg;
-      profile.themesDarkBg = themesDarkBg;
-      profile.themesDayBg2 = themesDayBg2;
-      profile.themesDarkBg2 = themesDarkBg2;
+      profile.dayList = dayList;
+      profile.darkList = darkList;
+
+
+      // profile.themesDay = themesDay;
+      // profile.themesDark = themesDark;
+      // profile.themesDayMessage = themesDayMessage;
+      // profile.themesDarkMessage = themesDarkMessage;
+      // profile.themesDayBg = themesDayBg;
+      // profile.themesDarkBg = themesDarkBg;
+      // profile.themesDayBg2 = themesDayBg2;
+      // profile.themesDarkBg2 = themesDarkBg2;
     }
     voipToken = _prefs.getString("voipToken");
     firebaseToken = _prefs.getString("firebaseToken");
