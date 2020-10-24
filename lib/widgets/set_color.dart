@@ -179,6 +179,18 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                           onValueChanged: (i) {
                             // logger.d(i);
                             setState(() {
+                              selectPicker = 1;
+                              focusNode1.unfocus();
+                              focusNode2.unfocus();
+                              if (i == 0) {
+                                pickerColor = accentColor;
+                              } else if (i == 1) {
+                                pickerColor = backgroundColor;
+                                pickerColor2 = backgroundColor2;
+                              } else if (i == 2) {
+                                pickerColor = messagesColor;
+                                pickerColor2 = messagesColor2;
+                              }
                               _segmented = i;
                             });
                           },
