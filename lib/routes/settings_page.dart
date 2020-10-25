@@ -602,6 +602,11 @@ class _SettingsPageState extends State<SettingsPage> {
         Global.profile.user.avatarUrlLocal = fileInfo.fileOriginLocal;
         // logger.d(fileInfo.fileOriginLocal);
       }
+      if (myInfo.avatar == 0 || myInfo.avatar == null) {
+        Global.profile.user.avatarUrl = null;
+        Global.profile.user.avatarUrlLocal = null;
+
+      }
 
       UserModel userInfo = Provider.of<UserModel>(context, listen: false);
       userInfo.user = Global.profile.user;

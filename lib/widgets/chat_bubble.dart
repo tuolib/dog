@@ -966,7 +966,7 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
   Widget _buildName() {
     var nameWidget = Container(
       child: Text(
-        widget.username,
+        'username',
         style: TextStyle(
           fontSize: 13,
           color: colors[rNum],

@@ -1018,7 +1018,7 @@ class _ConversationState extends State<Conversation> {
       // ArrayUtil.sortArray(scrollWidgetList, sortOrder: 1, property: 'timestamp');
       // logger.d(' time da xiao ${scrollList[scrollList.length - 1]['timestamp'] - msg['timestamp']}');
       // logger.d('msg time : ${msg['timestamp']}');
-      if (msg['timestamp'] <= scrollList[scrollList.length - 1]['timestamp']) {
+      if (msg['timestamp'] <= scrollList[0]['timestamp']) {
         topColor = Colors.blue;
       } else {
         topColor = Colors.red;

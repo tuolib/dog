@@ -145,88 +145,12 @@ class _SetColorWidgetState extends State<SetColorWidget> {
             // width: MediaQuery.of(context).size.width,
             child: Column(
               children: [
-                Container(
-                  // width: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.only(
-                    top: 10,
-                    bottom: 10,
-                    left: 10,
-                    right: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: themeObj.barBackgroundColor,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: themeObj.borderColor,
-                        width: 1,
-                        style: BorderStyle.solid,
-                      ),
-                    ),
-                  ),
-                  // margin: EdgeInsets.only(top: 10, bottom: 10),
-                  child: Flex(
-                    // mainAxisAlignment: MainAxisAlignment.center,
-                    // mainAxisSize: MainAxisSize.max,
-                    direction: Axis.horizontal,
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: CupertinoSlidingSegmentedControl<int>(
-                          // backgroundColor: themeObj.inputBackgroundColor,
-                          // padding: EdgeInsets.all(0),
-                          groupValue: _segmented,
-                          children: myTabs,
-                          onValueChanged: (i) {
-                            // logger.d(i);
-                            setState(() {
-                              selectPicker = 1;
-                              focusNode1.unfocus();
-                              focusNode2.unfocus();
-                              if (i == 0) {
-                                pickerColor = accentColor;
-                              } else if (i == 1) {
-                                pickerColor = backgroundColor;
-                                pickerColor2 = backgroundColor2;
-                              } else if (i == 2) {
-                                pickerColor = messagesColor;
-                                pickerColor2 = messagesColor2;
-                              }
-                              _segmented = i;
-                            });
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+                _buildTab(),
                 Expanded(
                   flex: 1,
                   child: _messagesWidget(),
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: themeObj.barBackgroundColor,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: themeObj.borderColor,
-                        width: 1,
-                        style: BorderStyle.solid,
-                      ),
-                      top: BorderSide(
-                        color: themeObj.borderColor,
-                        width: 1,
-                        style: BorderStyle.solid,
-                      ),
-                    ),
-                  ),
-                  padding: EdgeInsets.only(
-                    top: 6,
-                    bottom: 6,
-                    left: 8,
-                    right: 8,
-                  ),
-                  child: _inputBox(),
-                ),
+                _buildInput(),
                 Container(
                   child: Material(
                     child: ColorPicker(
@@ -240,81 +164,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                     ),
                   ),
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: themeObj.barBackgroundColor,
-                    border: Border(
-                      top: BorderSide(
-                        color: themeObj.borderColor,
-                        width: 1,
-                        style: BorderStyle.solid,
-                      ),
-                    ),
-                  ),
-                  height: 60,
-                  child: Flex(
-                    direction: Axis.horizontal,
-                    // mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: GestureDetector(
-                          onTap: () {
-                            // logger.d(1);
-                            Navigator.of(context).pop();
-                          },
-                          child: Container(
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: themeObj.barBackgroundColor,
-                              border: Border(
-                                right: BorderSide(
-                                  color: themeObj.borderColor,
-                                  width: 1,
-                                  style: BorderStyle.solid,
-                                ),
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                'Cancel',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: themeObj.normalColor,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: GestureDetector(
-                          onTap: () {
-                            _saveColor();
-                          },
-                          child: Container(
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: themeObj.barBackgroundColor,
-                            ),
-                            child: Center(
-                              child: Text(
-                                'Set',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: themeObj.normalColor,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                _buildButton(),
               ],
             ),
           ),
@@ -323,11 +173,175 @@ class _SetColorWidgetState extends State<SetColorWidget> {
     );
   }
 
+  Widget _buildButton() {
+    return Container(
+      decoration: BoxDecoration(
+        color: themeObj.barBackgroundColor,
+        border: Border(
+          top: BorderSide(
+            color: themeObj.borderColor,
+            width: 1,
+            style: BorderStyle.solid,
+          ),
+        ),
+      ),
+      height: 60,
+      child: Flex(
+        direction: Axis.horizontal,
+        // mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(
+            flex: 1,
+            child: GestureDetector(
+              onTap: () {
+                // logger.d(1);
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  color: themeObj.barBackgroundColor,
+                  border: Border(
+                    right: BorderSide(
+                      color: themeObj.borderColor,
+                      width: 1,
+                      style: BorderStyle.solid,
+                    ),
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: themeObj.normalColor,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: GestureDetector(
+              onTap: () {
+                _saveColor();
+              },
+              child: Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  color: themeObj.barBackgroundColor,
+                ),
+                child: Center(
+                  child: Text(
+                    'Set',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: themeObj.normalColor,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTab() {
+    return Container(
+      // width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.only(
+        top: 10,
+        bottom: 10,
+        left: 10,
+        right: 10,
+      ),
+      decoration: BoxDecoration(
+        color: themeObj.barBackgroundColor,
+        border: Border(
+          bottom: BorderSide(
+            color: themeObj.borderColor,
+            width: 1,
+            style: BorderStyle.solid,
+          ),
+        ),
+      ),
+      // margin: EdgeInsets.only(top: 10, bottom: 10),
+      child: Flex(
+        // mainAxisAlignment: MainAxisAlignment.center,
+        // mainAxisSize: MainAxisSize.max,
+        direction: Axis.horizontal,
+        children: [
+          Expanded(
+            flex: 1,
+            child: CupertinoSlidingSegmentedControl<int>(
+              // backgroundColor: themeObj.inputBackgroundColor,
+              // padding: EdgeInsets.all(0),
+              groupValue: _segmented,
+              children: myTabs,
+              onValueChanged: (i) {
+                // logger.d(i);
+                setState(() {
+                  selectPicker = 1;
+                  focusNode1.unfocus();
+                  focusNode2.unfocus();
+                  if (i == 0) {
+                    pickerColor = accentColor;
+                    pickerColor2 = null;
+                  } else if (i == 1) {
+                    pickerColor = backgroundColor;
+                    pickerColor2 = backgroundColor2;
+                  } else if (i == 2) {
+                    pickerColor = messagesColor;
+                    pickerColor2 = messagesColor2;
+                  }
+                  _segmented = i;
+                });
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInput() {
+    return Container(
+      decoration: BoxDecoration(
+        color: themeObj.barBackgroundColor,
+        border: Border(
+          bottom: BorderSide(
+            color: themeObj.borderColor,
+            width: 1,
+            style: BorderStyle.solid,
+          ),
+          top: BorderSide(
+            color: themeObj.borderColor,
+            width: 1,
+            style: BorderStyle.solid,
+          ),
+        ),
+      ),
+      padding: EdgeInsets.only(
+        top: 6,
+        bottom: 6,
+        left: 8,
+        right: 8,
+      ),
+      child: _inputBox(),
+    );
+  }
+
+
   Widget _inputBox() {
     return Stack(
       children: [
         Container(
-          height: 30,
+          height: 36,
           child: Flex(
             direction: Axis.horizontal,
             mainAxisSize: MainAxisSize.max,
@@ -341,6 +355,8 @@ class _SetColorWidgetState extends State<SetColorWidget> {
     );
   }
 
+
+
   Widget _colorInput(int type) {
     if (type == 1) {
       return Expanded(
@@ -348,16 +364,17 @@ class _SetColorWidgetState extends State<SetColorWidget> {
         child: Stack(
           children: [
             Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  color:
-                      selectPicker == 1 ? Colors.green : themeObj.borderColor,
-                  width: selectPicker == 1 ? 2 : 1,
-                ),
-              ),
+              // decoration: BoxDecoration(
+              //   borderRadius: BorderRadius.circular(15),
+              //   border: Border.all(
+              //     color:
+              //         selectPicker == 1 ? Colors.green : themeObj.borderColor,
+              //     width: selectPicker == 1 ? 2 : 1,
+              //   ),
+              // ),
               child: Focus(
                 child: CupertinoTextField(
+                  expands: true,
                   inputFormatters: [
                     // WhitelistingTextInputFormatter.digitsOnly,
                     //RegExp("[a-zA-Z0-9]")
@@ -378,16 +395,16 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                   },
                   textInputAction: TextInputAction.done,
                   padding:
-                  EdgeInsets.only(left: 40, right: 10, top: 3.5, bottom: 3.5),
+                  EdgeInsets.only(left: 40, right: 10, top: 6, bottom: 6),
                   // expands: true,
                   controller: _textController,
                   focusNode: focusNode1,
                   placeholder: '',
                   style: TextStyle(
-                    fontSize: 15.0,
-                    color: themeObj.normalColor,
+                    fontSize: 16.0,
+                    // color: themeObj.normalColor,
                     // fontSize: selectPicker == 1 ? 18 : 14.0,
-                    // color: selectPicker == 1 ? Colors.red : themeObj.normalColor,
+                    color: selectPicker == 1 ? Colors.green : themeObj.normalColor,
                   ),
                   decoration: BoxDecoration(
                     color: themeObj.inputBackgroundColor,
@@ -397,11 +414,16 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                       color: themeObj.borderColor,
                     ),
                   ),
-                  maxLines: 1,
+                  // maxLines: 1,
+                  maxLines: null,
+                  minLines: null,
                   onChanged: _inputTextChange,
                 ),
                 onFocusChange: (hasFocus) {
                   if (hasFocus) {
+                    if (selectPicker == 2) {
+                      focusNode1.unfocus();
+                    }
                     setState(() {
                       selectPicker = 1;
                       changeColor(pickerColor, type: 1);
@@ -440,17 +462,16 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                 child: Stack(
                   children: [
                     Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(
-                          color: selectPicker == 2
-                              ? Colors.green
-                              : themeObj.borderColor,
-                          width: selectPicker == 2 ? 2 : 1,
-                        ),
-                      ),
+                      // decoration: BoxDecoration(
+                      //   borderRadius: BorderRadius.circular(15),
+                      //   border: Border.all(
+                      //     color: themeObj.borderColor,
+                      //     width: 1,
+                      //   ),
+                      // ),
                       child: Focus(
                         child: CupertinoTextField(
+                          expands: true,
                           inputFormatters: [
                             // WhitelistingTextInputFormatter.digitsOnly,
                             //RegExp("[a-zA-Z0-9]")
@@ -471,16 +492,16 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                           },
                           textInputAction: TextInputAction.done,
                           padding: EdgeInsets.only(
-                              left: 40, right: 10, top: 3.5, bottom: 3.5),
+                              left: 40, right: 10, top: 6, bottom: 6),
                           // expands: true,
                           controller: _textController2,
                           focusNode: focusNode2,
                           placeholder: '',
                           style: TextStyle(
-                            fontSize: 15.0,
-                            color: themeObj.normalColor,
+                            fontSize: 16.0,
+                            // color: themeObj.normalColor,
                             // fontSize: selectPicker == 2 ? 18 : 14.0,
-                            // color: selectPicker == 2 ? Colors.red : themeObj.normalColor,
+                            color: selectPicker == 2 ? Colors.green : themeObj.normalColor,
                           ),
                           decoration: BoxDecoration(
                             color: themeObj.inputBackgroundColor,
@@ -490,11 +511,15 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                               color: themeObj.borderColor,
                             ),
                           ),
-                          maxLines: 1,
+                          maxLines: null,
+                          minLines: null,
                           onChanged: _inputTextChange,
                         ),
                         onFocusChange: (hasFocus) {
                           if (hasFocus) {
+                            if (selectPicker == 1) {
+                              focusNode2.unfocus();
+                            }
                             setState(() {
                               selectPicker = 2;
                               changeColor(pickerColor2, type: 2);
@@ -505,7 +530,12 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                       ),
 
                     ),
-                    _closeIcon(2),
+                    Positioned(
+                      right: 6,
+                      top: 0,
+                      child: _closeIcon(2),
+                    ),
+
                     Positioned(
                       left: 30,
                       top: 0,
