@@ -115,6 +115,8 @@ class _MainScreenState extends State<MainScreen> {
     callInfoSocket = callInfo;
     var deviceInfo = Provider.of<DeviceModel>(context, listen: false);
     deviceSocket = deviceInfo;
+
+    socketTheme = Provider.of<ThemeModel>(context, listen: false);
     // if (!hasStartCall) {
     //   createOverlayView(mainScreePage, false);
     // }

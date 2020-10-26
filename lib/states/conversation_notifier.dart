@@ -846,5 +846,9 @@ class ConversationScrollModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  noti() {
+    notifyListeners();
+  }
 }
 

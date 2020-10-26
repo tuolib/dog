@@ -7,6 +7,21 @@ import 'package:flutter/services.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:worm_indicator/worm_indicator.dart';
 
+abstract class KeyboardHiderMixin {
+  void hideKeyboard({
+    BuildContext context,
+    bool hideTextInput = true,
+    bool requestFocusNode = true,
+  }) {
+    if (hideTextInput) {
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+    }
+    if (context != null && requestFocusNode) {
+      FocusScope.of(context).requestFocus(FocusNode());
+    }
+  }
+}
+
 bool setType = false;
 
 class SetColorWidget extends StatefulWidget {
@@ -68,6 +83,11 @@ class _SetColorWidgetState extends State<SetColorWidget> {
 
   int pageNum = 1;
 
+  double inputFontSize = 16;
+  double inputPaddingTop = 5;
+  double inputBorder = 1;
+  double inputHeight = 30;
+
   @override
   void initState() {
     super.initState();
@@ -100,6 +120,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
     // if (messagesColorBack == null) {
     //   messagesColorBack = messagesColor;
     // }
+    // logger.d(Global.themes[themeObj.theme]);
     if (accentColor == null) {
       accentColor = themeObj.primaryColor;
     }
@@ -107,27 +128,46 @@ class _SetColorWidgetState extends State<SetColorWidget> {
       backgroundColor = themeObj.messagesChatBg;
     }
     if (backgroundColor2 == null) {
-      // backgroundColor2 = themeObj.messagesChatBg2;
+      if (themeObj.messagesChatBg2 != null) {
+        backgroundColor2 = themeObj.messagesChatBg2;
+      }
     }
     if (messagesColor == null) {
       messagesColor = themeObj.messagesColor;
+    }
+    if (messagesColor2 == null) {
+      if (themeObj.messagesColor2 != null) {
+        messagesColor2 = themeObj.messagesColor2;
+      }
+      // messagesColor2 = themeObj.messagesColor2;
     }
     if (_segmented == 0) {
       pickerColor = accentColor;
       _textController.text = "${accentColor.toHex().substring(3)}";
     } else if (_segmented == 1) {
-      if (backgroundColorTab == 0) {
-        pickerColor = backgroundColor;
-        logger.d('${backgroundColor.toHex()}');
-        _textController.text = "${backgroundColor.toHex().substring(3)}";
-      } else {
-        pickerColor = backgroundColor2;
-        logger.d('${backgroundColor2.toHex()}');
-        _textController.text = "${backgroundColor2.toHex().substring(3)}";
+      pickerColor = backgroundColor;
+      logger.d('${backgroundColor.toHex()}');
+      _textController.text = "${backgroundColor.toHex().substring(3)}";
+      if (backgroundColor2 != null) {
+        pickerColor2 = backgroundColor2;
+        _textController2.text = "${backgroundColor2.toHex().substring(3)}";
       }
+      // if (selectPicker == 0) {
+      //   pickerColor = backgroundColor;
+      //   logger.d('${backgroundColor.toHex()}');
+      //   _textController.text = "${backgroundColor.toHex().substring(3)}";
+      // } else {
+      //   pickerColor = backgroundColor2;
+      //   logger.d('${backgroundColor2.toHex()}');
+      //   _textController.text = "${backgroundColor2.toHex().substring(3)}";
+      // }
     } else if (_segmented == 2) {
       pickerColor = messagesColor;
       _textController.text = "${messagesColor.toHex().substring(3)}";
+      if (messagesColor2 != null) {
+        pickerColor2 = messagesColor2;
+        _textController2.text = "${messagesColor2.toHex().substring(3)}";
+      }
     }
     return GestureDetector(
       onTap: () {
@@ -311,6 +351,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
 
   Widget _buildInput() {
     return Container(
+      height: 48,
       decoration: BoxDecoration(
         color: themeObj.barBackgroundColor,
         border: Border(
@@ -336,7 +377,6 @@ class _SetColorWidgetState extends State<SetColorWidget> {
     );
   }
 
-
   Widget _inputBox() {
     return Stack(
       children: [
@@ -355,8 +395,6 @@ class _SetColorWidgetState extends State<SetColorWidget> {
     );
   }
 
-
-
   Widget _colorInput(int type) {
     if (type == 1) {
       return Expanded(
@@ -364,6 +402,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
         child: Stack(
           children: [
             Container(
+              height: inputHeight,
               // decoration: BoxDecoration(
               //   borderRadius: BorderRadius.circular(15),
               //   border: Border.all(
@@ -394,23 +433,28 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                     // logger.d(123);
                   },
                   textInputAction: TextInputAction.done,
-                  padding:
-                  EdgeInsets.only(left: 40, right: 10, top: 6, bottom: 6),
+                  padding: EdgeInsets.only(
+                    left: 40,
+                    right: 10,
+                    top: inputPaddingTop,
+                    bottom: inputPaddingTop,
+                  ),
                   // expands: true,
                   controller: _textController,
                   focusNode: focusNode1,
                   placeholder: '',
                   style: TextStyle(
-                    fontSize: 16.0,
+                    fontSize: inputFontSize,
                     // color: themeObj.normalColor,
                     // fontSize: selectPicker == 1 ? 18 : 14.0,
-                    color: selectPicker == 1 ? Colors.green : themeObj.normalColor,
+                    color:
+                        selectPicker == 1 ? Colors.green : themeObj.normalColor,
                   ),
                   decoration: BoxDecoration(
                     color: themeObj.inputBackgroundColor,
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(inputHeight / 2),
                     border: Border.all(
-                      width: 1,
+                      width: inputBorder,
                       color: themeObj.borderColor,
                     ),
                   ),
@@ -432,11 +476,9 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                   }
                 },
               ),
-
-
             ),
             Positioned(
-              right: 6,
+              right: 0,
               top: 0,
               child: pickerColor2 != null ? _closeIcon(1) : SizedBox(),
             ),
@@ -462,6 +504,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                 child: Stack(
                   children: [
                     Container(
+                      height: inputHeight,
                       // decoration: BoxDecoration(
                       //   borderRadius: BorderRadius.circular(15),
                       //   border: Border.all(
@@ -492,22 +535,29 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                           },
                           textInputAction: TextInputAction.done,
                           padding: EdgeInsets.only(
-                              left: 40, right: 10, top: 6, bottom: 6),
+                            left: 40,
+                            right: 10,
+                            top: inputPaddingTop,
+                            bottom: inputPaddingTop,
+                          ),
                           // expands: true,
                           controller: _textController2,
                           focusNode: focusNode2,
                           placeholder: '',
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: inputFontSize,
                             // color: themeObj.normalColor,
                             // fontSize: selectPicker == 2 ? 18 : 14.0,
-                            color: selectPicker == 2 ? Colors.green : themeObj.normalColor,
+                            color: selectPicker == 2
+                                ? Colors.green
+                                : themeObj.normalColor,
                           ),
                           decoration: BoxDecoration(
                             color: themeObj.inputBackgroundColor,
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius:
+                                BorderRadius.circular(inputHeight / 2),
                             border: Border.all(
-                              width: 1,
+                              width: inputBorder,
                               color: themeObj.borderColor,
                             ),
                           ),
@@ -520,22 +570,22 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                             if (selectPicker == 1) {
                               focusNode2.unfocus();
                             }
-                            setState(() {
-                              selectPicker = 2;
-                              changeColor(pickerColor2, type: 2);
-                              // isTextFiledFocus = hasFocus;
-                            });
+                            if (pickerColor2 != null) {
+                              setState(() {
+                                selectPicker = 2;
+                                changeColor(pickerColor2, type: 2);
+                                // isTextFiledFocus = hasFocus;
+                              });
+                            }
                           }
                         },
                       ),
-
                     ),
                     Positioned(
-                      right: 6,
+                      right: 0,
                       top: 0,
                       child: _closeIcon(2),
                     ),
-
                     Positioned(
                       left: 30,
                       top: 0,
@@ -567,6 +617,28 @@ class _SetColorWidgetState extends State<SetColorWidget> {
     );
   }
 
+  Widget _colorText() {
+    return Container(
+      height: 30,
+      alignment: Alignment.center,
+      child: Opacity(
+        opacity: 1,
+        child: Container(
+          height: inputHeight,
+          decoration: BoxDecoration(
+            color: themeObj.barBackgroundColor,
+          ),
+          child: Text(
+            '${_textController.text}',
+            style: TextStyle(
+              fontSize: inputFontSize,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _colorCircle(int type) {
     return Container(
       height: 30,
@@ -589,7 +661,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
       behavior: HitTestBehavior.translucent,
       child: Container(
         height: 30,
-        width: 30,
+        width: 46,
         alignment: Alignment.center,
         child: Icon(
           Icons.clear,
@@ -603,22 +675,20 @@ class _SetColorWidgetState extends State<SetColorWidget> {
           selectPicker = 1;
           if (type == 1) {
             // pickerColor = pickerColor2;
-            changeColor(pickerColor2, type: 1);
             if (_segmented == 1) {
               backgroundColor2 = null;
             } else if (_segmented == 2) {
               messagesColor2 = null;
             }
+            changeColor(pickerColor2, type: 1, close: true);
           } else {
-            changeColor(pickerColor, type: 1);
             if (_segmented == 1) {
               backgroundColor2 = null;
             } else if (_segmented == 2) {
               messagesColor2 = null;
             }
+            changeColor(pickerColor, type: 1, close: true);
           }
-          pickerColor2 = null;
-          _textController2.text = '';
         });
       },
     );
@@ -694,7 +764,16 @@ class _SetColorWidgetState extends State<SetColorWidget> {
         reverse: true,
         scrollDirection: Axis.vertical,
         child: Container(
-          color: backgroundColor,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                backgroundColor,
+                backgroundColor2 == null ? backgroundColor : backgroundColor2,
+              ],
+            ),
+          ),
           child: Column(
             children: <Widget>[
               Container(
@@ -707,6 +786,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                       'Do you have some apple xxxxxx slsdf sldfjs sdf lfsdf sdlf sdf sdfs sdf?',
                   isReply: false,
                   replyName: 'Bob Smith',
+                  index: 0,
                 ),
               ),
               Container(
@@ -717,6 +797,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                   time: 1601108277901,
                   isMe: true,
                   isReply: false,
+                  index: 1,
                 ),
               ),
               Container(
@@ -728,6 +809,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                   replyText: 'Does he want me to turn from the',
                   isReply: true,
                   replyName: 'Bob Smith',
+                  index: 2,
                 ),
               ),
               Container(
@@ -741,6 +823,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                       'Do you have some apple xxxxxx slsdf sldfjs sdf lfsdf sdlf sdf sdfs sdf?',
                   isReply: false,
                   replyName: 'Bob Smith',
+                  index: 3,
                 ),
               ),
               Container(
@@ -754,6 +837,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                       'Do you have some apple xxxxxx slsdf sldfjs sdf lfsdf sdlf sdf sdfs sdf?',
                   isReply: true,
                   replyName: 'Bob Smith',
+                  index: 4,
                 ),
               ),
               Container(
@@ -766,6 +850,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                   replyText: '',
                   isReply: false,
                   replyName: '',
+                  index: 5,
                 ),
               ),
               Container(
@@ -783,14 +868,32 @@ class _SetColorWidgetState extends State<SetColorWidget> {
     String replyText,
     String message,
     int time,
+    int index,
   }) {
     // themeObj = Provider.of<ThemeModel>(context);
     final align = isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
 
-    Color paintColor =
-        isMe ? themeObj.messagesColor : themeObj.messagesColorSide;
+    Color paintColor = isMe ? messagesColor : themeObj.messagesColorSide;
     var alignCorner = isMe ? Alignment.topRight : Alignment.bottomLeft;
     double _radius = themeObj.radius == null ? 16 : themeObj.radius;
+    Color startColor = messagesColor;
+    Color endColor = messagesColor2;
+    Color lastStartValue;
+    Color lastEndValue;
+    if (endColor != null) {
+      lastStartValue = Color.lerp(startColor, endColor, index / 6);
+      lastEndValue = Color.lerp(startColor, endColor, (index + 1) / 6);
+      if (isMe) {
+        paintColor = lastEndValue;
+      }
+    } else {
+      lastStartValue = startColor;
+      lastEndValue = startColor;
+    }
+    if (!isMe) {
+      lastStartValue = paintColor;
+      lastEndValue = paintColor;
+    }
     return Column(
       crossAxisAlignment: align,
       children: <Widget>[
@@ -805,12 +908,12 @@ class _SetColorWidgetState extends State<SetColorWidget> {
               margin: EdgeInsets.only(top: 2, bottom: 2, left: 2, right: 2),
               child: CustomPaint(
                 painter: ChatCustomCorner(
-                  color: isMe ? accentColor : paintColor,
+                  color: paintColor,
                   alignment: alignCorner,
                   showCorner: false,
                   radius: _radius,
-                  topColor: messagesColor,
-                  bottomColor: messagesColor,
+                  topColor: lastStartValue,
+                  bottomColor: lastEndValue,
                 ),
                 child: Container(
                   child: Stack(
@@ -917,6 +1020,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                                   context: context,
                                   isMe: isMe,
                                   message: message,
+                                  lineColor: lastEndValue,
                                 ),
                                 _buildMessageTime(
                                   isMe: isMe,
@@ -943,6 +1047,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
     BuildContext context,
     String message,
     bool isMe,
+    Color lineColor,
   }) {
     var contentWidget = Text.rich(
       TextSpan(
@@ -957,7 +1062,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
           TextSpan(
             text: '_________',
             style: TextStyle(
-              color: isMe ? messagesColor : themeObj.messagesColorSide,
+              color: isMe ? lineColor : themeObj.messagesColorSide,
             ),
           ),
         ],
@@ -1054,7 +1159,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
 
   // ValueChanged<Color> callback
   // type 1 pickerColor, 2 pickerColor2
-  void changeColor(Color color, {int type = 1}) {
+  void changeColor(Color color, {int type = 1, bool close = false}) {
     var conver = Provider.of<ConversationListModel>(context, listen: false);
     // logger.d()
     // logger.d(color.toHex());
@@ -1082,6 +1187,10 @@ class _SetColorWidgetState extends State<SetColorWidget> {
         pickerColor2 = color;
         _textController2.text = '${color.toHex().substring(3)}';
       }
+      if (close) {
+        pickerColor2 = null;
+        _textController2.text = '';
+      }
     });
     Map allColor = {
       'primary': accentColor.value,
@@ -1107,9 +1216,9 @@ class _SetColorWidgetState extends State<SetColorWidget> {
       themeObj.themeColorValue({
         'primary': accentColor.value,
         'background': backgroundColor.value,
-        'message': messagesColor.value,
         'background2': backgroundColor2 == null ? null : backgroundColor2.value,
-        'message2': messagesColor == null ? null : messagesColor.value,
+        'message': messagesColor.value,
+        'message2': messagesColor2 == null ? null : messagesColor2.value,
       }, 1);
       // themeObj.themeColorValue(accentColor.value, 0);
       // themeObj.themeColorValue(backgroundColor.value, 1);
@@ -1118,9 +1227,9 @@ class _SetColorWidgetState extends State<SetColorWidget> {
       themeObj.themeColorAdd({
         'primary': accentColor.value,
         'background': backgroundColor.value,
-        'message': messagesColor.value,
         'background2': backgroundColor2 == null ? null : backgroundColor2.value,
-        'message2': messagesColor == null ? null : messagesColor.value,
+        'message': messagesColor.value,
+        'message2': messagesColor2 == null ? null : messagesColor2.value,
       }, 2);
       // themeObj.themeColorAdd(accentColor.value, 0);
       // themeObj.themeColorAdd(backgroundColor.value, 1);

@@ -104,9 +104,9 @@ class ChatBubbleWidget extends StatefulWidget {
 
 class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserver {
   ThemeModel themeObj;
+
   Color topColor;
   Color bottomColor;
-
 //  final exampleAudioFilePath = this.message;
   List colors = Colors.primaries;
   static Random random = Random();
@@ -163,6 +163,7 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
       }
       advancedPlayer.startHeadlessService();
     }
+
     super.initState();
   }
 
@@ -1027,13 +1028,23 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
         scrollWidgetList.add(scrollItem);
       }
       ArrayUtil.sortArray(scrollWidgetList, sortOrder: 1, property: 'timestamp');
-
       // _setColor();
     }
   }
 
 
   _setColor() {
+    // topColor = Colors.red;
+    // bottomColor = Colors.green;
+    if (!widget.isMe) return;
+    Color startColor = themeObj.messagesColor;
+    Color endColor = themeObj.messagesColor2;
+    if (endColor == null) {
+      return;
+    }
+    if (startColor.value == endColor.value) {
+      return;
+    }
     // List colors = [Colors.red, Colors.green, Colors.yellow];
     // Random random = new Random();
 
@@ -1045,7 +1056,7 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
 
     // ArrayUtil.sortArray(scrollWidgetList, sortOrder: 1, property: 'timestamp');
     double totalHeight = 0;
-    bool hasSelf;
+    bool hasSelf = false;
     // 自己发消息颜色背景设置
     for (var s = 0; s < scrollList.length; s++) {
       totalHeight += scrollList[s]['height'];
@@ -1071,33 +1082,171 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
       // }
     }
 
-    double preHeight = 0;
-    Color startColor = Colors.blue;
-    Color endColor = Colors.red;
-    for (var s = 0; s < scrollList.length; s++) {
-      var scrollW = scrollList[s];
-      // double currentHeight = scrollW['height'];
-      // 此widget 开始的高度
-      final double startH = preHeight / totalHeight;
-      preHeight += scrollW['height'];
-      // 此widget 结束高度
-      final double endH = preHeight / totalHeight;
-
-      // 使用开始颜色
-      Color lastStartValue;
-      // 使用结束颜色
-      Color lastEndValue;
-      if (scrollW['timestamp'] == widget.timestamp) {
-        lastStartValue = Color.lerp(startColor, endColor, startH);
-        lastEndValue = Color.lerp(startColor, endColor, endH);
-        // setState(() {
-        //   topColor = lastStartValue;
-        //   bottomColor = lastEndValue;
-        // });
-        topColor = lastStartValue;
-        bottomColor = lastEndValue;
-      }
+    double mHeight = MediaQuery.of(context).size.height;
+    bool small = false;
+    if (totalHeight < mHeight - 48 - 60) {
+      totalHeight = mHeight - 48 - 60;
+      small = true;
+      // logger.d('small: $small');
     }
+
+    double preHeight = 0;
+
+    if (small) {
+      for (var s = scrollList.length - 1; s >= 0; s--) {
+        var scrollW = scrollList[s];
+        // double currentHeight = scrollW['height'];
+        // 此widget 开始的高度
+        final double startH = preHeight / totalHeight;
+        preHeight += scrollW['height'];
+        // 此widget 结束高度
+        final double endH = preHeight / totalHeight;
+
+        // 使用开始颜色
+        Color lastStartValue;
+        // 使用结束颜色
+        Color lastEndValue;
+        if (scrollW['timestamp'] == widget.timestamp) {
+
+          lastStartValue = Color.lerp(startColor, endColor, 1 - startH);
+          lastEndValue = Color.lerp(startColor, endColor, 1 - endH);
+          // setState(() {
+          //   topColor = lastStartValue;
+          //   bottomColor = lastEndValue;
+          // });
+          hasSelf = true;
+          topColor = lastStartValue;
+          bottomColor = lastEndValue;
+          // if (mounted) {
+          //   setState(() {
+          //     topColor = lastStartValue;
+          //     bottomColor = lastEndValue;
+          //   });
+          // }
+        }
+      }
+    } else {
+
+      // if (widget.timestamp < scrollList[0]['timestamp']) {
+      //   topColor = themeObj.messagesColor;
+      //   bottomColor = themeObj.messagesColor;
+      //   // logger.d('小: ${widget.content}');
+      // } else if (widget.timestamp > scrollList[scrollList.length - 1]['timestamp']) {
+      //   topColor = themeObj.messagesColor2;
+      //   bottomColor = themeObj.messagesColor2;
+      //   // logger.d('大${widget.content}');
+      // }
+
+      for (var s = 0; s < scrollList.length; s++) {
+        var scrollW = scrollList[s];
+        // double currentHeight = scrollW['height'];
+        // 此widget 开始的高度
+        final double startH = preHeight / totalHeight;
+        preHeight += scrollW['height'];
+        // 此widget 结束高度
+        final double endH = preHeight / totalHeight;
+
+        // 使用开始颜色
+        Color lastStartValue;
+        // 使用结束颜色
+        Color lastEndValue;
+        if (scrollW['timestamp'] == widget.timestamp) {
+
+          lastStartValue = Color.lerp(startColor, endColor, startH);
+          lastEndValue = Color.lerp(startColor, endColor, endH);
+          // setState(() {
+          //   topColor = lastStartValue;
+          //   bottomColor = lastEndValue;
+          // });
+          hasSelf = true;
+          topColor = lastStartValue;
+          bottomColor = lastEndValue;
+          // if (mounted) {
+          //   setState(() {
+          //     topColor = lastStartValue;
+          //     bottomColor = lastEndValue;
+          //   });
+          // }
+        }
+      }
+      // logger.d('hasSelf: $hasSelf');
+      // for (var s = 0; s < scrollWidgetList.length; s++) {
+      //   var scrollW = scrollWidgetList[s];
+      //
+      // }
+    }
+    if (!hasSelf) {
+      if (small) {
+        for (var s = scrollWidgetList.length - 1; s >= 0; s--) {
+          var scrollW = scrollWidgetList[s];
+          // double currentHeight = scrollW['height'];
+          // 此widget 开始的高度
+          final double startH = preHeight / totalHeight;
+          preHeight += scrollW['height'];
+          // 此widget 结束高度
+          final double endH = preHeight / totalHeight;
+
+          // 使用开始颜色
+          Color lastStartValue;
+          // 使用结束颜色
+          Color lastEndValue;
+          if (scrollW['timestamp'] == widget.timestamp) {
+
+            lastStartValue = Color.lerp(startColor, endColor, 1 - startH);
+            lastEndValue = Color.lerp(startColor, endColor, 1 - endH);
+            // setState(() {
+            //   topColor = lastStartValue;
+            //   bottomColor = lastEndValue;
+            // });
+            hasSelf = true;
+            topColor = lastStartValue;
+            bottomColor = lastEndValue;
+            // if (mounted) {
+            //   setState(() {
+            //     topColor = lastStartValue;
+            //     bottomColor = lastEndValue;
+            //   });
+            // }
+          }
+        }
+      } else {
+
+        for (var s = 0; s < scrollWidgetList.length; s++) {
+          var scrollW = scrollWidgetList[s];
+          // double currentHeight = scrollW['height'];
+          // 此widget 开始的高度
+          final double startH = preHeight / totalHeight;
+          preHeight += scrollW['height'];
+          // 此widget 结束高度
+          final double endH = preHeight / totalHeight;
+
+          // 使用开始颜色
+          Color lastStartValue;
+          // 使用结束颜色
+          Color lastEndValue;
+          if (scrollW['timestamp'] == widget.timestamp) {
+            lastStartValue = Color.lerp(startColor, endColor, startH);
+            lastEndValue = Color.lerp(startColor, endColor, endH);
+            // setState(() {
+            //   topColor = lastStartValue;
+            //   bottomColor = lastEndValue;
+            // });
+            hasSelf = true;
+            topColor = lastStartValue;
+            bottomColor = lastEndValue;
+            // if (mounted) {
+              // setState(() {
+              //   topColor = lastStartValue;
+              //   bottomColor = lastEndValue;
+              // });
+            // }
+          }
+        }
+      }
+      }
+    // if (scrollList.length == 0) {
+    //
+    // }
 
   }
 

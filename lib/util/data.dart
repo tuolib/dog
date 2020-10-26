@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'dart:math';
+import 'package:random_color/random_color.dart';
+
+
 import '../index.dart';
 
 class DataUtil {
@@ -205,10 +208,12 @@ class DataUtil {
   }
 
   static Color randomColor() {
+    RandomColor _randomColor = RandomColor();
 
-    List colors = [Colors.red, Colors.green, Colors.yellow];
-    Random random = new Random();
-    return colors[random.nextInt(3)];
+    Color _color = _randomColor.randomColor();
+    // List colors = [Colors.red, Colors.green, Colors.yellow];
+    // Random random = new Random();
+    return _color;
   }
 
 }

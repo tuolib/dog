@@ -157,7 +157,8 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
         type: 1,
         isMe: false,
         isGroup: false,
-        replyText: 'Do you have some apple xxxxxx slsdf sldfjs sdf lfsdf sdlf sdf sdfs sdf?',
+        replyText:
+            'Do you have some apple xxxxxx slsdf sldfjs sdf lfsdf sdlf sdf sdfs sdf?',
         isReply: true,
         replyName: 'Bob Smith',
         isImage: false,
@@ -178,6 +179,13 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
         timestamp: 1601108277901,
       );
     } else {
+      return _chatBubble(
+        isMe: true,
+        isReply: false,
+        message: "It's morning in Tokyo",
+        time: 1601108277901,
+        index: 1,
+      );
       return ChatBubbleWidget(
         callback: callback,
         message: "It's morning in Tokyo",
@@ -208,8 +216,209 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
         contentId: 1234,
         id: 1234,
         timestamp: 1601108277901,
+        topColor: themeObj.messagesColor,
+        bottomColor: themeObj.messagesColor2,
       );
     }
+  }
+
+  Widget _chatBubble({
+    bool isMe,
+    bool isReply,
+    String replyName,
+    String replyText,
+    String message,
+    int time,
+    int index,
+  }) {
+    // themeObj = Provider.of<ThemeModel>(context);
+    final align = isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+
+    Color paintColor = isMe ? themeObj.messagesColor : themeObj.messagesColorSide;
+    var alignCorner = isMe ? Alignment.topRight : Alignment.bottomLeft;
+    double _radius = themeObj.radius == null ? 16 : themeObj.radius;
+    Color startColor = themeObj.messagesColor;
+    Color endColor = themeObj.messagesColor2;
+    Color lastStartValue;
+    Color lastEndValue;
+    if (endColor != null) {
+      lastStartValue = Color.lerp(startColor, endColor, 0);
+      lastEndValue = Color.lerp(startColor, endColor, 1);
+      if (isMe) {
+        paintColor = lastEndValue;
+      }
+    } else {
+      lastStartValue = startColor;
+      lastEndValue = startColor;
+    }
+    if (!isMe) {
+      lastStartValue = paintColor;
+      lastEndValue = paintColor;
+    }
+    return Column(
+      crossAxisAlignment: align,
+      children: <Widget>[
+        Row(
+//          crossAxisAlignment: align,
+          mainAxisAlignment:
+          isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 2, bottom: 2, left: 2, right: 2),
+              child: CustomPaint(
+                painter: ChatCustomCorner(
+                  color: paintColor,
+                  alignment: alignCorner,
+                  showCorner: false,
+                  radius: _radius,
+                  topColor: lastStartValue,
+                  bottomColor: lastEndValue,
+                ),
+                child: Container(
+                  child: Stack(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(
+                            top: 3, bottom: 3, right: 8, left: 8),
+                        padding: EdgeInsets.only(
+                            top: 0, bottom: 0, right: 2, left: 5),
+                        decoration: BoxDecoration(
+                          // color: chatBubbleColor(),
+                          // color: widget.isMe
+                          //     ? themeObj.messagesColor
+                          //     : themeObj.messagesColorSide,
+                          borderRadius: BorderRadius.circular(_radius),
+                        ),
+                        constraints: BoxConstraints(
+                          maxWidth:
+                          MediaQuery.of(context).size.width / 1.3 - 30,
+                          minWidth: 20.0,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: align,
+                          children: <Widget>[
+                            Stack(
+                              children: [
+                                _buildMessage(
+                                  context: context,
+                                  isMe: isMe,
+                                  message: message,
+                                  lineColor: lastEndValue,
+                                ),
+                                _buildMessageTime(
+                                  isMe: isMe,
+                                  time: time,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            )
+            // _buildNothing(),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMessage({
+    BuildContext context,
+    String message,
+    bool isMe,
+    Color lineColor,
+  }) {
+    var contentWidget = Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: '$message',
+            style: TextStyle(
+              color:
+              isMe ? themeObj.messagesWordSelf : themeObj.messagesWordSide,
+            ),
+          ),
+          TextSpan(
+            text: '_________',
+            style: TextStyle(
+              color: isMe ? lineColor : themeObj.messagesColorSide,
+            ),
+          ),
+        ],
+      ),
+    );
+    return Container(
+      padding: EdgeInsets.all(1),
+      decoration: BoxDecoration(
+        // color: widget.isMe ? themeObj.messagesColor : themeObj.messagesColorSide,
+        borderRadius: BorderRadius.circular(themeObj.radius),
+      ),
+      child: contentWidget,
+    );
+  }
+
+  Widget _buildMessageTime({bool isMe, int time}) {
+    bool sending = false;
+    bool success = true;
+    return Positioned(
+      right: 0.0,
+      bottom: -10.0,
+      child: Padding(
+        padding: isMe
+            ? EdgeInsets.only(
+          right: 10,
+          bottom: 10.0,
+        )
+            : EdgeInsets.only(
+          left: 10,
+          bottom: 10.0,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              '${TimeUtil.formatTime(time, 1, 'HH:mm')}',
+              style: TextStyle(
+                color: isMe
+                    ? themeObj.inactiveColorMessageSelf
+                    : themeObj.inactiveColorMessage,
+                fontSize: 10.0,
+              ),
+            ),
+            if (isMe)
+              sending
+                  ? Container(
+                child: Icon(
+                  Icons.access_time,
+                  size: 10,
+                  color: themeObj.messagesWordSelf,
+                ),
+                height: 10.0,
+                width: 10.0,
+              )
+                  : success
+                  ? Icon(
+                Icons.check,
+                color: themeObj.messagesWordSelf,
+                size: 10.0,
+              )
+                  : Icon(
+                Icons.sms_failed,
+                color: Colors.red,
+                size: 10.0,
+              )
+          ],
+        ),
+      ),
+    );
   }
 
   _buildThemeMode(context) {
@@ -237,62 +446,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
-                        width: 100,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: themeObj.messagesChatBgAppearanceDay,
-                          border: Border.all(
-                            color: themeObj.themeMode == 1
-                                ? themeObj.primaryColor
-                                : Colors.grey,
-                            width: themeObj.themeMode == 1 ? 3 : 1,
-                            style: BorderStyle.solid,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Container(
-                              width: 100,
-                              margin: EdgeInsets.only(left: 5),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: 60,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                      color: themeObj
-                                          .messagesColorSideAppearanceDay,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(right: 5),
-                              width: 100,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    width: 60,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          themeObj.messagesColorAppearanceDay,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      _themeModeBox(mode: 1),
                       Container(
                         child: Text(
                           'Day',
@@ -317,62 +471,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
-                        width: 100,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: themeObj.messagesChatBgAppearanceDark,
-                          border: Border.all(
-                            color: themeObj.themeMode == 2
-                                ? themeObj.primaryColor
-                                : Colors.grey,
-                            width: themeObj.themeMode == 2 ? 3 : 1,
-                            style: BorderStyle.solid,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Container(
-                              width: 100,
-                              margin: EdgeInsets.only(left: 5),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: 60,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                      color: themeObj
-                                          .messagesColorSideAppearanceDark,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(right: 5),
-                              width: 100,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    width: 60,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          themeObj.messagesColorAppearanceDark,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      _themeModeBox(mode: 2),
                       Container(
                         child: Text(
                           'Night',
@@ -406,6 +505,125 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
     );
   }
 
+  _themeModeBox({int mode}) {
+
+    Color topColor;
+    Color bottomColor;
+    if (mode == 1) {
+      topColor = themeObj.messagesChatBgAppearanceDay;
+      if (themeObj.messagesChatBgAppearanceDay2 != null) {
+        bottomColor = themeObj.messagesChatBgAppearanceDay2;
+      } else {
+        bottomColor = topColor;
+      }
+    } else if (mode == 2) {
+      topColor = themeObj.messagesChatBgAppearanceDark;
+      if (themeObj.messagesChatBgAppearanceDark2 != null) {
+        bottomColor = themeObj.messagesChatBgAppearanceDark2;
+      } else {
+        bottomColor = topColor;
+      }
+
+    }
+    return Container(
+      width: 100,
+      height: 60,
+      decoration: BoxDecoration(
+        // color: themeObj.messagesChatBgAppearanceDark,
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            topColor,
+            bottomColor,
+          ],
+        ),
+        border: Border.all(
+          color: themeObj.themeMode == mode
+              ? themeObj.primaryColor
+              : Colors.grey,
+          width: themeObj.themeMode == mode ? 3 : 1,
+          style: BorderStyle.solid,
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _themeModeBubble(me: false, mode: mode),
+          _themeModeBubble(me: true, mode: mode),
+        ],
+      ),
+    );
+  }
+
+  _themeModeBubble({bool me, int mode}) {
+    Color topColor;
+    Color bottomColor;
+    if (mode == 1) {
+      topColor = themeObj.messagesColorAppearanceDay;
+      if (themeObj.messagesColorAppearanceDay2 != null) {
+        bottomColor = themeObj.messagesColorAppearanceDay2;
+      } else {
+        bottomColor = topColor;
+      }
+
+      if (!me) {
+        topColor = themeObj.messagesColorSideAppearanceDay;
+        topColor = themeObj.messagesColorSideAppearanceDay;
+      }
+    } else if (mode == 2) {
+      topColor = themeObj.messagesColorAppearanceDark;
+      if (themeObj.messagesColorAppearanceDark2 != null) {
+        bottomColor = themeObj.messagesColorAppearanceDark2;
+      } else {
+        bottomColor = topColor;
+      }
+
+      if (!me) {
+        topColor = themeObj.messagesColorSideAppearanceDark;
+        topColor = themeObj.messagesColorSideAppearanceDark;
+      }
+    }
+    return Container(
+      width: 100,
+      margin: EdgeInsets.only(left: me ? 0 : 5, right: me ? 5 : 0),
+      child: Column(
+        crossAxisAlignment:
+            me ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 60,
+            height: 20,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  topColor,
+                  me ? bottomColor : topColor,
+                ],
+              ),
+              // color: mode == 1
+              //     ? themeObj.messagesColorSideAppearanceDay
+              //     : themeObj.messagesColorSideAppearanceDark,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ],
+      ),
+    );
+    //     gradient: LinearGradient(
+    //       begin: Alignment.topCenter,
+    //       end: Alignment.bottomCenter,
+    //       colors: [
+    //         Colors.lightBlue,
+    //         Colors.deepPurpleAccent,
+    //         Colors.pinkAccent,
+    //       ],
+    //     ),
+  }
+
   _buildThemeColor(context) {
     var allMember = <Widget>[];
     allMember.add(Container(
@@ -422,7 +640,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
     for (var i = 0; i < myList.length; i++) {
       var item = Container(
         // height: 200,
-        child: _colorItem(myList[i]['primary'], i),
+        child: _colorItem(myList[i]['primary'], i, myList[i]),
       );
       allMember.add(item);
     }
@@ -459,12 +677,12 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
     );
   }
 
-  _colorItem(int colorItem, int index) {
+  _colorItem(int colorItem, int index, Map colorObj) {
     // logger.d(themeObj.theme);
     int themeIndex;
     bool selected = false;
 
-    bool showLitter = false;
+    bool showLitter = true;
     Color litterCirBg;
     int litterValue;
     if (Global.profile.themeMode == 1) {
@@ -484,9 +702,20 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
     } else {
       themeIndex = 0;
     }
-    if (litterValue != colorItem) {
-      showLitter = true;
+    // if (litterValue != colorItem) {
+    //   showLitter = true;
+    // }
+
+    Color topColor;
+    Color bottomColor;
+
+    topColor = Color(colorObj['message']);
+    if (colorObj['message2'] != null) {
+      bottomColor = Color(colorObj['message2']);
+    } else {
+      bottomColor = Color(colorObj['message']);
     }
+
     return Container(
       margin: EdgeInsets.only(left: 10, right: 10),
       decoration: BoxDecoration(
@@ -545,7 +774,16 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
                               width: 19,
                               height: 19,
                               decoration: BoxDecoration(
-                                color: litterCirBg,
+                                // color: litterCirBg,
+
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    topColor,
+                                    bottomColor,
+                                  ],
+                                ),
                                 shape: BoxShape.circle,
                               ),
                             ),

@@ -296,13 +296,48 @@ class ThemeModel extends ProfileChangeNotifier {
     }
     return colorObj;
   }
+  Color get messagesColor2 {
+    Color colorObj;
+    if (themeMode == 1) {
+      // colorObj = Color(Global.themesMessage[theme]);
+      var newValue = Global.themes[theme]['message2'];
+      if (newValue == null) {
+        return null;
+      }
+      if (Color(newValue).red > 177 &&
+          Color(newValue).green > 177 &&
+          Color(newValue).blue > 177) {
+        colorObj = Color.fromRGBO(40, 40, 48, 1);
+      } else {
+        colorObj = Color(newValue);
+      }
+    } else if (themeMode == 2) {
+      var newValue = Global.themes[themeDark]['message2'];
+      if (newValue == null) {
+        return null;
+      }
+      if (Color(newValue).red > 177 &&
+          Color(newValue).green > 177 &&
+          Color(newValue).blue > 177) {
+        colorObj = Color.fromRGBO(40, 40, 48, 1);
+      } else {
+        colorObj = Color(newValue);
+      }
+      // if (newValue > Color.fromRGBO(177, 177, 177, 1).value) {
+      //   colorObj = Color.fromRGBO(40, 40, 48, 1);
+      // } else {
+      //   colorObj = Color(newValue);
+      // }
+    }
+    return colorObj;
+  }
 
   // 对方消息背景 固定
   Color get messagesColorSide {
     Color colorObj;
     if (themeMode == 1) {
       //214, 221, 229
-      colorObj = Color.fromRGBO(214, 221, 229, 1);
+      colorObj = Color.fromRGBO(241, 241, 244, 1);
     } else if (themeMode == 2) {
       //38, 38, 40
       colorObj = Color.fromRGBO(38, 38, 40, 1);
@@ -325,9 +360,14 @@ class ThemeModel extends ProfileChangeNotifier {
   Color get messagesChatBg2 {
     Color colorObj;
     if (themeMode == 1) {
-      colorObj = Color(Global.themes[theme]['background2']);
+      if (Global.themes[theme]['background2'] != null) {
+        colorObj = Color(Global.themes[theme]['background2']);
+      }
     } else if (themeMode == 2) {
-      colorObj = Color(Global.themes[themeDark]['background2']);
+      if (Global.themes[themeDark]['background2'] != null) {
+        colorObj = Color(Global.themes[themeDark]['background2']);
+      }
+      // colorObj = Color(Global.themes[themeDark]['background2']);
     }
     return colorObj;
   }
@@ -339,23 +379,34 @@ class ThemeModel extends ProfileChangeNotifier {
       // messagesChatBg
       // colorObj = Color(Global.themesBg[theme]);
       var newValue = messagesChatBg.value;
-      if (Color(newValue).red > 177 &&
-          Color(newValue).green > 177 &&
-          Color(newValue).blue > 177) {
+      if (newValue == Color.fromRGBO(255, 255, 255, 1).value) {
+
         colorObj = Color(newValue);
       } else {
         colorObj = barBackgroundColor;
       }
+      // if (Color(newValue).red > 177 &&
+      //     Color(newValue).green > 177 &&
+      //     Color(newValue).blue > 177) {
+      //   colorObj = Color(newValue);
+      // } else {
+      //   colorObj = barBackgroundColor;
+      // }
     } else if (themeMode == 2) {
       // colorObj = Color(Global.themesBg[themeDark]);
       var newValue = messagesChatBg.value;
-      if (Color(newValue).red < 25 &&
-          Color(newValue).green < 25 &&
-          Color(newValue).blue < 25) {
+      if (newValue == Color.fromRGBO(0, 0, 0, 1).value) {
         colorObj = Color(newValue);
       } else {
         colorObj = barBackgroundColor;
       }
+      // if (Color(newValue).red < 25 &&
+      //     Color(newValue).green < 25 &&
+      //     Color(newValue).blue < 25) {
+      //   colorObj = Color(newValue);
+      // } else {
+      //   colorObj = barBackgroundColor;
+      // }
     }
     return colorObj;
   }
@@ -475,11 +526,27 @@ class ThemeModel extends ProfileChangeNotifier {
     }
     return colorObj;
   }
+  Color get messagesColorAppearanceDay2 {
+    Color colorObj;
+    // colorObj = Color(Global.profile.themesDayMessage[theme]);
+    var newValue = Global.profile.dayList[theme]['message2'];
+    if (newValue != null) {
+
+      if (Color(newValue).red > 177 &&
+          Color(newValue).green > 177 &&
+          Color(newValue).blue > 177) {
+        colorObj = Color.fromRGBO(40, 40, 48, 1);
+      } else {
+        colorObj = Color(newValue);
+      }
+    }
+    return colorObj;
+  }
 
   // 对方消息背景 固定
   Color get messagesColorSideAppearanceDay {
     Color colorObj;
-    colorObj = Color.fromRGBO(214, 221, 229, 1);
+    colorObj = Color.fromRGBO(241, 241, 244, 1);
     return colorObj;
   }
 
@@ -493,6 +560,27 @@ class ThemeModel extends ProfileChangeNotifier {
       colorObj = Color.fromRGBO(40, 40, 48, 1);
     } else {
       colorObj = Color(newValue);
+    }
+    // if (newValue > Color.fromRGBO(177, 177, 177, 1).value) {
+    //   colorObj = Color.fromRGBO(40, 40, 48, 1);
+    // } else {
+    //   colorObj = Color(newValue);
+    // }
+    // colorObj = Color(Global.profile.themesDarkMessage[themeDark]);
+    return colorObj;
+  }
+  Color get messagesColorAppearanceDark2 {
+    Color colorObj;
+    var newValue = Global.profile.darkList[themeDark]['message2'];
+    if (newValue != null) {
+      // colorObj = Color(value);
+      if (Color(newValue).red > 177 &&
+          Color(newValue).green > 177 &&
+          Color(newValue).blue > 177) {
+        colorObj = Color.fromRGBO(40, 40, 48, 1);
+      } else {
+        colorObj = Color(newValue);
+      }
     }
     // if (newValue > Color.fromRGBO(177, 177, 177, 1).value) {
     //   colorObj = Color.fromRGBO(40, 40, 48, 1);
@@ -533,14 +621,21 @@ class ThemeModel extends ProfileChangeNotifier {
     Color colorObj;
     // logger.d(Global.profile.themesDayBg);
     // logger.d(theme);
-    colorObj = Color(Global.profile.dayList[theme]['background2']);
+    var value = Global.profile.dayList[theme]['background2'];
+    if (value != null) {
+      colorObj = Color(value);
+    }
     // colorObj = CupertinoColors.
     return colorObj;
   }
   // 聊天页面背景颜色 themesBg 渐变色
   Color get messagesChatBgAppearanceDark2 {
     Color colorObj;
-    colorObj = Color(Global.profile.darkList[themeDark]['background2']);
+    // colorObj = Color(Global.profile.darkList[themeDark]['background2']);
+    var value = Global.profile.darkList[themeDark]['background2'];
+    if (value != null) {
+      colorObj = Color(value);
+    }
     // colorObj = CupertinoColors.
     return colorObj;
   }

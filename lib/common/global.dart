@@ -201,6 +201,45 @@ List dayList = [
     'message2': null,
     'background2': null,
   },
+  //52, 120, 246
+  // 230, 96, 237
+  {
+    'primary': Color.fromRGBO(52, 120, 246, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'background2': null,
+    'message': Color.fromRGBO(52, 120, 246, 1).value,
+    'message2': Color.fromRGBO(230, 96, 237, 1).value,
+  },
+  //180, 229, 99
+  //77, 173, 154
+  {
+    'primary': Color.fromRGBO(77, 173, 154, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'background2': null,
+    'message': Color.fromRGBO(180, 229, 99, 1).value,
+    'message2': Color.fromRGBO(77, 173, 154, 1).value,
+  },
+
+  //243, 216, 72
+  //194, 64, 37
+  {
+    'primary': Color.fromRGBO(194, 64, 37, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'background2': null,
+    'message': Color.fromRGBO(243, 216, 72, 1).value,
+    'message2': Color.fromRGBO(194, 64, 37, 1).value,
+  },
+
+  //221, 143, 232
+  //86, 189, 232
+  {
+    'primary': Color.fromRGBO(221, 143, 232, 1).value,
+    'background': Color.fromRGBO(255, 255, 255, 1).value,
+    'background2': null,
+    'message': Color.fromRGBO(221, 143, 232, 1).value,
+    'message2': Color.fromRGBO(86, 189, 232, 1).value,
+  },
+
   {
     'primary': Color.fromRGBO(87, 190, 232, 1).value,
     'message': Color.fromRGBO(87, 190, 232, 1).value,
@@ -270,11 +309,51 @@ List dayList = [
 List darkList = [
   {
     'primary': Color.fromRGBO(52, 120, 246, 1).value,
-    'message': Color.fromRGBO(52, 120, 246, 1).value,
     'background': Color.fromRGBO(0, 0, 0, 1).value,
-    'message2': null,
     'background2': null,
+    'message': Color.fromRGBO(52, 120, 246, 1).value,
+    'message2': null,
   },
+  //52, 120, 246
+  // 230, 96, 237
+  {
+    'primary': Color.fromRGBO(52, 120, 246, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'background2': null,
+    'message': Color.fromRGBO(52, 120, 246, 1).value,
+    'message2': Color.fromRGBO(230, 96, 237, 1).value,
+  },
+  //180, 229, 99
+  //77, 173, 154
+  {
+    'primary': Color.fromRGBO(77, 173, 154, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'background2': null,
+    'message': Color.fromRGBO(180, 229, 99, 1).value,
+    'message2': Color.fromRGBO(77, 173, 154, 1).value,
+  },
+
+  //243, 216, 72
+  //194, 64, 37
+  {
+    'primary': Color.fromRGBO(194, 64, 37, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'background2': null,
+    'message': Color.fromRGBO(243, 216, 72, 1).value,
+    'message2': Color.fromRGBO(194, 64, 37, 1).value,
+  },
+
+  //221, 143, 232
+  //86, 189, 232
+  {
+    'primary': Color.fromRGBO(221, 143, 232, 1).value,
+    'background': Color.fromRGBO(0, 0, 0, 1).value,
+    'background2': null,
+    'message': Color.fromRGBO(221, 143, 232, 1).value,
+    'message2': Color.fromRGBO(86, 189, 232, 1).value,
+  },
+
+
   {
     'primary': Color.fromRGBO(87, 190, 232, 1).value,
     'message': Color.fromRGBO(87, 190, 232, 1).value,
@@ -488,6 +567,10 @@ class Global {
         if (profile.darkList == null) {
           profile.darkList = darkList;
         }
+
+
+        // profile.dayList = dayList;
+        // profile.darkList = darkList;
 
 
         // logger.d(profile.themesDay);

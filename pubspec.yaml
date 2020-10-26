@@ -121,6 +121,7 @@ dependencies:
   smooth_page_indicator: ^0.2.0
   worm_indicator: ^0.2.4
   flutter_chat_bubble: ^1.0.2
+  random_color: ^1.0.5
 
 dev_dependencies:
   flutter_test:

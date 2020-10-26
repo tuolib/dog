@@ -178,11 +178,13 @@ class _ConversationState extends State<Conversation> {
       }
       _scrollPosition();
     });
+    _getIsSame();
     //
 
     // WidgetsBinding.instance.addPostFrameCallback(_initColor());
     // _setColor();
   }
+
   _initColor() {
     if (!hasInitColor) {
       hasInitColor = true;
@@ -1012,17 +1014,36 @@ class _ConversationState extends State<Conversation> {
     afterBuild();
     Color topColor;
     Color bottomColor;
-    var scrollModel = Provider.of<ConversationScrollModel>(context, listen: false);
-    List scrollList = scrollModel.scrollList;
-    if (scrollList.length != 0 && msg['isMe']) {
-      // ArrayUtil.sortArray(scrollWidgetList, sortOrder: 1, property: 'timestamp');
-      // logger.d(' time da xiao ${scrollList[scrollList.length - 1]['timestamp'] - msg['timestamp']}');
-      // logger.d('msg time : ${msg['timestamp']}');
-      if (msg['timestamp'] <= scrollList[0]['timestamp']) {
-        topColor = Colors.blue;
-      } else {
-        topColor = Colors.red;
+    if (!sameColor) {
+      var scrollModel = Provider.of<ConversationScrollModel>(context, listen: false);
+      List scrollList = scrollModel.scrollList;
+      // List scrollList = scrollWidgetList;
+
+      if (scrollList.length != 0 && msg['isMe']) {
+        // logger.d(scrollWidgetList[0]['content']);
+        // ArrayUtil.sortArray(scrollWidgetList, sortOrder: 1, property: 'timestamp');
+        // logger.d(' time da xiao ${scrollList[scrollList.length - 1]['timestamp'] - msg['timestamp']}');
+        // logger.d('msg time : ${msg['timestamp']}');
+        // if (msg['timestamp'] <= scrollList[scrollList.length - 1]['timestamp']) {
+        //   topColor = themeObj.messagesColor;
+        // } else {
+        //   topColor = themeObj.messagesColor2;
+        // }
+        if (msg['timestamp'] <= scrollList[scrollList.length - 1]['timestamp']) {
+          topColor = themeObj.messagesColor;
+        }
+        else {
+          topColor = themeObj.messagesColor2;
+        }
       }
+      // if (scrollWidgetList.length != 0 && msg['isMe']){
+      //   if (msg['timestamp'] <= scrollWidgetList[scrollWidgetList.length - 1]['timestamp']) {
+      //     topColor = themeObj.messagesColor;
+      //   } else {
+      //     topColor = themeObj.messagesColor2;
+      //   }
+      // }
+
     }
     return ChatBubbleWidget(
       // stream: streamEvent,
@@ -1737,6 +1758,7 @@ class _ConversationState extends State<Conversation> {
         _sliverController.jumpTo(conversionInfo['extentBefore']);
         if (conversionInfo['extentBefore'] == 0) {
           _resetSavePosition();
+          _sliverController.position.jumpTo(-2);
         } else {
           _scrollPosition();
         }
@@ -2026,9 +2048,10 @@ class _ConversationState extends State<Conversation> {
 
 
   bool shouldSet = true;
-
+  bool sameColor = false;
   int addNum = 0;
   _setColor() {
+    if (sameColor) return;
     // logger.d('set color');
     // return;
     double mediaHeight = MediaQuery.of(context).size.height - 48;
@@ -2038,7 +2061,7 @@ class _ConversationState extends State<Conversation> {
     if (shouldSet) {
       shouldSet = false;
 
-      var timeout = Duration(milliseconds: 100);
+      var timeout = Duration(milliseconds: 10);
 
       shouldSetTimer = Timer(timeout, () {
         bool hasSelf = false;
@@ -2058,7 +2081,7 @@ class _ConversationState extends State<Conversation> {
               RenderBox renderBoxRed =
               scrollW['key']?.currentContext?.findRenderObject();
               var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
-              if (positionsRed.dy >= 0 && positionsRed.dy <= mediaHeight) {
+              if (positionsRed.dy + scrollW['height'] >= 0 && positionsRed.dy - scrollW['height']  <= mediaHeight) {
                 sList.add(scrollW);
               }
               // logger.d('${scrollW['content']}');
@@ -2066,78 +2089,37 @@ class _ConversationState extends State<Conversation> {
               // logger.d('height: ${scrollW['height']}');
             }
           }
+          ArrayUtil.sortArray(sList, sortOrder: 1, property: 'timestamp');
           // logger.d('sList.length: ${sList.length}');
           scrollModel.updateScrollList(sList);
           // print('update');
         }
 
         addNum += 1;
-        // logger.d('addNum: $addNum');
-        // print('scrollWidgetList: ${scrollWidgetList.length}');
         shouldSetTimer?.cancel();
         shouldSet = true;
-        // List colors = [Colors.red, Colors.green, Colors.yellow];
-        // Random random = new Random();
-
-        // int index = 0;
-        // double totalHeight = 0;
-        // // 自己发消息颜色背景设置
-        // for (var s = 0; s < scrollWidgetList.length; s++) {
-        //   totalHeight += scrollWidgetList[s]['height'];
-        //   // index = random.nextInt(3);
-        //   // if (scrollWidgetList[s]['key']?.currentContext != null) {
-        //   //   // scrollArr.add(scrollWidgetList[s]['id']);
-        //   //   RenderBox renderBoxRed =
-        //   //   scrollWidgetList[s]['key']?.currentContext?.findRenderObject();
-        //   //   var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
-        //   //   logger.d(positionsRed.dy);
-        //   //   logger.d('${scrollWidgetList[s]['height']}');
-        //   //   // if (positionMax < positionsRed.dy && maxHeight >= positionsRed.dy) {
-        //   //   //   positionMax = positionsRed.dy;
-        //   //   //   positionMaxItem = {
-        //   //   //     "key": scrollWidgetList[s]['key'],
-        //   //   //     "id": scrollWidgetList[s]['id'],
-        //   //   //     "dy": positionsRed.dy,
-        //   //   //     "height": scrollWidgetList[s]['height'],
-        //   //   //     "createdDate": scrollWidgetList[s]['createdDate'],
-        //   //   //     "timestamp": scrollWidgetList[s]['timestamp'],
-        //   //   //   };
-        //   //   // }
-        //   // }
-        // }
-        //
-        // double preHeight = 0;
-        // Color startColor = Colors.blue;
-        // Color endColor = Colors.red;
-        // for (var s = 0; s < scrollWidgetList.length; s++) {
-        //
-        //   double currentHeight = scrollWidgetList[s]['height'];
-        //   // 此widget 开始的高度
-        //   final double startH = preHeight / totalHeight;
-        //   preHeight += scrollWidgetList[s]['height'];
-        //   // 此widget 结束高度
-        //   final double endH = preHeight / totalHeight;
-        //   // 使用开始颜色
-        //   Color lastStartValue;
-        //   // 使用结束颜色
-        //   Color lastEndValue;
-        //
-        //   logger.d(startH);
-        //   logger.d(endH);
-        //
-        //   lastStartValue = Color.lerp(startColor, endColor, startH);
-        //   lastEndValue = Color.lerp(startColor, endColor, endH);
-        //   conversion.updateMultipleItem(
-        //     scrollWidgetList[s]['timestamp'],
-        //     lastStartValue,
-        //     lastEndValue,
-        //   );
-        // }
         // conversion.noti();
 
       });
     }
 
+
+  }
+
+  _getIsSame() {
+
+    Color topColor = socketTheme.messagesColor;
+    Color bottomColor = socketTheme.messagesColor2;
+    if (bottomColor == null) {
+      sameColor = true;
+      // logger.d(sameColor);
+      return;
+    }
+    if (topColor.value == bottomColor.value) {
+      sameColor = true;
+      // logger.d(sameColor);
+      return;
+    }
 
   }
 }
