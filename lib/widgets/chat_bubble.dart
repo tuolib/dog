@@ -25,6 +25,7 @@ List scrollWidgetList = [];
 typedef void OnError(Exception exception);
 
 Timer doStreamTime;
+
 // ignore: must_be_immutable
 class ChatBubbleWidget extends StatefulWidget {
   String message,
@@ -58,6 +59,7 @@ class ChatBubbleWidget extends StatefulWidget {
   Color topColor;
   Color bottomColor;
   Color primaryColor;
+
   // StreamController streamController;
 
   ChatBubbleWidget({
@@ -102,11 +104,12 @@ class ChatBubbleWidget extends StatefulWidget {
   ChatBubbleState createState() => ChatBubbleState();
 }
 
-class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserver {
+class ChatBubbleState extends State<ChatBubbleWidget> {
   ThemeModel themeObj;
 
   Color topColor;
   Color bottomColor;
+
 //  final exampleAudioFilePath = this.message;
   List colors = Colors.primaries;
   static Random random = Random();
@@ -144,6 +147,7 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
 
   bool shouldAdd = true;
   int addNum = 0;
+
   @override
   void initState() {
     topColor = widget.topColor;
@@ -170,11 +174,11 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
   @override
   void dispose() {
     // logger.d(widget.content);
-    scrollWidgetList.removeWhere((item) => item['timestamp'] == widget.timestamp);
+    scrollWidgetList
+        .removeWhere((item) => item['timestamp'] == widget.timestamp);
 
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -286,71 +290,84 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
     var alignCorner = widget.isMe ? Alignment.topRight : Alignment.bottomLeft;
     double _radius = themeObj.radius == null ? 16 : themeObj.radius;
     return Consumer<ConversationScrollModel>(
-        builder: (BuildContext context,
-            ConversationScrollModel conversationScrollModel, Widget child) {
-
-          // print('widget.content: ${widget.content}');
-          if (widget.isMe) {
-            // print(mounted);
-            _setColor();
+      builder: (
+        BuildContext context,
+        ConversationScrollModel conversationScrollModel,
+        Widget child,
+      ) {
+        Color _topColor;
+        Color _bottomColor;
+        // print('widget.content: ${widget.content}');
+        if (widget.isMe && topColor != null) {
+          // print(mounted);
+          // _setColor();
+          List scrollList = conversationScrollModel.scrollList;
+          for(var i = 0; i < scrollList.length; i++) {
+            final Map sW = scrollList[i];
+            if (widget.timestamp == sW['timestamp']) {
+              topColor = sW['topColor'];
+              bottomColor = sW['bottomColor'];
+              break;
+            }
           }
-
-      return Container(
-        margin: EdgeInsets.only(top: 2, bottom: 2, left: 2, right: 2),
-        child: CustomPaint(
-          painter: ChatCustomCorner(
-            color: paintColor,
-            alignment: alignCorner,
-            showCorner: widget.showAvatar,
-            radius: _radius,
-            topColor: topColor == null ? paintColor : topColor,
-            bottomColor: bottomColor == null ? paintColor : bottomColor,
-          ),
-          child: Container(
-            child: Stack(
-              children: <Widget>[
-                Container(
-                  margin: EdgeInsets.only(top: 3, bottom: 3, right: 8, left: 8),
-                  padding:
-                      EdgeInsets.only(top: 0, bottom: 0, right: 2, left: 5),
-                  decoration: BoxDecoration(
-                    // color: chatBubbleColor(),
-                    // color: widget.isMe
-                    //     ? themeObj.messagesColor
-                    //     : themeObj.messagesColorSide,
-                    borderRadius: BorderRadius.circular(_radius),
-                  ),
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width / 1.3 - 30,
-                    minWidth: 20.0,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: align,
-                    children: <Widget>[
-                      _buildName(),
-                      _buildReply(),
-                      widget.isReply ? SizedBox(height: 5) : SizedBox(),
-                      Stack(
-                        children: [
-                          _buildMessage(context),
-                          _buildMessageTime(),
-                        ],
-                      ),
-                    ],
-                  ),
-                )
-              ],
+        }
+        return Container(
+          margin: EdgeInsets.only(top: 2, bottom: 2, left: 2, right: 2),
+          child: CustomPaint(
+            painter: ChatCustomCorner(
+              color: paintColor,
+              alignment: alignCorner,
+              showCorner: widget.showAvatar,
+              radius: _radius,
+              topColor: topColor == null ? paintColor : topColor,
+              bottomColor: bottomColor == null ? paintColor : bottomColor,
+            ),
+            child: Container(
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    margin:
+                        EdgeInsets.only(top: 3, bottom: 3, right: 8, left: 8),
+                    padding:
+                        EdgeInsets.only(top: 0, bottom: 0, right: 2, left: 5),
+                    decoration: BoxDecoration(
+                      // color: chatBubbleColor(),
+                      // color: widget.isMe
+                      //     ? themeObj.messagesColor
+                      //     : themeObj.messagesColorSide,
+                      borderRadius: BorderRadius.circular(_radius),
+                    ),
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width / 1.3 - 30,
+                      minWidth: 20.0,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: align,
+                      children: <Widget>[
+                        _buildName(),
+                        _buildReply(),
+                        widget.isReply ? SizedBox(height: 5) : SizedBox(),
+                        Stack(
+                          children: [
+                            _buildMessage(context),
+                            _buildMessageTime(),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   ColorFiltered _chatBubbleFilter({Widget child, bool ismine}) {
-
     return ColorFiltered(
       colorFilter: ColorFilter.mode(
           Colors.white, ismine ? BlendMode.values[4] : BlendMode.values[7]),
@@ -398,7 +415,9 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
                     text: '_________',
                     style: TextStyle(
                       color: widget.isMe
-                          ? bottomColor != null ? bottomColor : themeObj.messagesColor
+                          ? bottomColor != null
+                              ? bottomColor
+                              : themeObj.messagesColor
                           : themeObj.messagesColorSide,
                     ),
                   ),
@@ -406,7 +425,6 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
               ),
             ),
           ),
-
           Text.rich(
             TextSpan(
               children: [
@@ -423,7 +441,9 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
                   // text: '_________',
                   style: TextStyle(
                     color: widget.isMe
-                        ? bottomColor != null ? bottomColor : themeObj.messagesColor
+                        ? bottomColor != null
+                            ? bottomColor
+                            : themeObj.messagesColor
                         : themeObj.messagesColorSide,
                   ),
                 ),
@@ -895,11 +915,10 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
               // color: chatBubbleReplyColor(),
               // borderRadius: BorderRadius.all(Radius.circular(5.0)),
               border: Border(
-                left: BorderSide(
-                  color: primaryColor,
-                  width: 2.0,
-                )
-              ),
+                  left: BorderSide(
+                color: primaryColor,
+                width: 2.0,
+              )),
             ),
             // constraints: BoxConstraints(
             //   minHeight: 25,
@@ -1027,13 +1046,14 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
       } else {
         scrollWidgetList.add(scrollItem);
       }
-      ArrayUtil.sortArray(scrollWidgetList, sortOrder: 1, property: 'timestamp');
+      ArrayUtil.sortArray(scrollWidgetList,
+          sortOrder: 1, property: 'timestamp');
       // _setColor();
     }
   }
 
-
   _setColor() {
+    return;
     // topColor = Colors.red;
     // bottomColor = Colors.green;
     if (!widget.isMe) return;
@@ -1050,8 +1070,8 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
 
     // int index = 0;
 
-
-    var scrollModel = Provider.of<ConversationScrollModel>(context, listen: false);
+    var scrollModel =
+        Provider.of<ConversationScrollModel>(context, listen: false);
     List scrollList = scrollModel.scrollList;
 
     // ArrayUtil.sortArray(scrollWidgetList, sortOrder: 1, property: 'timestamp');
@@ -1089,6 +1109,7 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
       small = true;
       // logger.d('small: $small');
     }
+    totalHeight = mHeight - 48 - 60;
 
     double preHeight = 0;
 
@@ -1107,7 +1128,6 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
         // 使用结束颜色
         Color lastEndValue;
         if (scrollW['timestamp'] == widget.timestamp) {
-
           lastStartValue = Color.lerp(startColor, endColor, 1 - startH);
           lastEndValue = Color.lerp(startColor, endColor, 1 - endH);
           // setState(() {
@@ -1126,7 +1146,6 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
         }
       }
     } else {
-
       // if (widget.timestamp < scrollList[0]['timestamp']) {
       //   topColor = themeObj.messagesColor;
       //   bottomColor = themeObj.messagesColor;
@@ -1151,7 +1170,6 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
         // 使用结束颜色
         Color lastEndValue;
         if (scrollW['timestamp'] == widget.timestamp) {
-
           lastStartValue = Color.lerp(startColor, endColor, startH);
           lastEndValue = Color.lerp(startColor, endColor, endH);
           // setState(() {
@@ -1191,7 +1209,6 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
           // 使用结束颜色
           Color lastEndValue;
           if (scrollW['timestamp'] == widget.timestamp) {
-
             lastStartValue = Color.lerp(startColor, endColor, 1 - startH);
             lastEndValue = Color.lerp(startColor, endColor, 1 - endH);
             // setState(() {
@@ -1210,7 +1227,6 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
           }
         }
       } else {
-
         for (var s = 0; s < scrollWidgetList.length; s++) {
           var scrollW = scrollWidgetList[s];
           // double currentHeight = scrollW['height'];
@@ -1235,29 +1251,29 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
             topColor = lastStartValue;
             bottomColor = lastEndValue;
             // if (mounted) {
-              // setState(() {
-              //   topColor = lastStartValue;
-              //   bottomColor = lastEndValue;
-              // });
+            // setState(() {
+            //   topColor = lastStartValue;
+            //   bottomColor = lastEndValue;
+            // });
             // }
           }
         }
       }
-      }
+    }
     // if (scrollList.length == 0) {
     //
     // }
-
   }
 
   _deleteColor() {
-    var scrollModel = Provider.of<ConversationScrollModel>(context, listen: false);
+    var scrollModel =
+        Provider.of<ConversationScrollModel>(context, listen: false);
     List scrollList = scrollModel.scrollList;
     for (var s = 0; s < scrollList.length; s++) {
       if (scrollList[s]['key']?.currentContext != null) {
         // scrollArr.add(scrollList[s]['id']);
         RenderBox renderBoxRed =
-        scrollList[s]['key']?.currentContext?.findRenderObject();
+            scrollList[s]['key']?.currentContext?.findRenderObject();
         var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
         // logger.d(positionsRed.dy);
         // logger.d('${scrollList[s]['height']}');
@@ -1265,11 +1281,8 @@ class ChatBubbleState extends State<ChatBubbleWidget> with WidgetsBindingObserve
     }
   }
 
-
-
-
-  // void _afterLayoutPersistent(Duration duration) {
-  //   logger.d('persistent: ${duration.inMilliseconds}');
-  //   logger.d(widget.content);
-  // }
+// void _afterLayoutPersistent(Duration duration) {
+//   logger.d('persistent: ${duration.inMilliseconds}');
+//   logger.d(widget.content);
+// }
 }

@@ -510,6 +510,15 @@ class ThemeModel extends ProfileChangeNotifier {
     return 16.0;
   }
 
+  // 背景图片
+  int get backgroundImage {
+    int bg;
+    if (Global.backgroundImage != null) {
+      bg = int.parse(Global.backgroundImage);
+    }
+    return bg;
+  }
+
 
   /// 特殊颜色 主题页面
   // 自己消息背景 themesMessage

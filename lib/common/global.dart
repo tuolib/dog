@@ -552,6 +552,9 @@ class Global {
   // 呼叫人 名字
   static String callerName = '';
 
+  // 背景图片
+  static String backgroundImage;
+
   //初始化全局信息，会在APP启动时执行
   static Future init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -567,40 +570,6 @@ class Global {
         if (profile.darkList == null) {
           profile.darkList = darkList;
         }
-
-
-        // profile.dayList = dayList;
-        // profile.darkList = darkList;
-
-
-        // logger.d(profile.themesDay);
-        // if (profile.themesDay == null) {
-        //   profile.themesDay = themesDay;
-        // }
-        // // logger.d(profile.themesDay);
-        // if (profile.themesDark == null) {
-        //   profile.themesDark = themesDark;
-        // }
-        // if (profile.themesDayMessage == null) {
-        //   profile.themesDayMessage = themesDayMessage;
-        // }
-        // if (profile.themesDarkMessage == null) {
-        //   profile.themesDarkMessage = themesDarkMessage;
-        // }
-        // // logger.d(profile.themesDayBg);
-        // if (profile.themesDayBg == null) {
-        //   profile.themesDayBg = themesDayBg;
-        // }
-        // if (profile.themesDarkBg == null) {
-        //   profile.themesDarkBg = themesDarkBg;
-        // }
-        // // logger.d(profile.themesDayBg);
-        // if (profile.themesDayBg2 == null) {
-        //   profile.themesDayBg2 = themesDayBg2;
-        // }
-        // if (profile.themesDarkBg2 == null) {
-        //   profile.themesDarkBg2 = themesDarkBg2;
-        // }
         saveProfile();
       } catch (e) {
         print(e);
@@ -608,26 +577,11 @@ class Global {
     } else {
       profile.dayList = dayList;
       profile.darkList = darkList;
-
-
-      // profile.themesDay = themesDay;
-      // profile.themesDark = themesDark;
-      // profile.themesDayMessage = themesDayMessage;
-      // profile.themesDarkMessage = themesDarkMessage;
-      // profile.themesDayBg = themesDayBg;
-      // profile.themesDarkBg = themesDarkBg;
-      // profile.themesDayBg2 = themesDayBg2;
-      // profile.themesDarkBg2 = themesDarkBg2;
     }
     voipToken = _prefs.getString("voipToken");
     firebaseToken = _prefs.getString("firebaseToken");
     apnsToken = _prefs.getString("apnsToken");
 
-    _prefs.setString("currentCallUuid", '');
-    _prefs.setString("hasCall", '0');
-    _prefs.setString("callFriendId", '0');
-    _prefs.setString("callGroupId", '0');
-    _prefs.setString("callerName", '');
     // 视频或者语音 uuid
     currentCallUuid = _prefs.getString("currentCallUuid");
     // 是否显示系统拨打电话界面
@@ -638,6 +592,29 @@ class Global {
     callGroupId = _prefs.getString("callGroupId");
     // 呼叫人 名字
     callerName = _prefs.getString("callerName");
+
+    backgroundImage  = _prefs.getString("backgroundImage");
+
+    if (currentCallUuid == null) {
+      _prefs.setString("currentCallUuid", '');
+      currentCallUuid = '';
+    }
+    if (hasCall == null) {
+      _prefs.setString("hasCall", '0');
+      hasCall = '0';
+    }
+    if (callFriendId == null) {
+      _prefs.setString("callFriendId", '0');
+      callFriendId = '0';
+    }
+    if (callGroupId == null) {
+      _prefs.setString("callGroupId", '0');
+      callGroupId = '0';
+    }
+    if (callerName == null) {
+      callerName = '';
+      _prefs.setString("callerName", '');
+    }
 
 //    chatPositionList = jsonDecode(_prefs.getString("chatPositionList"));
     // 如果没有缓存策略，设置默认缓存策略
@@ -691,41 +668,47 @@ class Global {
   }
 
   // ios VoIP token
-  static saveVoipToken(String voipToken) =>
-      _prefs.setString("voipToken", voipToken);
+  static saveVoipToken(String value) =>
+      _prefs.setString("voipToken", value);
 
   // firebase notification device token
-  static saveFirebaseToken(String firebaseToken) =>
-      _prefs.setString("firebaseToken", firebaseToken);
+  static saveFirebaseToken(String value) =>
+      _prefs.setString("firebaseToken", value);
 
   // apns notification device token
-  static saveApnsToken(String apnsToken) =>
-      _prefs.setString("apnsToken", apnsToken);
+  static saveApnsToken(String value) =>
+      _prefs.setString("apnsToken", value);
 
   // call 类别
-  static saveUuid(String uuid) {
-    Global.currentCallUuid = uuid;
-    _prefs.setString("currentCallUuid", uuid);
+  static saveUuid(String value) {
+    Global.currentCallUuid = value;
+    _prefs.setString("currentCallUuid", value);
   }
 
-  static saveHasCall(String hasCall) {
-    Global.hasCall = hasCall;
-    _prefs.setString("hasCall", hasCall);
+  static saveHasCall(String value) {
+    Global.hasCall = value;
+    _prefs.setString("hasCall", value);
   }
 
-  static saveCallFriendId(String callFriendId) {
-    Global.callFriendId = callFriendId;
-    _prefs.setString("callFriendId", callFriendId);
+  static saveCallFriendId(String value) {
+    Global.callFriendId = value;
+    _prefs.setString("callFriendId", value);
   }
 
-  static saveCallGroupId(String callGroupId) {
-    Global.callGroupId = callGroupId;
-    _prefs.setString("callGroupId", callGroupId);
+  static saveCallGroupId(String value) {
+    Global.callGroupId = value;
+    _prefs.setString("callGroupId", value);
   }
 
-  static saveCallerName(String callerName) {
-    Global.callerName = callerName;
-    _prefs.setString("callerName", callerName);
+  static saveCallerName(String value) {
+    Global.callerName = value;
+    _prefs.setString("callerName", value);
+  }
+
+
+  static saveBackgroundImage(String value) {
+    Global.backgroundImage = value;
+    _prefs.setString("backgroundImage", value);
   }
 }
 

@@ -39,8 +39,8 @@ bool hasGetHistoryDownOver = false;
 // 是否还在渲染中
 bool afterBuilding = false;
 
-
 Timer shouldSetTimer;
+
 class Conversation extends StatefulWidget {
   final int groupId;
   final int contactId;
@@ -250,31 +250,8 @@ class _ConversationState extends State<Conversation> {
                   Expanded(
                     child: Stack(
                       children: [
-                        // Container(
-                        //   decoration: BoxDecoration(
-                        //     gradient: LinearGradient(
-                        //       begin: Alignment.topCenter,
-                        //       end: Alignment.bottomCenter,
-                        //       colors: [
-                        //         Colors.lightBlue,
-                        //         Colors.deepPurpleAccent,
-                        //         Colors.pinkAccent,
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
-                        // Container(
-                        //   // width: MediaQuery.of(context).size.width,
-                        //   // height: MediaQuery.of(context).size.height,
-                        //   decoration: BoxDecoration(
-                        //     image: DecorationImage(
-                        //       image: AssetImage('assets/cm4.jpeg'),
-                        //       fit: BoxFit.fill,
-                        //     ),
-                        //   ),
-                        // ),
+                        _buildBackground(),
                         _buildListBox(conversationList),
-
                       ],
                     ),
                   ),
@@ -529,6 +506,62 @@ class _ConversationState extends State<Conversation> {
           ),
       ],
     );
+  }
+
+  _buildBackground() {
+
+
+
+    Widget backG;
+    if (themeObj.backgroundImage == null) {
+      var bg2 = themeObj.messagesChatBg2;
+      if (bg2 == null) {
+        bg2 = themeObj.messagesChatBg;
+      }
+      backG = Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              themeObj.messagesChatBg,
+              bg2,
+            ],
+          ),
+        ),
+      );
+    } else {
+      backG = Container(
+        // width: MediaQuery.of(context).size.width,
+        // height: MediaQuery.of(context).size.height,
+        child: FutureBuilder(
+            future: _getBackgroundFile(),
+            builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+              return snapshot.data != null ? Image.file(snapshot.data) : Container();
+            }),
+      );
+    }
+
+    return Container(
+      child: backG,
+    );
+  }
+
+  Future<File> _getBackgroundFile() async {
+    final dbHelper = DatabaseHelper.instance;
+    if (themeObj.backgroundImage == null) return null;
+    String filePath;
+    FileSql fileInfo = await dbHelper.fileOne(themeObj.backgroundImage);
+    if (fileInfo != null) {
+      filePath = fileInfo.fileOriginLocal;
+    }
+    if (filePath != null) {
+
+      File f = File(filePath);
+      return f;
+    } else {
+      return null;
+    }
   }
 
   _inputTextChange(String text) {
@@ -866,32 +899,32 @@ class _ConversationState extends State<Conversation> {
               SliverToBoxAdapter(
                 child: !hasGetHistoryDownOver
                     ? Align(
-                  alignment: Alignment.center,
-                  child: Container(
-                    padding: EdgeInsets.all(4),
-                    height: 40.0,
-                    width: 40.0,
-                    child: !hasGetHistoryDownOver
-                        ? SizedBox(
-                      width: 30,
-                      height: 30.0,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation(
-                          themeObj.primaryColor,
+                        alignment: Alignment.center,
+                        child: Container(
+                          padding: EdgeInsets.all(4),
+                          height: 40.0,
+                          width: 40.0,
+                          child: !hasGetHistoryDownOver
+                              ? SizedBox(
+                                  width: 30,
+                                  height: 30.0,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation(
+                                      themeObj.primaryColor,
+                                    ),
+                                  ),
+                                )
+                              : SizedBox(),
                         ),
-                      ),
-                    )
-                        : SizedBox(),
-                  ),
-                )
+                      )
                     : SizedBox(),
               ),
               ...sliversNew,
               SliverList(
                 key: centerKey,
                 delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
+                  (BuildContext context, int index) {
                     //                  return Container(
                     //                    alignment: Alignment.center,
                     //                    color: Colors.green[200 + bottom[index] % 4 * 100],
@@ -913,22 +946,21 @@ class _ConversationState extends State<Conversation> {
                     width: 40.0,
                     child: !hasGetHistoryUpOver
                         ? SizedBox(
-                      width: 30,
-                      height: 30.0,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation(
-                          themeObj.primaryColor,
-                        ),
-                      ),
-                    )
+                            width: 30,
+                            height: 30.0,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation(
+                                themeObj.primaryColor,
+                              ),
+                            ),
+                          )
                         : SizedBox(),
                   ),
                 ),
               ),
             ],
           ),
-
         ),
       ),
     );
@@ -1015,7 +1047,8 @@ class _ConversationState extends State<Conversation> {
     Color topColor;
     Color bottomColor;
     if (!sameColor) {
-      var scrollModel = Provider.of<ConversationScrollModel>(context, listen: false);
+      var scrollModel =
+          Provider.of<ConversationScrollModel>(context, listen: false);
       List scrollList = scrollModel.scrollList;
       // List scrollList = scrollWidgetList;
 
@@ -1029,10 +1062,19 @@ class _ConversationState extends State<Conversation> {
         // } else {
         //   topColor = themeObj.messagesColor2;
         // }
-        if (msg['timestamp'] <= scrollList[scrollList.length - 1]['timestamp']) {
+
+        /// 1
+        // if (msg['timestamp'] <=
+        //     scrollList[scrollList.length - 1]['timestamp']) {
+        //   topColor = themeObj.messagesColor;
+        // } else {
+        //   topColor = themeObj.messagesColor2;
+        // }
+
+        /// 2
+        if (msg['timestamp'] <= scrollList[0]['timestamp']) {
           topColor = themeObj.messagesColor;
-        }
-        else {
+        } else {
           topColor = themeObj.messagesColor2;
         }
       }
@@ -1756,16 +1798,19 @@ class _ConversationState extends State<Conversation> {
 //        logger.d('jumpafterBuild');
         hasJumpLastPosition = true;
         _sliverController.jumpTo(conversionInfo['extentBefore']);
+        //
+        // if (conversionInfo['extentAfter'] == 0 && conversionInfo['extentBefore'] != 0) {
+        //   _sliverController.position.jumpTo(2);
+        // }
         if (conversionInfo['extentBefore'] == 0) {
           _resetSavePosition();
-          _sliverController.position.jumpTo(-2);
+          _sliverController.position.jumpTo(-0.1);
         } else {
           _scrollPosition();
         }
       }
     });
   }
-
 
   _scrollPosition() async {
     _setColor();
@@ -1899,13 +1944,13 @@ class _ConversationState extends State<Conversation> {
     return true;
   }
 
-  _getHistoryUp() {
+  _getHistoryUp() async {
     if (!hasGetHistoryUp && !hasGetHistoryUpOver) {
       hasGetHistoryUp = true;
       int offsetDate = converList[converList.length - 1]['createdDate'];
       if (offsetDate != preOffset) {
         preOffset = offsetDate;
-        socketProviderConversationListModel.getConversationList(
+        await socketProviderConversationListModel.getConversationList(
           page: 1,
           groupId: conversionInfo['groupId'],
 //          offsetId: minId,
@@ -1914,6 +1959,7 @@ class _ConversationState extends State<Conversation> {
           contactId: conversionInfo['contactId'],
           groupType: conversionInfo['groupType'],
         );
+        _setColor();
       }
     }
   }
@@ -1965,8 +2011,10 @@ class _ConversationState extends State<Conversation> {
       // );
       if (!sameLast) {
         await Future.delayed(Duration(milliseconds: 2000));
-        socketProviderConversationListModel.removeRangeList(
-            40, converList.length);
+        if (converList.length > 40) {
+          socketProviderConversationListModel.removeRangeList(
+              40, converList.length);
+        }
       }
     } else if (type == 2) {
       /// 如果有新消息，就到新消息的事件最小一个地方
@@ -2046,17 +2094,29 @@ class _ConversationState extends State<Conversation> {
     fbModel.setTopLine(false, noti: false);
   }
 
-
   bool shouldSet = true;
   bool sameColor = false;
   int addNum = 0;
+
   _setColor() {
-    if (sameColor) return;
-    // logger.d('set color');
     // return;
+    if (sameColor) return;
+
+    Color startColor = socketTheme.messagesColor;
+    Color endColor = socketTheme.messagesColor2;
+    if (endColor == null) {
+      return;
+    }
+    if (startColor.value == endColor.value) {
+      return;
+    }
     double mediaHeight = MediaQuery.of(context).size.height - 48;
-    var scrollModel = Provider.of<ConversationScrollModel>(context, listen: false);
+    var scrollModel =
+        Provider.of<ConversationScrollModel>(context, listen: false);
     // List scrollList = scrollModel.scrollList;
+    double totalHeight = 0;
+    double preHeight = 0;
+    bool small = false;
 
     if (shouldSet) {
       shouldSet = false;
@@ -2066,31 +2126,170 @@ class _ConversationState extends State<Conversation> {
       shouldSetTimer = Timer(timeout, () {
         bool hasSelf = false;
         for (var s = 0; s < scrollWidgetList.length; s++) {
-          if (scrollWidgetList[s]['isMe'] == true) {
+          var sW = scrollWidgetList[s];
+          if (sW['isMe'] == true) {
             hasSelf = true;
             // print(scrollWidgetList[s]['content']);
+            // totalHeight += sW['height'];
             break;
           }
         }
+
         if (hasSelf) {
+          double maxScroll = _sliverController.position.maxScrollExtent;
+          if (maxScroll < mediaHeight - 48 - 60) {
+            // totalHeight = mediaHeight - 48 - 60;
+            totalHeight = mediaHeight - 48 - 60;
+            small = true;
+            // logger.d('small: $small');
+          } else {
+            totalHeight = mediaHeight;
+          }
           List sList = [];
-          for (var s = 0; s < scrollWidgetList.length; s++) {
-            var scrollW = scrollWidgetList[s];
-            if (scrollW['key']?.currentContext != null) {
-              // scrollArr.add(scrollList[s]['id']);
-              RenderBox renderBoxRed =
-              scrollW['key']?.currentContext?.findRenderObject();
-              var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
-              if (positionsRed.dy + scrollW['height'] >= 0 && positionsRed.dy - scrollW['height']  <= mediaHeight) {
-                sList.add(scrollW);
+          if (small) {
+            for (var s = scrollWidgetList.length - 1; s >= 0; s--) {
+              var scrollW = scrollWidgetList[s];
+              if (scrollW['key']?.currentContext != null) {
+                // scrollArr.add(scrollList[s]['id']);
+                RenderBox renderBoxRed =
+                scrollW['key']?.currentContext?.findRenderObject();
+                var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
+                if (positionsRed.dy + scrollW['height'] >= 0 &&
+                    positionsRed.dy < 0 ||
+                    positionsRed.dy <= mediaHeight && positionsRed.dy > 0) {
+                  final double startH = preHeight / totalHeight;
+
+                  if (positionsRed.dy < 0) {
+                    preHeight += positionsRed.dy + scrollW['height'];
+                  } else if (positionsRed.dy > 0 &&
+                      positionsRed.dy + scrollW['height'] > mediaHeight &&
+                      scrollW['height'] < mediaHeight) {
+                    preHeight += mediaHeight - positionsRed.dy;
+                  } else if (scrollW['height'] > mediaHeight){
+                    preHeight += mediaHeight;
+                  } else {
+                    preHeight += scrollW['height'];
+                  }
+                  // 此widget 结束高度
+                  final double endH = preHeight / totalHeight;
+                  Color topColor;
+                  Color bottomColor;
+
+                  // topColor = Color.lerp(startColor, endColor, startH);
+                  // bottomColor = Color.lerp(startColor, endColor, endH);
+
+
+                  topColor = Color.lerp(startColor, endColor, 1 - startH);
+                  bottomColor = Color.lerp(startColor, endColor, 1 - endH);
+
+                  scrollW['topColor'] = topColor;
+                  scrollW['bottomColor'] = bottomColor;
+                  sList.add(scrollW);
+                }
               }
-              // logger.d('${scrollW['content']}');
-              // logger.d('dy: ${positionsRed.dy}');
-              // logger.d('height: ${scrollW['height']}');
+            }
+          } else {
+            for (var s = 0; s < scrollWidgetList.length; s++) {
+              var scrollW = scrollWidgetList[s];
+              if (scrollW['key']?.currentContext != null) {
+                // scrollArr.add(scrollList[s]['id']);
+                RenderBox renderBoxRed =
+                scrollW['key']?.currentContext?.findRenderObject();
+                var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
+                if (positionsRed.dy + scrollW['height'] >= 0 &&
+                    positionsRed.dy < 0 ||
+                    positionsRed.dy <= mediaHeight && positionsRed.dy > 0) {
+                  final double startH = preHeight / totalHeight;
+
+                  if (positionsRed.dy < 0) {
+                    preHeight += positionsRed.dy + scrollW['height'];
+                  } else if (positionsRed.dy > 0 &&
+                      positionsRed.dy + scrollW['height'] > mediaHeight &&
+                      scrollW['height'] < mediaHeight) {
+                    preHeight += mediaHeight - positionsRed.dy;
+                  } else if (scrollW['height'] > mediaHeight){
+                    preHeight += mediaHeight;
+                  } else {
+                    preHeight += scrollW['height'];
+                  }
+                  // 此widget 结束高度
+                  final double endH = preHeight / totalHeight;
+                  Color topColor;
+                  Color bottomColor;
+
+                  topColor = Color.lerp(startColor, endColor, startH);
+                  bottomColor = Color.lerp(startColor, endColor, endH);
+
+                  scrollW['topColor'] = topColor;
+                  scrollW['bottomColor'] = bottomColor;
+                  sList.add(scrollW);
+                }
+              }
             }
           }
+          // for (var s = 0; s < scrollWidgetList.length; s++) {
+          //   var scrollW = scrollWidgetList[s];
+          //   if (scrollW['key']?.currentContext != null) {
+          //     // scrollArr.add(scrollList[s]['id']);
+          //     RenderBox renderBoxRed =
+          //     scrollW['key']?.currentContext?.findRenderObject();
+          //     var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
+          //     if (positionsRed.dy + scrollW['height'] >= 0 &&
+          //         positionsRed.dy < 0 ||
+          //         positionsRed.dy <= mediaHeight && positionsRed.dy > 0) {
+          //       final double startH = preHeight / totalHeight;
+          //
+          //       if (positionsRed.dy < 0) {
+          //         preHeight += positionsRed.dy + scrollW['height'];
+          //       } else if (positionsRed.dy > 0 &&
+          //           positionsRed.dy + scrollW['height'] > mediaHeight &&
+          //           scrollW['height'] < mediaHeight) {
+          //         preHeight += mediaHeight - positionsRed.dy;
+          //       } else if (scrollW['height'] > mediaHeight){
+          //         preHeight += mediaHeight;
+          //       } else {
+          //         preHeight += scrollW['height'];
+          //       }
+          //       // 此widget 结束高度
+          //       final double endH = preHeight / totalHeight;
+          //       Color topColor;
+          //       Color bottomColor;
+          //
+          //       topColor = Color.lerp(startColor, endColor, startH);
+          //       bottomColor = Color.lerp(startColor, endColor, endH);
+          //
+          //       scrollW['topColor'] = topColor;
+          //       scrollW['bottomColor'] = bottomColor;
+          //       sList.add(scrollW);
+          //     }
+          //   }
+          // }
+
           ArrayUtil.sortArray(sList, sortOrder: 1, property: 'timestamp');
-          // logger.d('sList.length: ${sList.length}');
+          // List scrollList = sList;
+          preHeight = 0;
+          // for (var s = 0; s < scrollList.length; s++) {
+          //   var scrollW = scrollList[s];
+          //   // double currentHeight = scrollW['height'];
+          //   // 此widget 开始的高度
+          //   final double startH = preHeight / totalHeight;
+          //   preHeight += scrollW['height'];
+          //   // 此widget 结束高度
+          //   final double endH = preHeight / totalHeight;
+          //
+          //   // 使用开始颜色
+          //   Color lastStartValue;
+          //   // 使用结束颜色
+          //   Color lastEndValue;
+          //   // if (scrollW['timestamp'] == widget.timestamp) {
+          //   //   lastStartValue = Color.lerp(startColor, endColor, startH);
+          //   //   lastEndValue = Color.lerp(startColor, endColor, endH);
+          //   //   hasSelf = true;
+          //   //   topColor = lastStartValue;
+          //   //   bottomColor = lastEndValue;
+          //   // }
+          // }
+          logger.d('sList.length: ${sList.length}');
           scrollModel.updateScrollList(sList);
           // print('update');
         }
@@ -2099,15 +2298,11 @@ class _ConversationState extends State<Conversation> {
         shouldSetTimer?.cancel();
         shouldSet = true;
         // conversion.noti();
-
       });
     }
-
-
   }
 
   _getIsSame() {
-
     Color topColor = socketTheme.messagesColor;
     Color bottomColor = socketTheme.messagesColor2;
     if (bottomColor == null) {
@@ -2120,6 +2315,5 @@ class _ConversationState extends State<Conversation> {
       // logger.d(sameColor);
       return;
     }
-
   }
 }

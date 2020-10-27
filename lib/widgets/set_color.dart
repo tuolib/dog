@@ -75,7 +75,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
   Color messagesColor;
   Color messagesColor2;
 
-  int backgroundColorTab = 0;
+  int colorTab = 0;
 
   final controller = PageController(viewportFraction: 1);
 
@@ -87,6 +87,10 @@ class _SetColorWidgetState extends State<SetColorWidget> {
   double inputPaddingTop = 5;
   double inputBorder = 1;
   double inputHeight = 30;
+
+  bool showInput2 = false;
+
+  bool hasInitColor = false;
 
   @override
   void initState() {
@@ -121,32 +125,36 @@ class _SetColorWidgetState extends State<SetColorWidget> {
     //   messagesColorBack = messagesColor;
     // }
     // logger.d(Global.themes[themeObj.theme]);
-    if (accentColor == null) {
-      accentColor = themeObj.primaryColor;
-    }
-    if (backgroundColor == null) {
-      backgroundColor = themeObj.messagesChatBg;
-    }
-    if (backgroundColor2 == null) {
-      if (themeObj.messagesChatBg2 != null) {
-        backgroundColor2 = themeObj.messagesChatBg2;
+    if (!hasInitColor) {
+      hasInitColor = true;
+      if (accentColor == null) {
+        accentColor = themeObj.primaryColor;
       }
-    }
-    if (messagesColor == null) {
-      messagesColor = themeObj.messagesColor;
-    }
-    if (messagesColor2 == null) {
-      if (themeObj.messagesColor2 != null) {
-        messagesColor2 = themeObj.messagesColor2;
+      if (backgroundColor == null) {
+        backgroundColor = themeObj.messagesChatBg;
       }
-      // messagesColor2 = themeObj.messagesColor2;
+      if (backgroundColor2 == null) {
+        if (themeObj.messagesChatBg2 != null) {
+          backgroundColor2 = themeObj.messagesChatBg2;
+        }
+      }
+      if (messagesColor == null) {
+        messagesColor = themeObj.messagesColor;
+      }
+      if (messagesColor2 == null) {
+        if (themeObj.messagesColor2 != null) {
+          messagesColor2 = themeObj.messagesColor2;
+        }
+        // messagesColor2 = themeObj.messagesColor2;
+      }
+
     }
     if (_segmented == 0) {
       pickerColor = accentColor;
       _textController.text = "${accentColor.toHex().substring(3)}";
     } else if (_segmented == 1) {
       pickerColor = backgroundColor;
-      logger.d('${backgroundColor.toHex()}');
+      // logger.d('${backgroundColor.toHex()}');
       _textController.text = "${backgroundColor.toHex().substring(3)}";
       if (backgroundColor2 != null) {
         pickerColor2 = backgroundColor2;
@@ -332,12 +340,23 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                   if (i == 0) {
                     pickerColor = accentColor;
                     pickerColor2 = null;
+                    showInput2 = false;
                   } else if (i == 1) {
                     pickerColor = backgroundColor;
                     pickerColor2 = backgroundColor2;
+                    if (backgroundColor2 != null) {
+                      showInput2 = true;
+                    } else {
+                      showInput2 = false;
+                    }
                   } else if (i == 2) {
                     pickerColor = messagesColor;
                     pickerColor2 = messagesColor2;
+                    if (messagesColor2 != null) {
+                      showInput2 = true;
+                    } else {
+                      showInput2 = false;
+                    }
                   }
                   _segmented = i;
                 });
@@ -497,8 +516,8 @@ class _SetColorWidgetState extends State<SetColorWidget> {
       );
     } else {
       return Expanded(
-        flex: pickerColor2 != null ? 1 : null,
-        child: pickerColor2 != null
+        flex: showInput2  ? 1 : null,
+        child: showInput2
             ? Container(
                 margin: EdgeInsets.only(left: 10),
                 child: Stack(
@@ -671,16 +690,15 @@ class _SetColorWidgetState extends State<SetColorWidget> {
       onTap: () {
         setState(() {
           // if (selectPicker == )
-
           selectPicker = 1;
           if (type == 1) {
-            // pickerColor = pickerColor2;
+            pickerColor = pickerColor2;
             if (_segmented == 1) {
               backgroundColor2 = null;
             } else if (_segmented == 2) {
               messagesColor2 = null;
             }
-            changeColor(pickerColor2, type: 1, close: true);
+            changeColor(pickerColor, type: 1, close: true);
           } else {
             if (_segmented == 1) {
               backgroundColor2 = null;
@@ -689,6 +707,11 @@ class _SetColorWidgetState extends State<SetColorWidget> {
             }
             changeColor(pickerColor, type: 1, close: true);
           }
+
+          pickerColor2 = null;
+          _textController2.text = '';
+          showInput2 = false;
+          // logger.d(pickerColor2);
         });
       },
     );
@@ -712,6 +735,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
         setState(() {
           pickerColor2 = DataUtil.randomColor();
           selectPicker = 2;
+          showInput2 = true;
           changeColor(pickerColor2, type: 2);
         });
       },
@@ -1186,10 +1210,6 @@ class _SetColorWidgetState extends State<SetColorWidget> {
         }
         pickerColor2 = color;
         _textController2.text = '${color.toHex().substring(3)}';
-      }
-      if (close) {
-        pickerColor2 = null;
-        _textController2.text = '';
       }
     });
     Map allColor = {

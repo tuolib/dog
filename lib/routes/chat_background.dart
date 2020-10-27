@@ -11,6 +11,23 @@ class ChatBackgroundRoute extends StatefulWidget {
 class _ChatBackgroundRoute extends State<ChatBackgroundRoute> {
   ThemeModel themeObj;
 
+  //insertFile = FileSql(
+  //                 id: jsonObj['avatar'],
+  //                 name: jsonObj['avatarName'],
+  //                 fileName: jsonObj['avatarName'],
+  //                 fileOriginUrl: jsonObj['avatarUrl'],
+  //                 fileOriginLocal: '',
+  //                 fileCompressUrl: jsonObj['avatarUrlCompress'],
+  //                 fileCompressLocal: '',
+  //                 fileSize: 0,
+  //               );
+  //               res = await dbHelper.fileAdd(insertFile);
+  //               futuresLocalFile.add(Git().saveImageFileCompress(
+  //                 insertFile.id,
+  //                 insertFile.fileName,
+  //                 insertFile.fileCompressUrl,
+  //               ));
+
   double con1 = 30;
   double border1 = 2;
   double border2 = 2;
