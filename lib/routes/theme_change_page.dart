@@ -685,14 +685,14 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
     bool showLitter = true;
     Color litterCirBg;
     int litterValue;
-    if (Global.profile.themeMode == 1) {
+    if (themeObj.themeMode == 1) {
       themeIndex = themeObj.theme;
       litterValue = Global.profile.dayList[index]['message'];
       litterCirBg = Color(litterValue);
       if (index == themeObj.theme) {
         selected = true;
       }
-    } else if (Global.profile.themeMode == 2) {
+    } else if (themeObj.themeMode == 2) {
       themeIndex = themeObj.themeDark;
       litterValue = Global.profile.darkList[index]['message'];
       litterCirBg = Color(litterValue);
@@ -701,6 +701,9 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
       }
     } else {
       themeIndex = 0;
+      if (index == themeObj.theme) {
+        selected = true;
+      }
     }
     // if (litterValue != colorItem) {
     //   showLitter = true;

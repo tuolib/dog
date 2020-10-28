@@ -23,7 +23,7 @@ class SocketsIoNotify {
       print('socketInit  $socketInit');
       print('socketInit?.connected ${socketInit?.connected}');
       if (socketInit != null) return;
-      // if (Global.profile.token == null || Global.profile.token == '') return;
+      if (Global.profile.token == null || Global.profile.token == '') return;
       var addr = "$localAddress";
       socketInit = io(addr, <String, dynamic>{
         'transports': ['websocket'],

@@ -295,22 +295,39 @@ class ChatBubbleState extends State<ChatBubbleWidget> {
         ConversationScrollModel conversationScrollModel,
         Widget child,
       ) {
-        Color _topColor;
-        Color _bottomColor;
+        // Color _topColor = topColor;
+        // Color _bottomColor = bottomColor;
         // print('widget.content: ${widget.content}');
-        if (widget.isMe && topColor != null) {
+        double stops = 0;
+        double stops2 = 1;
+        if (widget.isMe && themeObj.messagesColor2 != null) {
           // print(mounted);
           // _setColor();
           List scrollList = conversationScrollModel.scrollList;
           for(var i = 0; i < scrollList.length; i++) {
             final Map sW = scrollList[i];
             if (widget.timestamp == sW['timestamp']) {
-              topColor = sW['topColor'];
-              bottomColor = sW['bottomColor'];
+              if (sW['topColor'] != null) {
+                topColor =  sW['topColor'];
+              }
+              if (sW['bottomColor'] != null) {
+                bottomColor =  sW['bottomColor'];
+              }
+              if (sW['stops'] != null) {
+                stops =  sW['stops'];
+              }
+              if (sW['stops2'] != null) {
+                stops2 =  sW['stops2'];
+              }
               break;
             }
           }
+          // logger.d(scrollList[0]['timestamp']);
+          // logger.d(widget.timestamp);
+          // logger.d(_bottomColor);
         }
+        // logger.d(topColor);
+        // logger.d(bottomColor);
         return Container(
           margin: EdgeInsets.only(top: 2, bottom: 2, left: 2, right: 2),
           child: CustomPaint(
@@ -321,15 +338,17 @@ class ChatBubbleState extends State<ChatBubbleWidget> {
               radius: _radius,
               topColor: topColor == null ? paintColor : topColor,
               bottomColor: bottomColor == null ? paintColor : bottomColor,
+              stops: stops,
+              stops2: stops2,
             ),
             child: Container(
               child: Stack(
                 children: <Widget>[
                   Container(
                     margin:
-                        EdgeInsets.only(top: 3, bottom: 3, right: 8, left: 8),
+                    EdgeInsets.only(top: 3, bottom: 3, right: 8, left: 8),
                     padding:
-                        EdgeInsets.only(top: 0, bottom: 0, right: 2, left: 5),
+                    EdgeInsets.only(top: 0, bottom: 0, right: 2, left: 5),
                     decoration: BoxDecoration(
                       // color: chatBubbleColor(),
                       // color: widget.isMe
@@ -363,6 +382,70 @@ class ChatBubbleState extends State<ChatBubbleWidget> {
             ),
           ),
         );
+        // return Container(
+        //   margin: EdgeInsets.only(top: 2, bottom: 2, left: 2, right: 2),
+        //   child: Container(
+        //     decoration: BoxDecoration(
+        //       gradient: LinearGradient(
+        //         begin: Alignment.topCenter,
+        //         end: Alignment.bottomCenter,
+        //         colors: [
+        //           topColor == null ? paintColor : topColor,
+        //           bottomColor == null ? paintColor : bottomColor,
+        //         ],
+        //       ),
+        //       borderRadius: BorderRadius.circular(_radius),
+        //     ),
+        //     child: Stack(
+        //       children: <Widget>[
+        //         Container(
+        //           margin:
+        //           EdgeInsets.only(top: 3, bottom: 3, right: 8, left: 8),
+        //           padding:
+        //           EdgeInsets.only(top: 0, bottom: 0, right: 2, left: 5),
+        //           decoration: BoxDecoration(
+        //             // color: chatBubbleColor(),
+        //             // color: widget.isMe
+        //             //     ? themeObj.messagesColor
+        //             //     : themeObj.messagesColorSide,
+        //             // gradient: LinearGradient(
+        //             //   begin: Alignment.topCenter,
+        //             //   end: Alignment.bottomCenter,
+        //             //   colors: [
+        //             //     topColor == null ? paintColor : topColor,
+        //             //     bottomColor == null ? paintColor : bottomColor,
+        //             //   ],
+        //             // ),
+        //             borderRadius: BorderRadius.circular(_radius),
+        //           ),
+        //           constraints: BoxConstraints(
+        //             maxWidth: MediaQuery.of(context).size.width / 1.3 - 30,
+        //             minWidth: 20.0,
+        //           ),
+        //           child: Column(
+        //             mainAxisSize: MainAxisSize.min,
+        //             mainAxisAlignment: MainAxisAlignment.start,
+        //             crossAxisAlignment: align,
+        //             children: <Widget>[
+        //               _buildName(),
+        //               _buildReply(),
+        //               widget.isReply ? SizedBox(height: 5) : SizedBox(),
+        //               Stack(
+        //                 children: [
+        //                   _buildMessage(context),
+        //                   _buildMessageTime(),
+        //                 ],
+        //               ),
+        //             ],
+        //           ),
+        //         ),
+        //
+        //       ],
+        //     ),
+        //   ),
+        // );
+
+
       },
     );
   }
@@ -1049,6 +1132,7 @@ class ChatBubbleState extends State<ChatBubbleWidget> {
       ArrayUtil.sortArray(scrollWidgetList,
           sortOrder: 1, property: 'timestamp');
       // _setColor();
+      widget.callback(0, '1', '1', type: 2);
     }
   }
 

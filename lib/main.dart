@@ -39,12 +39,8 @@ void main() async {
 //      break;
 //    }
 //  }
-  final dbHelper = DatabaseHelper.instance;
-  await dbHelper.fileUpdateLocalUrl();
   await Global.init().then((e) => runApp(MyApp()));
-  if (Global.profile.token != null) {
-    socketIoItem.initCommunication();
-  }
+  socketIoItem.initCommunication();
 
 //  if (didReceiveLocalNotificationSubject != null) {
 //    didReceiveLocalNotificationSubject.close();

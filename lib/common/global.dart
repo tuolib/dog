@@ -1,8 +1,11 @@
-import '../index.dart';
+
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:package_info/package_info.dart';
+
+import '../index.dart';
 
 // // 提供可选主题色
 List exampleColor = [
@@ -554,6 +557,9 @@ class Global {
 
   // 背景图片
   static String backgroundImage;
+  static String backgroundImageUrl;
+
+  static String appVersion;
 
   //初始化全局信息，会在APP启动时执行
   static Future init() async {
@@ -581,7 +587,6 @@ class Global {
     voipToken = _prefs.getString("voipToken");
     firebaseToken = _prefs.getString("firebaseToken");
     apnsToken = _prefs.getString("apnsToken");
-
     // 视频或者语音 uuid
     currentCallUuid = _prefs.getString("currentCallUuid");
     // 是否显示系统拨打电话界面
@@ -594,6 +599,9 @@ class Global {
     callerName = _prefs.getString("callerName");
 
     backgroundImage  = _prefs.getString("backgroundImage");
+    backgroundImageUrl  = _prefs.getString("backgroundImageUrl");
+
+    appVersion = _prefs.getString("appVersion");
 
     if (currentCallUuid == null) {
       _prefs.setString("currentCallUuid", '');
@@ -615,6 +623,10 @@ class Global {
       callerName = '';
       _prefs.setString("callerName", '');
     }
+    if (appVersion == null) {
+      appVersion = '1.0.0';
+      _prefs.setString("appVersion", '1.0.0');
+    }
 
 //    chatPositionList = jsonDecode(_prefs.getString("chatPositionList"));
     // 如果没有缓存策略，设置默认缓存策略
@@ -625,6 +637,27 @@ class Global {
 
     //初始化网络请求相关配置
     Git.init();
+
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String appName = packageInfo.appName;
+    String packageName = packageInfo.packageName;
+    String version = packageInfo.version;
+    String buildNumber = packageInfo.buildNumber;
+    // print('app version: $version');
+    if (version != appVersion) {
+      final dbHelper = DatabaseHelper.instance;
+      await dbHelper.fileUpdateLocalUrl();
+
+      if (backgroundImage != null) {
+        final dbHelper = DatabaseHelper.instance;
+        FileSql fileInfo = dbHelper.fileOne(int.parse(backgroundImage));
+        if (fileInfo != null) {
+          backgroundImageUrl = fileInfo.fileOriginLocal;
+        }
+      }
+      saveAppVersion(version);
+    }
+
   }
 
   // 持久化Profile信息
@@ -706,9 +739,15 @@ class Global {
   }
 
 
-  static saveBackgroundImage(String value) {
+  static saveBackgroundImage(String value, String url) {
     Global.backgroundImage = value;
+    Global.backgroundImageUrl = url;
     _prefs.setString("backgroundImage", value);
+    _prefs.setString("backgroundImageUrl", url);
+  }
+  static saveAppVersion(String value) {
+    Global.appVersion = value;
+    _prefs.setString("appVersion", value);
   }
 }
 

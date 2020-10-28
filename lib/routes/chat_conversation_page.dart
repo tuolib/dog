@@ -158,6 +158,13 @@ class _ConversationState extends State<Conversation> {
 
   bool hasInitColor = false;
 
+  // set color
+  double mediaHeight;
+  bool shouldSet = true;
+  bool sameColor = false;
+  int addNum = 0;
+  ConversationScrollModel scrollModel;
+
   @override
   void initState() {
     super.initState();
@@ -180,15 +187,11 @@ class _ConversationState extends State<Conversation> {
     });
     _getIsSame();
     //
-
-    // WidgetsBinding.instance.addPostFrameCallback(_initColor());
-    // _setColor();
   }
 
   _initColor() {
     if (!hasInitColor) {
       hasInitColor = true;
-      _setColor();
       setTopLine();
     }
   }
@@ -216,6 +219,7 @@ class _ConversationState extends State<Conversation> {
     //   _initColor();
     // }
     _initColor();
+    scrollModel = Provider.of<ConversationScrollModel>(context, listen: false);
     themeObj = Provider.of<ThemeModel>(context);
     pageContext = context;
     addPeople = Provider.of<AddPeopleModel>(context);
@@ -531,14 +535,19 @@ class _ConversationState extends State<Conversation> {
         ),
       );
     } else {
+      // backG = Container(
+      //   // width: MediaQuery.of(context).size.width,
+      //   // height: MediaQuery.of(context).size.height,
+      //   child: FutureBuilder(
+      //       future: _getBackgroundFile(),
+      //       builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+      //         return snapshot.data != null ? Image.file(snapshot.data) : Container();
+      //       }),
+      // );
       backG = Container(
         // width: MediaQuery.of(context).size.width,
         // height: MediaQuery.of(context).size.height,
-        child: FutureBuilder(
-            future: _getBackgroundFile(),
-            builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
-              return snapshot.data != null ? Image.file(snapshot.data) : Container();
-            }),
+        child: Image.file(File(themeObj.backgroundImageUrl)),
       );
     }
 
@@ -1238,10 +1247,14 @@ class _ConversationState extends State<Conversation> {
     }
   }
 
-  callback(index, property, filePath) {
+  callback(index, property, filePath, {int type}) {
     logger.d('callback');
+    if (type == 2) {
+      _setColor();
+    } else {
+      conversion.updateListItem(index, property, filePath);
+    }
 
-    conversion.updateListItem(index, property, filePath);
   }
 
   showAttachmentBottomSheet(context) {
@@ -1813,39 +1826,48 @@ class _ConversationState extends State<Conversation> {
   }
 
   _scrollPosition() async {
-    _setColor();
     const timeout = Duration(milliseconds: 30);
     saveHistoryTime?.cancel();
     saveHistoryTime = Timer(timeout, () {
+
+      //
       var scrollArr = [];
       double positionMax = 0;
       double maxHeight = 850;
       var positionMaxItem;
+
       for (var s = 0; s < scrollWidgetList.length; s++) {
-        if (scrollWidgetList[s]['key']?.currentContext != null) {
-          scrollArr.add(scrollWidgetList[s]['id']);
+        Map scrollW = scrollWidgetList[s];
+        if (scrollW['key']?.currentContext != null) {
+          scrollArr.add(scrollW['id']);
           RenderBox renderBoxRed =
-              scrollWidgetList[s]['key']?.currentContext?.findRenderObject();
+              scrollW['key']?.currentContext?.findRenderObject();
           var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
-          if (positionMax < positionsRed.dy && maxHeight >= positionsRed.dy) {
+          if (positionMax < positionsRed.dy && maxHeight >= positionsRed.dy ||
+              positionsRed.dy < 0 && positionsRed.dy + scrollW['height'] > 0 ) {
             positionMax = positionsRed.dy;
             positionMaxItem = {
-              "key": scrollWidgetList[s]['key'],
-              "id": scrollWidgetList[s]['id'],
+              "key": scrollW['key'],
+              "id": scrollW['id'],
               "dy": positionsRed.dy,
-              "height": scrollWidgetList[s]['height'],
-              "createdDate": scrollWidgetList[s]['createdDate'],
-              "timestamp": scrollWidgetList[s]['timestamp'],
+              "height": scrollW['height'],
+              "createdDate": scrollW['createdDate'],
+              "timestamp": scrollW['timestamp'],
             };
           }
+
         }
       }
       if (positionMaxItem == null) {
         _resetSavePosition();
-        return;
+      } else {
+        _savePosition(positionMaxItem);
       }
-      _savePosition(positionMaxItem);
     });
+
+    _setColor();
+
+
   }
 
 //  保存滚动位置
@@ -1889,7 +1911,7 @@ class _ConversationState extends State<Conversation> {
       "extentAfterId": extentAfterId,
       "extentBeforeId": extentBeforeId,
     };
-    // logger.d(saveInfo);
+    logger.d(saveInfo);
     socketProviderChatListModel.updateItemPropertyMultiple(
       conversionInfo['groupId'],
       saveInfo,
@@ -1959,7 +1981,7 @@ class _ConversationState extends State<Conversation> {
           contactId: conversionInfo['contactId'],
           groupType: conversionInfo['groupType'],
         );
-        _setColor();
+
       }
     }
   }
@@ -2094,58 +2116,63 @@ class _ConversationState extends State<Conversation> {
     fbModel.setTopLine(false, noti: false);
   }
 
-  bool shouldSet = true;
-  bool sameColor = false;
-  int addNum = 0;
-
-  _setColor() {
+  _setColor({List screenList}) {
     // return;
     if (sameColor) return;
 
+    // return;
+
     Color startColor = socketTheme.messagesColor;
     Color endColor = socketTheme.messagesColor2;
-    if (endColor == null) {
-      return;
-    }
-    if (startColor.value == endColor.value) {
-      return;
-    }
-    double mediaHeight = MediaQuery.of(context).size.height - 48;
-    var scrollModel =
-        Provider.of<ConversationScrollModel>(context, listen: false);
+    // if (endColor == null) {
+    //   return;
+    // }
+    // if (startColor.value == endColor.value) {
+    //   return;
+    // }
+    // var scrollModel =
+    //     Provider.of<ConversationScrollModel>(context, listen: false);
     // List scrollList = scrollModel.scrollList;
-    double totalHeight = 0;
-    double preHeight = 0;
-    bool small = false;
 
+    mediaHeight = MediaQuery.of(context).size.height - 48;
     if (shouldSet) {
       shouldSet = false;
 
-      var timeout = Duration(milliseconds: 10);
+      var timeout = Duration(milliseconds: 30);
 
       shouldSetTimer = Timer(timeout, () {
+
         bool hasSelf = false;
+        double totalHeight = 0;
+        double preHeight = 0;
+        bool small = false;
         for (var s = 0; s < scrollWidgetList.length; s++) {
           var sW = scrollWidgetList[s];
           if (sW['isMe'] == true) {
             hasSelf = true;
             // print(scrollWidgetList[s]['content']);
-            // totalHeight += sW['height'];
-            break;
+            totalHeight += sW['height'];
+            // break;
           }
         }
 
         if (hasSelf) {
           double maxScroll = _sliverController.position.maxScrollExtent;
-          if (maxScroll < mediaHeight - 48 - 60) {
+          // double extentAfter = _sliverController.position.extentAfter;
+          if (maxScroll > totalHeight) {
+            totalHeight = maxScroll;
+          }
+          if (totalHeight < mediaHeight) {
             // totalHeight = mediaHeight - 48 - 60;
-            totalHeight = mediaHeight - 48 - 60;
+            totalHeight = mediaHeight;
             small = true;
             // logger.d('small: $small');
           } else {
             totalHeight = mediaHeight;
           }
           List sList = [];
+          // logger.d('small: $small');
+          // logger.d('mediaHeight: $mediaHeight');
           if (small) {
             for (var s = scrollWidgetList.length - 1; s >= 0; s--) {
               var scrollW = scrollWidgetList[s];
@@ -2198,30 +2225,76 @@ class _ConversationState extends State<Conversation> {
                 var positionsRed = renderBoxRed?.localToGlobal(Offset(0, 0));
                 if (positionsRed.dy + scrollW['height'] >= 0 &&
                     positionsRed.dy < 0 ||
-                    positionsRed.dy <= mediaHeight && positionsRed.dy > 0) {
-                  final double startH = preHeight / totalHeight;
+                    positionsRed.dy <= mediaHeight && positionsRed.dy > 0
+                    // positionsRed.dy > 0 &&
+                ) {
+                  double startStops;
+                  double endStops;
+                  final double startH = preHeight / mediaHeight;
 
-                  if (positionsRed.dy < 0) {
+                  if (positionsRed.dy + scrollW['height'] > 0 &&
+                      positionsRed.dy < 0) {
+                    // 位置超出顶部，但尾部还在显示范围
                     preHeight += positionsRed.dy + scrollW['height'];
+                    startStops = -positionsRed.dy;
+                    if (positionsRed.dy + scrollW['height'] > mediaHeight) {
+                      endStops = mediaHeight - positionsRed.dy;
+                    } else {
+                      endStops = scrollW['height'];
+                    }
+
                   } else if (positionsRed.dy > 0 &&
                       positionsRed.dy + scrollW['height'] > mediaHeight &&
                       scrollW['height'] < mediaHeight) {
+                    // 位置大于0，位置+高度 超出底部屏幕，高度小于屏幕
                     preHeight += mediaHeight - positionsRed.dy;
-                  } else if (scrollW['height'] > mediaHeight){
-                    preHeight += mediaHeight;
+                    startStops = 0;
+                    // endStops = scrollW['height'];
+                    if (positionsRed.dy + scrollW['height'] > mediaHeight) {
+                      endStops = mediaHeight - positionsRed.dy;
+                    } else {
+                      endStops = scrollW['height'];
+                    }
+                  } else if (positionsRed.dy >= 0 && scrollW['height'] > mediaHeight){
+                    // 位置大于0，高度大于屏幕，
+                    preHeight += mediaHeight - positionsRed.dy;
+                    startStops = 0;
+                    // endStops = mediaHeight - positionsRed.dy;
+                    if (positionsRed.dy + scrollW['height'] > mediaHeight) {
+                      endStops = mediaHeight - positionsRed.dy;
+                    } else {
+                      endStops = scrollW['height'];
+                    }
                   } else {
                     preHeight += scrollW['height'];
+                    startStops = 0;
+                    endStops = scrollW['height'];
+                  }
+                  // logger.d(preHeight);
+                  if (preHeight > mediaHeight) {
+                    preHeight = mediaHeight;
                   }
                   // 此widget 结束高度
-                  final double endH = preHeight / totalHeight;
+                  double endH = preHeight / totalHeight;
                   Color topColor;
                   Color bottomColor;
+                  // logger.d('endH: $endH');
 
                   topColor = Color.lerp(startColor, endColor, startH);
                   bottomColor = Color.lerp(startColor, endColor, endH);
+                  double stops;
+                  double stops2;
+                  // logger.d('topColor: ${topColor.value}');
+                  // logger.d('bottomColor: ${bottomColor.value}');
+                  stops = startStops / scrollW['height'];
+                  stops2 = endStops / scrollW['height'];
 
+                  // logger.d(stops);
+                  // logger.d(stops2);
                   scrollW['topColor'] = topColor;
                   scrollW['bottomColor'] = bottomColor;
+                  scrollW['stops'] = stops;
+                  scrollW['stops2'] = stops2;
                   sList.add(scrollW);
                 }
               }
@@ -2267,7 +2340,6 @@ class _ConversationState extends State<Conversation> {
 
           ArrayUtil.sortArray(sList, sortOrder: 1, property: 'timestamp');
           // List scrollList = sList;
-          preHeight = 0;
           // for (var s = 0; s < scrollList.length; s++) {
           //   var scrollW = scrollList[s];
           //   // double currentHeight = scrollW['height'];

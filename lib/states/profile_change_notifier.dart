@@ -518,6 +518,13 @@ class ThemeModel extends ProfileChangeNotifier {
     }
     return bg;
   }
+  String get backgroundImageUrl {
+    String bg;
+    bg = Global.backgroundImageUrl;
+    return bg;
+  }
+
+
 
 
   /// 特殊颜色 主题页面

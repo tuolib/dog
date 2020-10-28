@@ -8,6 +8,8 @@ class ChatCustomCorner extends CustomPainter {
   final double radius;
   final Color topColor;
   final Color bottomColor;
+  final double stops;
+  final double stops2;
 
   ChatCustomCorner({
     @required this.color,
@@ -16,6 +18,8 @@ class ChatCustomCorner extends CustomPainter {
     this.radius = 16.0,
     this.topColor,
     this.bottomColor,
+    this.stops = 0,
+    this.stops2 = 1,
   });
 
   // var _radius = 10.0;
@@ -64,11 +68,15 @@ class ChatCustomCorner extends CustomPainter {
             ..shader = LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-            colors: [
-              _topColor,
-              _bottomColor,
-            ],
-          ).createShader(rect)
+              colors: [
+                _topColor,
+                _bottomColor,
+              ],
+              stops: [
+                stops,
+                stops2,
+              ],
+            ).createShader(rect)
             // ..color = this.color
             ..style = PaintingStyle.fill);
       var path = new Path();
@@ -90,9 +98,9 @@ class ChatCustomCorner extends CustomPainter {
 
       // path.arcToPoint(Offset(size.width - 2 * nipSize, size.height - nipSize),
       //     radius: Radius.circular(2 * nipSize));
-      path.arcToPoint(Offset(size.width - nipSize / 2, size.height - nipSize - 3),
+      path.arcToPoint(
+          Offset(size.width - nipSize / 2, size.height - nipSize - 3),
           radius: Radius.circular(2 * nipSize));
-
 
       // path.arcToPoint(Offset(size.width - 4 * nipSize, size.height),
       //     radius: Radius.circular(2 * nipSize));
@@ -104,8 +112,6 @@ class ChatCustomCorner extends CustomPainter {
           radius: Radius.circular(radius));
       path.lineTo(0, radius);
       path.arcToPoint(Offset(radius, 0), radius: Radius.circular(radius));
-
-
 
       canvas.clipPath(path);
       if (showCorner) {
@@ -141,7 +147,6 @@ class ChatCustomCorner extends CustomPainter {
       // path.lineTo(_x, size.height);
       // path.lineTo(_x, size.height - 20);
 
-
       path.moveTo(radius, 0);
       path.lineTo(size.width - radius, 0);
       path.arcToPoint(Offset(size.width, radius),
@@ -175,10 +180,6 @@ class ChatCustomCorner extends CustomPainter {
       path.arcToPoint(Offset(radius + nipSize, 0),
           radius: Radius.circular(radius));
 
-
-
-
-
       canvas.clipPath(path);
       if (showCorner) {
         canvas.drawRRect(
@@ -204,10 +205,9 @@ class ChatCustomCorner extends CustomPainter {
 
 class UniqueColorGenerator {
   static Random random = new Random();
+
   static Color getColor() {
     return Color.fromARGB(
         255, random.nextInt(255), random.nextInt(255), random.nextInt(255));
   }
 }
-
-
