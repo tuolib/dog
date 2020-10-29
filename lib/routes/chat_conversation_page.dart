@@ -515,25 +515,35 @@ class _ConversationState extends State<Conversation> {
   _buildBackground() {
 
 
-
+    BoxDecoration box;
     Widget backG;
     if (themeObj.backgroundImage == null) {
       var bg2 = themeObj.messagesChatBg2;
       if (bg2 == null) {
         bg2 = themeObj.messagesChatBg;
       }
-      backG = Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              themeObj.messagesChatBg,
-              bg2,
-            ],
-          ),
+      box = BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            themeObj.messagesChatBg,
+            bg2,
+          ],
         ),
       );
+      // backG = Container(
+      //   decoration: BoxDecoration(
+      //     gradient: LinearGradient(
+      //       begin: Alignment.topCenter,
+      //       end: Alignment.bottomCenter,
+      //       colors: [
+      //         themeObj.messagesChatBg,
+      //         bg2,
+      //       ],
+      //     ),
+      //   ),
+      // );
     } else {
       // backG = Container(
       //   // width: MediaQuery.of(context).size.width,
@@ -549,10 +559,17 @@ class _ConversationState extends State<Conversation> {
         // height: MediaQuery.of(context).size.height,
         child: Image.file(File(themeObj.backgroundImageUrl)),
       );
+      box = BoxDecoration(
+        image: DecorationImage(
+          image: FileImage(File(themeObj.backgroundImageUrl)),
+          fit: BoxFit.cover,
+        ),
+      );
     }
 
     return Container(
-      child: backG,
+      decoration: box,
+      // child: backG,
     );
   }
 
@@ -594,10 +611,6 @@ class _ConversationState extends State<Conversation> {
           double mW = MediaQuery.of(context).size.width;
           // logger.d(mH);
           // logger.d(mW);
-          // WidgetsBinding.instance.addPostFrameCallback((_) {
-          //   floatAction.noti();
-          //   // Add Your Code here.
-          // });
           return Container(
             // height: 48,
             constraints: BoxConstraints(
@@ -1247,7 +1260,7 @@ class _ConversationState extends State<Conversation> {
     }
   }
 
-  callback(index, property, filePath, {int type}) {
+  callback( {int index, String property, String filePath, int type}) {
     logger.d('callback');
     if (type == 2) {
       _setColor();
@@ -1821,6 +1834,7 @@ class _ConversationState extends State<Conversation> {
         } else {
           _scrollPosition();
         }
+        _setColor();
       }
     });
   }

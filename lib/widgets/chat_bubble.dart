@@ -478,63 +478,97 @@ class ChatBubbleState extends State<ChatBubbleWidget> {
 
     var conversion = Provider.of<ConversationListModel>(context);
     if (widget.type == 1) {
-      contentWidget = Stack(
-        children: [
-          Opacity(
-            opacity: 0,
-            child: Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: '${widget.message}',
-                    style: TextStyle(
-                      color: widget.isMe
-                          ? themeObj.messagesWordSelf
-                          : themeObj.messagesWordSide,
-                    ),
-                  ),
-                  TextSpan(
-                    // text: '             ',
-                    text: '_________',
-                    style: TextStyle(
-                      color: widget.isMe
-                          ? bottomColor != null
-                              ? bottomColor
-                              : themeObj.messagesColor
-                          : themeObj.messagesColorSide,
-                    ),
-                  ),
-                ],
+      contentWidget = Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: '${widget.message}',
+              style: TextStyle(
+                color: widget.isMe
+                    ? themeObj.messagesWordSelf
+                    : themeObj.messagesWordSide,
               ),
             ),
-          ),
-          Text.rich(
             TextSpan(
-              children: [
-                TextSpan(
-                  text: '${widget.message}',
-                  style: TextStyle(
-                    color: widget.isMe
-                        ? themeObj.messagesWordSelf
-                        : themeObj.messagesWordSide,
-                  ),
-                ),
-                TextSpan(
-                  text: '          ',
-                  // text: '_________',
-                  style: TextStyle(
-                    color: widget.isMe
-                        ? bottomColor != null
-                            ? bottomColor
-                            : themeObj.messagesColor
-                        : themeObj.messagesColorSide,
-                  ),
-                ),
-              ],
+              text: '_________',
+              // text: '_________',
+              // style: TextStyle(
+              //   color: widget.isMe
+              //       ? bottomColor != null
+              //           ? bottomColor
+              //           : themeObj.messagesColor
+              //       : themeObj.messagesColorSide,
+              // ),
+              style: TextStyle(
+                color: Color.fromRGBO(0, 0, 0, 0),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
+      // contentWidget = Stack(
+      //   children: [
+      //     Opacity(
+      //       opacity: 0,
+      //       child: Text.rich(
+      //         TextSpan(
+      //           children: [
+      //             TextSpan(
+      //               text: '${widget.message}',
+      //               style: TextStyle(
+      //                 color: widget.isMe
+      //                     ? themeObj.messagesWordSelf
+      //                     : themeObj.messagesWordSide,
+      //               ),
+      //             ),
+      //             TextSpan(
+      //               // text: '             ',
+      //               text: '_________',
+      //               // style: TextStyle(
+      //               //   color: widget.isMe
+      //               //       ? bottomColor != null
+      //               //           ? bottomColor
+      //               //           : themeObj.messagesColor
+      //               //       : themeObj.messagesColorSide,
+      //               // ),
+      //               style: TextStyle(
+      //                 color: Color.fromRGBO(0, 0, 0, 0),
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       ),
+      //     ),
+      //     Text.rich(
+      //       TextSpan(
+      //         children: [
+      //           TextSpan(
+      //             text: '${widget.message}',
+      //             style: TextStyle(
+      //               color: widget.isMe
+      //                   ? themeObj.messagesWordSelf
+      //                   : themeObj.messagesWordSide,
+      //             ),
+      //           ),
+      //           TextSpan(
+      //             text: '          ',
+      //             // text: '_________',
+      //             // style: TextStyle(
+      //             //   color: widget.isMe
+      //             //       ? bottomColor != null
+      //             //           ? bottomColor
+      //             //           : themeObj.messagesColor
+      //             //       : themeObj.messagesColorSide,
+      //             // ),
+      //             style: TextStyle(
+      //               color: Color.fromRGBO(0, 0, 0, 0),
+      //             ),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ],
+      // );
 //       if (!widget.isReply) {
 // //        contentWidget = Padding(
 // //          padding: EdgeInsets.only(right: 50.0),
@@ -836,12 +870,12 @@ class ChatBubbleState extends State<ChatBubbleWidget> {
                         OpenFile.open(filePath);
                       } else {
                         try {
-                          widget.callback(widget.index, 'downloading', true);
+                          widget.callback(index: widget.index, proerty: 'downloading', filePath: '');
                           downData = await Git(context).download(
                               '1', widget.contentName, widget.message);
                           if (downData['isSuccess'] == true) {
                             widget.callback(
-                                widget.index, 'filePath', downData['filePath']);
+                                index: widget.index, proerty: 'filePath', filePath: downData['filePath']);
 //                            folder_open
 //                            conversion.updateListItem(
 //                                widget.index, 'filePath', downData['filePath']);
@@ -850,17 +884,17 @@ class ChatBubbleState extends State<ChatBubbleWidget> {
 //                                widget.filePath = downData['filePath'];
 //                              },
 //                            );
-                            widget.callback(
-                                widget.index, 'downloadSuccess', true);
+//                             widget.callback(
+//                                 widget.index, 'downloadSuccess', true);
                           }
                           print('downData: $downData');
                         } catch (e) {
                           print('downData error: $e');
-                          widget.callback(
-                              widget.index, 'downloadSuccess', false);
+                          // widget.callback(
+                          //     widget.index, 'downloadSuccess', false);
                         } finally {}
 
-                        widget.callback(widget.index, 'downloading', false);
+                        // widget.callback(widget.index, 'downloading', false);
                       }
                     },
                   ),
@@ -1132,7 +1166,7 @@ class ChatBubbleState extends State<ChatBubbleWidget> {
       ArrayUtil.sortArray(scrollWidgetList,
           sortOrder: 1, property: 'timestamp');
       // _setColor();
-      widget.callback(0, '1', '1', type: 2);
+      widget.callback(type: 2);
     }
   }
 

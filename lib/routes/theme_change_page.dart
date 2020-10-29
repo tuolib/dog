@@ -1,8 +1,13 @@
-import '../index.dart';
+
+import 'dart:io';
+
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 // import 'modals/floating_modal.dart';
+
+import '../index.dart';
 
 int oldTheme;
 int oldThemeDark;
@@ -81,21 +86,52 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
                 SliverToBoxAdapter(
                   child: _buildChat(context),
                 ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      return Container(
-                        color: themeObj.messagesChatBg,
-                        padding: EdgeInsets.only(
-                          top: index == 0 ? 10 : 0,
-                          bottom: index == 1 ? 10 : 0,
+                SliverToBoxAdapter(
+                  child: Container(
+                    padding: EdgeInsets.only(
+                      top: 10,
+                      bottom: 10,
+                    ),
+                    decoration: _buildBackground(),
+                    // constraints: BoxConstraints(
+                    //   minHeight: 136,
+                    // ),
+                    child: Stack(
+                      children: [
+
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildChatList(context, 0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                _buildChatList(context, 1),
+                              ],
+                            ),
+
+                          ],
                         ),
-                        child: _buildChatList(context, index),
-                      );
-                    },
-                    childCount: 2,
+
+                      ],
+                    ),
                   ),
                 ),
+                // SliverList(
+                //   delegate: SliverChildBuilderDelegate(
+                //     (BuildContext context, int index) {
+                //       return Container(
+                //         color: themeObj.messagesChatBg,
+                //         padding: EdgeInsets.only(
+                //           top: index == 0 ? 10 : 0,
+                //           bottom: index == 1 ? 10 : 0,
+                //         ),
+                //         child: _buildChatList(context, index),
+                //       );
+                //     },
+                //     childCount: 2,
+                //   ),
+                // ),
                 SliverToBoxAdapter(
                   child: _buildThemeMode(context),
                 ),
@@ -220,6 +256,39 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
         bottomColor: themeObj.messagesColor2,
       );
     }
+  }
+
+
+  _buildBackground() {
+    BoxDecoration box;
+    if (themeObj.backgroundImage == null) {
+      var bg2 = themeObj.messagesChatBg2;
+      if (bg2 == null) {
+        bg2 = themeObj.messagesChatBg;
+      }
+      box = BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            themeObj.messagesChatBg,
+            bg2,
+          ],
+        ),
+      );
+    } else {
+      box = BoxDecoration(
+        image: DecorationImage(
+          image: FileImage(File(themeObj.backgroundImageUrl)),
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+    return box;
+    // return Container(
+    //   decoration: box,
+    //   // child: backG,
+    // );
   }
 
   Widget _chatBubble({
@@ -349,7 +418,7 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
           TextSpan(
             text: '_________',
             style: TextStyle(
-              color: isMe ? lineColor : themeObj.messagesColorSide,
+              color: Color.fromRGBO(0, 0, 0, 0),
             ),
           ),
         ],
@@ -982,7 +1051,15 @@ class _ThemeChangeRoute extends State<ThemeChangeRoute> {
     );
   }
 
-  callback() {}
+  callback( {int index, String property, String filePath, int type}) {
+    // logger.d('callback');
+    // if (type == 2) {
+    //   _setColor();
+    // } else {
+    //   conversion.updateListItem(index, property, filePath);
+    // }
+
+  }
 
   _showColorPicker(BuildContext context, int type) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

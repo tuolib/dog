@@ -868,7 +868,7 @@ class _SetColorWidgetState extends State<SetColorWidget> {
                 // height: 30,
                 width: MediaQuery.of(context).size.width,
                 child: _chatBubble(
-                  message: "It's morning in Tokyo....",
+                  message: "It's morning in Tokyo ....",
                   time: 1601108277901,
                   isMe: true,
                   replyText: '',
@@ -1084,9 +1084,9 @@ class _SetColorWidgetState extends State<SetColorWidget> {
             ),
           ),
           TextSpan(
-            text: '_________',
+            text: '---------',
             style: TextStyle(
-              color: isMe ? lineColor : themeObj.messagesColorSide,
+              color: Color.fromRGBO(0, 0, 0, 0),
             ),
           ),
         ],
