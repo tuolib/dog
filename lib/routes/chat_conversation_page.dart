@@ -1830,7 +1830,7 @@ class _ConversationState extends State<Conversation> {
         // }
         if (conversionInfo['extentBefore'] == 0) {
           _resetSavePosition();
-          _sliverController.position.jumpTo(-0.1);
+          // _sliverController.position.jumpTo(-0.1);
         } else {
           _scrollPosition();
         }
@@ -1878,8 +1878,12 @@ class _ConversationState extends State<Conversation> {
         _savePosition(positionMaxItem);
       }
     });
-
-    _setColor();
+    double offset = _sliverController.position.extentBefore;
+    double extentAfter = _sliverController.position.extentAfter;
+    // logger.d(extentAfter);
+    if (offset > 0 && extentAfter > 0) {
+      _setColor();
+    }
 
 
   }
@@ -1925,7 +1929,7 @@ class _ConversationState extends State<Conversation> {
       "extentAfterId": extentAfterId,
       "extentBeforeId": extentBeforeId,
     };
-    logger.d(saveInfo);
+    // logger.d(saveInfo);
     socketProviderChatListModel.updateItemPropertyMultiple(
       conversionInfo['groupId'],
       saveInfo,
