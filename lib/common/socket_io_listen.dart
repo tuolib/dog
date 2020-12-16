@@ -1672,15 +1672,15 @@ class SocketIoListen {
       print('dataObj senderid : ${dataObj["senderId"]}');
       print('myId : $myId');
       if (index != null) {
-        isOnline = index.isOnline;
-//          如果发送人是本人，就不用增加一条未读消息
-        if (dataObj['senderId'] == myId) {
-          newChatNumber = index.newChatNumber;
-        } else {
-          newChatNumber = index.newChatNumber + 1;
-        }
-        groupAvatarLocal = index.groupAvatarLocal;
-        print('--------------index.isOnline: ${index.isOnline}');
+//         isOnline = index.isOnline;
+// //          如果发送人是本人，就不用增加一条未读消息
+//         if (dataObj['senderId'] == myId) {
+//           newChatNumber = index.newChatNumber;
+//         } else {
+//           newChatNumber = index.newChatNumber + 1;
+//         }
+//         groupAvatarLocal = index.groupAvatarLocal;
+//         print('--------------index.isOnline: ${index.isOnline}');
       } else {
         if (dataObj['senderId'] == myId) {
           newChatNumber = 0;

@@ -239,6 +239,10 @@ Future<dynamic> onResumeVoip(bool isLocal, Map<String, dynamic> payload) {
   logger.d("hasCall: ${Global.hasCall}");
   logger.d("callGroupId: ${Global.callGroupId}");
   var data = payload['data'];
+  if (socketInit == null) {
+
+    Global.init().then((e) => runApp(MyApp()));
+  }
   if (data['type'] == 'callInvite') {
     // 如果已经有通话中，则不显示新通知
     if (Global.hasCall == '1') {

@@ -43,10 +43,14 @@
 // flutter_call_kit
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type withCompletionHandler:(void (^)(void))completion {
   // Process the received push
+
+
   [FlutterVoipPushNotificationPlugin didReceiveIncomingPushWithPayload:payload forType:(NSString *)type];
     NSLog(@"payload voip");
     
 //    NSString *uuid = payload.dictionaryPayload[@"uuid"];
+
+    NSString *msgType = payload.dictionaryPayload[@"data"][@"msgType"];
     NSString *uuid = payload.dictionaryPayload[@"data"][@"uuid"];
     NSLog(@"Value of uuid = %@", uuid);
 //    NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:uuidString];
@@ -59,8 +63,9 @@
    NSString *callerName = payload.dictionaryPayload[@"data"][@"callerName"];
    NSLog(@"Value of callerName = %@", callerName);
 //   NSString *handle = @"+12011234567";
-
+if (msgType == '1') {
   [FlutterCallKitPlugin reportNewIncomingCall:uuid handle:handle handleType:@"generic" hasVideo:hasVideo  localizedCallerName:callerName fromPushKit: YES];
+    }
 
   completion();
 }
